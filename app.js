@@ -13,6 +13,9 @@
   const STORAGE_SHOPPING_CHECKED = 'mealPlanner_shoppingChecked';
   const STORAGE_WIZARD_DONE = 'mealPlanner_wizardDone';
 
+  /** Served next to index.html (e.g. GitHub Pages). Loaded when the meal library is empty. */
+  const BUNDLED_MEALS_CSV = 'meals.csv';
+
   const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   /** Stored in planSides when user explicitly skips a side (no side ingredients). */
   const SIDE_NONE = '__none__';
@@ -1571,11 +1574,36 @@
   function init() {
     loadState();
     checkUrlImport();
-    initWizard();
-    renderMealLibrary(true);
-    renderPlannerGrid();
-    renderShoppingList();
 
+    function finishInit() {
+      initWizard();
+      renderMealLibrary(true);
+      renderPlannerGrid();
+      renderShoppingList();
+
+      wireEventListeners();
+    }
+
+    if (state.meals.length === 0) {
+      fetch(BUNDLED_MEALS_CSV, { cache: 'no-store' })
+        .then(function (r) {
+          if (!r.ok) throw new Error('bundled meals unavailable');
+          return r.text();
+        })
+        .then(function (text) {
+          importMealsFromCsv(text);
+          if (state.meals.length > 0 && !localStorage.getItem(STORAGE_WIZARD_DONE)) {
+            localStorage.setItem(STORAGE_WIZARD_DONE, 'true');
+          }
+        })
+        .catch(function () { /* file missing, file://, or offline — fall through to wizard */ })
+        .finally(finishInit);
+    } else {
+      finishInit();
+    }
+  }
+
+  function wireEventListeners() {
     document.getElementById('add-meal-btn')?.addEventListener('click', () => openMealModal());
     document.getElementById('meal-form')?.addEventListener('submit', handleMealFormSubmit);
     document.getElementById('meal-modal-cancel')?.addEventListener('click', closeMealModal);

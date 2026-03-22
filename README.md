@@ -4,8 +4,8 @@ A simple **weekly meal planner** in the browser: build a **meal library** with i
 
 - **Weekdays:** dinner slots only  
 - **Weekends:** lunch + dinner  
-- **First visit:** a short wizard helps you add meals and an initial plan  
-- **Data:** everything is stored in **localStorage** on that device only (not sent to a server)
+- **First visit:** if [`meals.csv`](meals.csv) is present next to the app (e.g. on GitHub Pages), that **default meal library** loads automatically and the setup wizard is skipped. Otherwise the wizard walks you through adding meals.  
+- **Data:** your plan and edits are stored in **localStorage** on that device only (not sent to a server)
 
 ## Features
 
@@ -13,6 +13,14 @@ A simple **weekly meal planner** in the browser: build a **meal library** with i
 - Weekly planner + shopping list (with checkboxes)  
 - **Share** / **Import** for the full plan (link, QR, or JSON file)  
 - **Import / export meals** as CSV; **export plan** as CSV  
+
+## Default meals (`meals.csv`)
+
+Commit a **`meals.csv`** in the repo root (same folder as `index.html`). The app **fetches it only when the meal library is empty** (new visitor or cleared storage), then saves a copy into `localStorage`. Update the CSV in git and redeploy to change the defaults for new users; existing users keep their saved library until they clear site data or re-import.
+
+Use **Export meals CSV** in the app to regenerate the file after editing meals in the UI.
+
+**Note:** `fetch` needs a real URL. Opening `index.html` as `file://` often **cannot** load `meals.csv`; use a local server (below) or GitHub Pages.
 
 ## Run locally
 
@@ -52,7 +60,7 @@ Once the repo is **public** on your personal account, anyone can use it with the
 
 ## Privacy note
 
-Plans and meals live in **the visitor’s browser** only. Sharing a **Share** link or file sends that snapshot to whoever you give it to; the GitHub repo does not store your personal meal data.
+Your **weekly plan** lives in the visitor’s browser only. The **default** meal list is whatever you commit as `meals.csv` in this repo (public if the repo is public). Sharing a **Share** link or file sends that plan snapshot to whoever you give it to.
 
 ## License
 
