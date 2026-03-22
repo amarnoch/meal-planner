@@ -17,6 +17,20 @@
   const BUNDLED_MEALS_CSV = 'meals.csv';
 
   const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+  const DAY_ABBREV = {
+    Monday: 'Mon',
+    Tuesday: 'Tue',
+    Wednesday: 'Wed',
+    Thursday: 'Thu',
+    Friday: 'Fri',
+    Saturday: 'Sat',
+    Sunday: 'Sun'
+  };
+
+  function dayAbbrev(day) {
+    return DAY_ABBREV[day] || day;
+  }
   /** Stored in planSides when user explicitly skips a side (no side ingredients). */
   const SIDE_NONE = '__none__';
 
@@ -242,6 +256,62 @@
     if (state.meals.length < slots.length && meatFreeCandidates.length < 2) {
       setTimeout(() => alert('Filled with available meals. Add more (and more meat-free options) for better variety.'), 100);
     }
+  }
+
+  /** Random-fill only the slots for one day (lunch+dinner on weekends, dinner only on weekdays). */
+  function autoFillDay(day) {
+    if (!state.meals.length) {
+      alert('Add some meals to your library first.');
+      return;
+    }
+    if (!DAYS.includes(day)) return;
+
+    clearDay(day);
+
+    const daySlots = getSlotsForDay(day);
+    const shuffledMeals = shuffleArray(state.meals);
+    const allowedForDay = (m, d) => (d === 'Saturday' || d === 'Sunday') || !isLongMeal(m);
+    const usedToday = new Set();
+    let prevCarbTypes = new Set();
+
+    for (const mealType of daySlots) {
+      const preferQuick = (day === 'Tuesday' || day === 'Thursday') && daySlots.length === 1;
+
+      let pool = shuffledMeals.filter(m => allowedForDay(m, day) && !usedToday.has(m.meal_name));
+      if (pool.length === 0) pool = shuffledMeals.filter(m => allowedForDay(m, day));
+      if (pool.length === 0) pool = shuffledMeals.slice();
+
+      if (preferQuick) {
+        const quickPool = pool.filter(isQuickMeal);
+        if (quickPool.length > 0) pool = quickPool;
+      }
+
+      const meal = pool[Math.floor(Math.random() * pool.length)];
+      if (!meal) continue;
+
+      let variantName = undefined;
+      let sideName = undefined;
+
+      if (meal.variants && meal.variants.length > 0) {
+        variantName = meal.variants[Math.floor(Math.random() * meal.variants.length)].name;
+      }
+      if (meal.sides && meal.sides.length > 0) {
+        const allowedSides = meal.sides.filter(s => {
+          const tags = getCarbTypes(meal, variantName, s.name);
+          return ![...tags].some(t => prevCarbTypes.has(t));
+        });
+        const sidePool = allowedSides.length > 0 ? allowedSides : meal.sides;
+        sideName = sidePool[Math.floor(Math.random() * sidePool.length)].name;
+      }
+
+      setPlannedMeal(day, mealType, meal.meal_name, variantName, sideName);
+      usedToday.add(meal.meal_name);
+      prevCarbTypes = getCarbTypes(meal, variantName, sideName);
+    }
+
+    renderPlannerGrid();
+    renderShoppingList();
+    renderWeekSummary();
   }
 
   function clearPlan() {
@@ -791,7 +861,19 @@
       const col = document.createElement('div');
       col.className = 'planner-day';
       col.dataset.day = day;
-      let header = `<div class="planner-day-header"><span class="planner-day-name">${day}</span><button type="button" class="btn-icon clear-day-btn" title="Clear ${day}" data-day="${escapeHtml(day)}" aria-label="Clear ${escapeHtml(day)}">&times;</button></div>`;
+
+      const headerEl = document.createElement('div');
+      headerEl.className = 'planner-day-header';
+      headerEl.innerHTML = `
+        <span class="planner-day-name" title="${escapeHtml(day)}"><span class="planner-day-name-long">${escapeHtml(day)}</span><span class="planner-day-name-short">${escapeHtml(dayAbbrev(day))}</span></span>
+        <span class="planner-day-toolbar">
+          <button type="button" class="btn-icon random-day-btn" title="Random meals for ${escapeHtml(day)}" data-day="${escapeHtml(day)}" aria-label="Random meals for ${escapeHtml(day)}">&#127922;</button>
+          <button type="button" class="btn-icon clear-day-btn" title="Clear ${day}" data-day="${escapeHtml(day)}" aria-label="Clear ${escapeHtml(day)}">&times;</button>
+        </span>`;
+
+      const slotsWrap = document.createElement('div');
+      slotsWrap.className = 'planner-day-slots';
+
       for (const mealType of slots) {
         const mealName = getPlannedMeal(day, mealType);
         const variantName = getPlannedVariant(day, mealType);
@@ -801,19 +883,49 @@
         let displayName = variantName ? `${mealName} (${variantName})` : mealName;
         if (sideName && sideName !== SIDE_NONE) displayName += ' with ' + sideName;
         const slotId = `slot-${day}-${mealType}`;
-        const label = slots.length > 1 ? `<span class="slot-label">${mealType}</span>` : '';
-        const quickIcon = meal && meal.quick ? ' <span class="meal-quick-icon" title="Quick meal">⚡</span>' : '';
-        const content = mealName
-          ? `<button type="button" class="planned-meal" data-day="${escapeHtml(day)}" data-meal-type="${escapeHtml(mealType)}" draggable="true">${emoji ? '<span class="meal-emoji-display">' + escapeHtml(emoji) + '</span>' : ''}${escapeHtml(displayName)}${quickIcon}</button>`
-          : '';
-        col.innerHTML += `
-          <div class="planner-slot ${mealName ? '' : 'empty'}" data-day="${escapeHtml(day)}" data-meal-type="${escapeHtml(mealType)}" id="${slotId}" role="list">
-            ${label}
-            ${content}
-          </div>
-        `;
+        const slotDiv = document.createElement('div');
+        slotDiv.className = 'planner-slot' + (mealName ? '' : ' empty');
+        slotDiv.dataset.day = day;
+        slotDiv.dataset.mealType = mealType;
+        slotDiv.id = slotId;
+        slotDiv.setAttribute('role', 'list');
+        if (slots.length > 1) {
+          const lab = document.createElement('span');
+          lab.className = 'slot-label';
+          lab.textContent = mealType;
+          slotDiv.appendChild(lab);
+        }
+        if (mealName) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'planned-meal';
+          btn.dataset.day = day;
+          btn.dataset.mealType = mealType;
+          btn.draggable = true;
+          if (emoji) {
+            const em = document.createElement('span');
+            em.className = 'meal-emoji-display';
+            em.textContent = emoji;
+            btn.appendChild(em);
+          }
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'planned-meal-label';
+          nameSpan.textContent = displayName;
+          btn.appendChild(nameSpan);
+          if (meal && meal.quick) {
+            const q = document.createElement('span');
+            q.className = 'meal-quick-icon';
+            q.title = 'Quick meal';
+            q.textContent = '⚡';
+            btn.appendChild(q);
+          }
+          slotDiv.appendChild(btn);
+        }
+        slotsWrap.appendChild(slotDiv);
       }
-      col.innerHTML = header + col.innerHTML;
+
+      col.appendChild(headerEl);
+      col.appendChild(slotsWrap);
       grid.appendChild(col);
     }
     renderWeekSummary();
@@ -859,6 +971,12 @@
   function attachPlannerDragDrop() {
     document.querySelectorAll('.clear-day-btn').forEach(btn => {
       btn.addEventListener('click', () => clearDay(btn.dataset.day));
+    });
+    document.querySelectorAll('.random-day-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        autoFillDay(btn.dataset.day);
+      });
     });
     const slots = document.querySelectorAll('.planner-slot');
     slots.forEach(slot => {
