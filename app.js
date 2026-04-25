@@ -16,7 +16,8 @@
 
   /** Served next to index.html (e.g. GitHub Pages). Loaded when the meal library is empty. */
   const BUNDLED_MEALS_CSV = 'meals.csv';
-  const BUNDLED_RECIPES_JSON = 'recipes.example.json';
+  /** Shared recipe library: fetched on every load when available (canonical); merged with local notes/meal links and local-only drafts. */
+  const BUNDLED_RECIPES_JSON = 'recipes.json';
 
   const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -50,6 +51,7 @@
 
   let activeRecipeCategory = 'all';
   let activeRecipeId = null;
+  let recipeWizardStep = 1;
   /** Stored in planSides when user explicitly skips a side (no side ingredients). */
   const SIDE_NONE = '__none__';
 
@@ -963,12 +965,89 @@
     return { recipe };
   }
 
+  /** Strip common ``` / ```json fences from model output. */
+  function stripMarkdownFences(text) {
+    const s = String(text || '').trim();
+    const fullFence = s.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?```\s*$/im);
+    if (fullFence) return fullFence[1].trim();
+    const inner = s.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (inner) return inner[1].trim();
+    return s;
+  }
+
+  /** Pull first top-level JSON object or array from text (after fence strip), forgiving extra prose. */
+  function extractJsonSubstring(text) {
+    const s = stripMarkdownFences(text);
+    const objStart = s.indexOf('{');
+    const arrStart = s.indexOf('[');
+    if (objStart === -1 && arrStart === -1) return s.trim();
+    let start;
+    let openChar;
+    if (objStart === -1) {
+      start = arrStart;
+      openChar = '[';
+    } else if (arrStart === -1) {
+      start = objStart;
+      openChar = '{';
+    } else if (objStart < arrStart) {
+      start = objStart;
+      openChar = '{';
+    } else {
+      start = arrStart;
+      openChar = '[';
+    }
+    const closeChar = openChar === '{' ? '}' : ']';
+    let depth = 0;
+    let inStr = false;
+    let esc = false;
+    for (let i = start; i < s.length; i++) {
+      const c = s[i];
+      if (inStr) {
+        if (esc) esc = false;
+        else if (c === '\\') esc = true;
+        else if (c === '"') inStr = false;
+        continue;
+      }
+      if (c === '"') {
+        inStr = true;
+        continue;
+      }
+      if (c === openChar) depth++;
+      else if (c === closeChar) {
+        depth--;
+        if (depth === 0) return s.slice(start, i + 1);
+      }
+    }
+    return s.slice(start);
+  }
+
+  /** Merge canonical bundled recipes with device data: keep local notes/mealName by id; append local-only draft recipes. */
+  function mergeBundledRecipesWithLocal(localList, bundledList) {
+    const localById = new Map((localList || []).map(r => [String(r.id), r]));
+    const bundledIds = new Set(bundledList.map(r => String(r.id)));
+    const merged = bundledList.map(br => {
+      const loc = localById.get(String(br.id));
+      if (!loc) return br;
+      const notesFromLocal = loc.notes != null ? String(loc.notes) : '';
+      return {
+        ...br,
+        notes: notesFromLocal.length ? loc.notes : br.notes,
+        mealName: loc.mealName != null ? loc.mealName : br.mealName
+      };
+    });
+    for (const r of localList || []) {
+      if (!bundledIds.has(String(r.id))) merged.push(r);
+    }
+    return merged;
+  }
+
   function parseRecipeJson(text) {
+    const raw = extractJsonSubstring(text);
     let parsed;
     try {
-      parsed = JSON.parse(text);
+      parsed = JSON.parse(raw);
     } catch (_) {
-      return { error: 'Could not parse JSON. Check for missing commas or extra markdown.' };
+      return { error: 'Could not parse JSON. Check for missing commas, truncated output, or text outside the JSON block.' };
     }
     if (Array.isArray(parsed)) {
       const recipes = [];
@@ -1039,7 +1118,7 @@
     list.innerHTML = '';
     const recipes = getFilteredRecipes();
     if (recipes.length === 0) {
-      list.innerHTML = '<p class="recipes-empty">No recipes yet. Add one from a link, screenshot notes, or pasted JSON.</p>';
+      list.innerHTML = '<p class="recipes-empty">No recipes yet. The shared library loads from <code>recipes.json</code> after deploy, or use <strong>Extract recipe</strong> to validate JSON before adding it in git.</p>';
       return;
     }
     for (const recipe of recipes) {
@@ -1173,11 +1252,36 @@ Notes or screenshot context:
 ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
   }
 
+  function setRecipeWizardStep(step) {
+    recipeWizardStep = Math.max(1, Math.min(3, step));
+    for (let i = 1; i <= 3; i++) {
+      const panel = document.getElementById(`recipe-step-${i}`);
+      if (panel) panel.hidden = i !== recipeWizardStep;
+    }
+    document.querySelectorAll('.recipe-wizard-indicator').forEach((el, idx) => {
+      el.classList.toggle('active', idx + 1 === recipeWizardStep);
+    });
+    const back = document.getElementById('recipe-wizard-back');
+    const next = document.getElementById('recipe-wizard-next');
+    const validateBtn = document.getElementById('validate-recipe-json-btn');
+    const doneBtn = document.getElementById('recipe-wizard-done-btn');
+    const pasteBtn = document.getElementById('paste-recipe-json-btn');
+    if (back) back.hidden = recipeWizardStep === 1;
+    if (next) next.hidden = recipeWizardStep === 3;
+    if (validateBtn) validateBtn.hidden = recipeWizardStep !== 3;
+    if (doneBtn) doneBtn.hidden = recipeWizardStep !== 3;
+    if (pasteBtn) pasteBtn.hidden = recipeWizardStep !== 3;
+  }
+
   function openRecipeModal() {
     const overlay = document.getElementById('recipe-modal-overlay');
     if (!overlay) return;
     document.getElementById('recipe-json-input').value = '';
-    document.getElementById('recipe-json-error').hidden = true;
+    const err = document.getElementById('recipe-json-error');
+    const ok = document.getElementById('recipe-json-ok');
+    if (err) err.hidden = true;
+    if (ok) ok.hidden = true;
+    setRecipeWizardStep(1);
     overlay.setAttribute('aria-hidden', 'false');
     overlay.style.display = 'flex';
   }
@@ -1189,27 +1293,65 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     overlay.style.display = 'none';
   }
 
-  function saveRecipeFromTextarea() {
+  function validateRecipeJsonFromTextarea() {
     const input = document.getElementById('recipe-json-input');
     const error = document.getElementById('recipe-json-error');
+    const ok = document.getElementById('recipe-json-ok');
     const result = parseRecipeJson(input?.value || '');
     if (result.error) {
+      if (ok) ok.hidden = true;
       if (error) {
         error.textContent = result.error;
         error.hidden = false;
       }
       return;
     }
-    const recipes = result.recipes || [result.recipe];
-    upsertRecipes(recipes);
-    closeRecipeModal();
-    activeRecipeId = recipes[0].id;
-    renderRecipes();
-    showAppPanel('recipes');
+    const n = result.recipes ? result.recipes.length : 1;
+    if (error) error.hidden = true;
+    if (ok) {
+      ok.textContent = `Valid: ${n} recipe object(s). Add this JSON to recipes.json in the repo, commit, and push — GitHub Pages will redeploy and everyone gets the updated shared library.`;
+      ok.hidden = false;
+    }
+  }
+
+  function copyPromptAndOpenClaude() {
+    const prompt = buildRecipePrompt();
+    const openClaude = () => {
+      window.open('https://claude.ai/new', '_blank', 'noopener,noreferrer');
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(prompt).then(() => {
+        const toast = document.getElementById('recipe-prompt-copied');
+        if (toast) {
+          toast.hidden = false;
+          setTimeout(() => { toast.hidden = true; }, 1800);
+        }
+        openClaude();
+      }).catch(() => openClaude());
+    } else {
+      openClaude();
+    }
+  }
+
+  function pasteRecipeJsonFromClipboard() {
+    if (!navigator.clipboard || !navigator.clipboard.readText) {
+      alert('Clipboard read is not supported in this browser. Paste into the box manually.');
+      return;
+    }
+    navigator.clipboard.readText().then(text => {
+      const ta = document.getElementById('recipe-json-input');
+      if (ta) ta.value = text;
+      const ok = document.getElementById('recipe-json-ok');
+      const err = document.getElementById('recipe-json-error');
+      if (ok) ok.hidden = true;
+      if (err) err.hidden = true;
+    }).catch(() => {
+      alert('Could not read the clipboard. Paste manually or check site permissions.');
+    });
   }
 
   function exportRecipesJson() {
-    downloadJson(JSON.stringify(state.recipes, null, 2), 'recipes.json');
+    downloadJson(JSON.stringify(state.recipes, null, 2), 'meal-planner-recipes-backup.json');
   }
 
   function importRecipesFile(e) {
@@ -1226,27 +1368,29 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       }
       upsertRecipes(result.recipes || [result.recipe]);
       renderRecipesList();
+      alert('Backup merged into this device. Shared recipes still come from recipes.json on the server after you redeploy.');
     };
     reader.readAsText(file);
   }
 
-  function loadBundledRecipesIfEmpty() {
-    if (state.recipes.length > 0) return Promise.resolve();
+  function loadSharedRecipesFromBundle() {
     return fetch(BUNDLED_RECIPES_JSON, { cache: 'no-store' })
       .then(r => {
-        if (!r.ok) throw new Error('bundled recipes unavailable');
+        if (!r.ok) throw new Error('recipes.json unavailable');
         return r.json();
       })
       .then(data => {
         const items = Array.isArray(data) ? data : [data];
-        const recipes = [];
+        const bundled = [];
         for (const item of items) {
           const res = normaliseRecipe(item);
-          if (!res.error) recipes.push(res.recipe);
+          if (!res.error) bundled.push(res.recipe);
         }
-        if (recipes.length > 0) upsertRecipes(recipes);
+        const localBefore = [...state.recipes];
+        state.recipes = mergeBundledRecipesWithLocal(localBefore, bundled);
+        saveRecipes();
       })
-      .catch(() => {});
+      .catch(() => { /* offline, file://, or missing file — keep recipes from loadState */ });
   }
 
   // --- Planner grid ---
@@ -2116,7 +2260,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         .catch(function () { /* file missing, file://, or offline — fall through to wizard */ })
       : Promise.resolve();
 
-    Promise.all([mealsPromise, loadBundledRecipesIfEmpty()]).finally(finishInit);
+    Promise.all([mealsPromise, loadSharedRecipesFromBundle()]).finally(finishInit);
   }
 
   function wireEventListeners() {
@@ -2213,7 +2357,12 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     document.getElementById('close-recipes-btn')?.addEventListener('click', () => showAppPanel('planner'));
     document.getElementById('add-recipe-btn')?.addEventListener('click', openRecipeModal);
     document.getElementById('recipe-modal-cancel')?.addEventListener('click', closeRecipeModal);
-    document.getElementById('save-recipe-json-btn')?.addEventListener('click', saveRecipeFromTextarea);
+    document.getElementById('recipe-wizard-back')?.addEventListener('click', () => setRecipeWizardStep(recipeWizardStep - 1));
+    document.getElementById('recipe-wizard-next')?.addEventListener('click', () => setRecipeWizardStep(recipeWizardStep + 1));
+    document.getElementById('recipe-wizard-done-btn')?.addEventListener('click', closeRecipeModal);
+    document.getElementById('validate-recipe-json-btn')?.addEventListener('click', validateRecipeJsonFromTextarea);
+    document.getElementById('paste-recipe-json-btn')?.addEventListener('click', pasteRecipeJsonFromClipboard);
+    document.getElementById('copy-recipe-prompt-open-claude-btn')?.addEventListener('click', copyPromptAndOpenClaude);
     document.getElementById('copy-recipe-prompt-btn')?.addEventListener('click', () => {
       navigator.clipboard.writeText(buildRecipePrompt()).then(() => {
         const toast = document.getElementById('recipe-prompt-copied');

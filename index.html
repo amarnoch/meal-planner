@@ -93,13 +93,14 @@
       <div class="recipes-header">
         <div>
           <h2>Recipes</h2>
-          <p>Save recipes, toddler snacks, bakes and sides. Copy meal recipes into the meal list when you want to plan them.</p>
+          <p>Shared recipe library from <code>recipes.json</code> (same for everyone after deploy). Toddler snacks, bakes and sides stay recipe-only until you copy a meal into the meal list.</p>
+          <p class="recipes-header-hint">To add recipes: use <strong>Extract recipe</strong> → Claude/ChatGPT → paste JSON into git. <strong>Import backup file</strong> only restores a JSON snapshot on this device.</p>
         </div>
         <div class="recipes-header-actions">
-          <button type="button" class="btn btn-primary btn-sm" id="add-recipe-btn">Add Recipe</button>
-          <button type="button" class="btn btn-secondary btn-sm" id="import-recipes-btn">Import JSON</button>
+          <button type="button" class="btn btn-primary btn-sm" id="add-recipe-btn">Extract recipe</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="import-recipes-btn">Import backup file</button>
           <input type="file" id="import-recipes-input" accept=".json" hidden>
-          <button type="button" class="btn btn-secondary btn-sm" id="export-recipes-btn">Export JSON</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="export-recipes-btn">Export backup</button>
           <button type="button" class="btn btn-secondary btn-sm recipes-close-btn" id="close-recipes-btn">Back</button>
         </div>
       </div>
@@ -215,38 +216,67 @@
     </div>
   </div>
 
-  <!-- Add/import recipe modal -->
+  <!-- Extract recipe helper (batch workflow: JSON goes into recipes.json in git) -->
   <div id="recipe-modal-overlay" class="modal-overlay" aria-hidden="true">
     <div class="modal recipe-modal">
-      <h2>Add Recipe</h2>
-      <p class="form-hint">Paste a recipe JSON object from ChatGPT/Claude, or use the prompt below with an Instagram link, web link, screenshot, or manual recipe notes.</p>
+      <h2>Extract recipe</h2>
+      <p class="form-hint">Three steps: describe the source, copy a prompt into Claude or ChatGPT, then validate JSON before you paste it into <code>recipes.json</code> in the repo.</p>
 
-      <label for="recipe-source-type">Source type</label>
-      <select id="recipe-source-type">
-        <option value="manual">Manual / notes</option>
-        <option value="instagram">Instagram link</option>
-        <option value="web">Web page link</option>
-        <option value="screenshot">Screenshot</option>
-      </select>
+      <ol class="recipe-wizard-steps" aria-label="Steps">
+        <li class="recipe-wizard-indicator active" data-step="1">Source</li>
+        <li class="recipe-wizard-indicator" data-step="2">Extract</li>
+        <li class="recipe-wizard-indicator" data-step="3">Validate</li>
+      </ol>
 
-      <label for="recipe-source-url">Source URL (optional)</label>
-      <input type="url" id="recipe-source-url" placeholder="https://...">
+      <div id="recipe-step-1" class="recipe-wizard-panel">
+        <label for="recipe-source-type">Source type</label>
+        <select id="recipe-source-type">
+          <option value="manual">Manual / notes</option>
+          <option value="instagram">Instagram link</option>
+          <option value="web">Web page link</option>
+          <option value="screenshot">Screenshot</option>
+        </select>
 
-      <label for="recipe-source-notes">Source notes (optional)</label>
-      <textarea id="recipe-source-notes" rows="3" placeholder="Paste rough recipe notes, or describe the screenshot you will attach in ChatGPT/Claude."></textarea>
+        <label for="recipe-source-url">Source URL (optional)</label>
+        <input type="url" id="recipe-source-url" placeholder="https://...">
 
-      <div class="recipe-prompt-actions">
-        <button type="button" class="btn btn-secondary btn-sm" id="copy-recipe-prompt-btn">Copy extraction prompt</button>
-        <span id="recipe-prompt-copied" class="share-copied-toast" hidden>Copied!</span>
+        <label for="recipe-source-notes">Source notes (optional)</label>
+        <textarea id="recipe-source-notes" rows="3" placeholder="Paste rough recipe notes, or describe the screenshot you will attach in the chat."></textarea>
       </div>
 
-      <label for="recipe-json-input">Recipe JSON</label>
-      <textarea id="recipe-json-input" rows="10" placeholder='{"title":"Spinach & Cheese Muffins", ...}'></textarea>
-      <p id="recipe-json-error" class="form-error" hidden></p>
+      <div id="recipe-step-2" class="recipe-wizard-panel" hidden>
+        <p class="form-hint">Copy the prompt, then paste it (and your link or screenshot) in Claude or ChatGPT. When the model returns JSON, go to the next step to check it.</p>
+        <div class="recipe-prompt-actions recipe-prompt-actions-wrap">
+          <button type="button" class="btn btn-primary btn-sm" id="copy-recipe-prompt-open-claude-btn">Copy prompt &amp; open Claude</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="copy-recipe-prompt-btn">Copy prompt only</button>
+          <span id="recipe-prompt-copied" class="share-copied-toast" hidden>Copied!</span>
+        </div>
+        <p class="recipe-external-links">
+          Or open in a new tab:
+          <a href="https://claude.ai/new" target="_blank" rel="noopener noreferrer">Open Claude</a>
+          ·
+          <a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">Open ChatGPT</a>
+        </p>
+      </div>
 
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" id="recipe-modal-cancel">Cancel</button>
-        <button type="button" class="btn btn-primary" id="save-recipe-json-btn">Save Recipe</button>
+      <div id="recipe-step-3" class="recipe-wizard-panel" hidden>
+        <label for="recipe-json-input">Paste recipe JSON to validate</label>
+        <textarea id="recipe-json-input" rows="10" placeholder='{"title":"…"} or [ {...}, {...} ] — markdown fences are OK'></textarea>
+        <p id="recipe-json-error" class="form-error" hidden></p>
+        <p id="recipe-json-ok" class="form-success" hidden></p>
+      </div>
+
+      <div class="modal-actions recipe-modal-actions-split">
+        <div class="recipe-modal-actions-left">
+          <button type="button" class="btn btn-secondary" id="recipe-wizard-back" hidden>Back</button>
+          <button type="button" class="btn btn-secondary" id="recipe-modal-cancel">Cancel</button>
+        </div>
+        <div class="recipe-modal-actions-right">
+          <button type="button" class="btn btn-secondary btn-sm" id="paste-recipe-json-btn" hidden>Paste from clipboard</button>
+          <button type="button" class="btn btn-primary" id="recipe-wizard-next">Next</button>
+          <button type="button" class="btn btn-secondary" id="recipe-wizard-done-btn" hidden>Done</button>
+          <button type="button" class="btn btn-primary" id="validate-recipe-json-btn" hidden>Validate JSON</button>
+        </div>
       </div>
     </div>
   </div>

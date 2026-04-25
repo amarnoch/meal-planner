@@ -11,21 +11,33 @@ A simple **weekly meal planner** in the browser: build a **meal library** with i
 
 - Meal library with variants, sides, and comma-separated ingredients  
 - Weekly planner + shopping list (with checkboxes)  
-- Lightweight recipes notebook with categories such as meals, toddler snacks, baking and sides  
+- **Shared recipe library** via committed [`recipes.json`](recipes.json) (loaded on every visit when the file is available — ideal for a household after GitHub Pages redeploys)  
 - **Share** / **Import** for the full plan (link, QR, or JSON file)  
 - **Import / export meals** as CSV; **export plan** as CSV  
 
-## Recipes
+## Recipes (batch library + device backup)
 
-Recipes are stored locally in your browser as small JSON records. They are useful for saving links, ingredients, instructions and comments without making every recipe part of the weekly meal plan.
+The **canonical recipe list** for everyone using the deployed app lives in **`recipes.json`** in this repo. After you push, GitHub Pages serves the new file and all visitors get the same library on refresh.
 
-- Use **Recipes → Add Recipe** to copy an extraction prompt for ChatGPT/Claude.
-- Paste an Instagram link, web link, screenshot or rough recipe notes into ChatGPT/Claude with that prompt.
-- Paste the returned JSON into the app and save it.
-- Meal-type recipes can be copied into the normal **Meal Library** using **Copy to meal list**.
-- Toddler snacks, bakes and sides stay recipe-only by default, so things like spinach and cheese muffins or banana bread do not clutter the weekly planner.
+- **Extract recipe** (in the app): step through **Source → Extract → Validate**. Build a prompt for Claude or ChatGPT, copy model output, and use **Validate JSON** to check it before you commit.  
+- **Copy prompt & open Claude** copies the prompt and opens a new chat; you can also use **Open Claude** / **Open ChatGPT** links.  
+- **Paste from clipboard** (validate step) helps on mobile when the model returns JSON.  
+- The parser accepts a bare object, an array, or JSON wrapped in fenced code blocks from chat tools (markdown-style fences are stripped).  
+- **Export backup** downloads a JSON snapshot of whatever is on **this device** (merged library + local drafts + your notes).  
+- **Import backup file** merges that snapshot into this browser only — it does **not** update the shared repo.  
+- Meal-type recipes can still be copied into the **Meal Library** from a recipe card.  
+- Per-recipe **comments** and “in meal list” state stay on the device when they differ from the file (same `id` = your local notes overlay the shared record).
 
-The app includes a small `recipes.example.json` fixture. On a new device/browser, it loads only when no recipes are already saved.
+### Batch workflow (add a recipe for everyone)
+
+1. On phone or desktop, open the app → **Recipes** → **Extract recipe** and complete the steps.  
+2. In Claude or ChatGPT, paste the prompt plus your link or screenshot; copy the JSON it returns.  
+3. On a laptop (or GitHub’s web editor), append the object to the **`recipes.json`** array (or add a new object if it’s a single recipe).  
+4. Validate syntax, e.g. `python3 -m json.tool recipes.json > /tmp/out.json && mv /tmp/out.json recipes.json`  
+5. `git add recipes.json && git commit -m "Add recipe" && git push`  
+6. Wait for GitHub Pages to redeploy, then refresh the app — you and anyone else using the site see the new recipes.
+
+If **`recipes.json` fails to load** (offline, opening as `file://`, or file missing), the app keeps using the last **localStorage** copy from the previous successful load, including any **local-only drafts** (recipes with ids not in the file).
 
 ## Default meals (`meals.csv`)
 
@@ -33,7 +45,7 @@ Commit a **`meals.csv`** in the repo root (same folder as `index.html`). The app
 
 Use **Export meals CSV** in the app to regenerate the file after editing meals in the UI.
 
-**Note:** `fetch` needs a real URL. Opening `index.html` as `file://` often **cannot** load `meals.csv`; use a local server (below) or GitHub Pages.
+**Note:** `fetch` needs a real URL. Opening `index.html` as `file://` often **cannot** load `meals.csv` or `recipes.json`; use a local server (below) or GitHub Pages.
 
 ## Run locally
 
@@ -73,7 +85,7 @@ Once the repo is **public** on your personal account, anyone can use it with the
 
 ## Privacy note
 
-Your **weekly plan** and saved **recipes** live in the visitor’s browser only. The **default** meal list and example recipes are whatever you commit as `meals.csv` and `recipes.example.json` in this repo (public if the repo is public). Sharing a **Share** link or file sends that plan/recipe snapshot to whoever you give it to.
+Your **weekly plan** and **device-specific recipe notes / backups** live in the visitor’s browser. The **default meal list** and **shared recipes** are whatever you commit as `meals.csv` and `recipes.json` (public if the repo is public). Sharing a **Share** link or file sends that plan snapshot to whoever you give it to.
 
 ## License
 
