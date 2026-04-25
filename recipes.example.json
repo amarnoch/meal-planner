@@ -1,0 +1,38 @@
+[
+  {
+    "id": "rec_spinach_cheese_muffins",
+    "title": "Spinach & Cheese Muffins",
+    "source": {
+      "type": "manual",
+      "url": null,
+      "label": null
+    },
+    "imageUrl": null,
+    "servings": 12,
+    "category": "toddler_snack",
+    "tags": ["toddler snack", "healthy snack", "1 year old", "baking"],
+    "ingredients": [
+      { "qty": "50", "unit": "g", "name": "butter", "notes": "plus extra for greasing", "emoji": "🧈" },
+      { "qty": "2", "unit": "", "name": "eggs", "notes": null, "emoji": "🥚" },
+      { "qty": "100", "unit": "ml", "name": "milk", "notes": null, "emoji": "🥛" },
+      { "qty": "1", "unit": "block", "name": "frozen spinach", "notes": "defrosted and chopped", "emoji": "🥬" },
+      { "qty": "60", "unit": "g", "name": "cheese", "notes": "grated", "emoji": "🧀" },
+      { "qty": "150", "unit": "g", "name": "plain flour", "notes": "sieved", "emoji": "🌾" }
+    ],
+    "steps": [
+      "Preheat the oven to 180C.",
+      "Melt the butter in a large bowl.",
+      "Add the eggs and whisk.",
+      "Add the milk and mix.",
+      "Defrost the spinach in a small bowl in the microwave, then chop it.",
+      "Grate the cheese.",
+      "Sieve the plain flour into the large bowl with the butter, eggs and milk.",
+      "Add the cheese and chopped spinach, then mix.",
+      "Grease a muffin tray with butter.",
+      "Spoon the mixture into the tray and bake for 15-16 minutes until golden."
+    ],
+    "notes": "Toddler-friendly snack. Keep as recipe-only by default rather than adding to the weekly meal list.",
+    "createdAt": "2026-04-25T21:09:00Z",
+    "mealName": null
+  }
+]

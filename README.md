@@ -11,8 +11,21 @@ A simple **weekly meal planner** in the browser: build a **meal library** with i
 
 - Meal library with variants, sides, and comma-separated ingredients  
 - Weekly planner + shopping list (with checkboxes)  
+- Lightweight recipes notebook with categories such as meals, toddler snacks, baking and sides  
 - **Share** / **Import** for the full plan (link, QR, or JSON file)  
 - **Import / export meals** as CSV; **export plan** as CSV  
+
+## Recipes
+
+Recipes are stored locally in your browser as small JSON records. They are useful for saving links, ingredients, instructions and comments without making every recipe part of the weekly meal plan.
+
+- Use **Recipes → Add Recipe** to copy an extraction prompt for ChatGPT/Claude.
+- Paste an Instagram link, web link, screenshot or rough recipe notes into ChatGPT/Claude with that prompt.
+- Paste the returned JSON into the app and save it.
+- Meal-type recipes can be copied into the normal **Meal Library** using **Copy to meal list**.
+- Toddler snacks, bakes and sides stay recipe-only by default, so things like spinach and cheese muffins or banana bread do not clutter the weekly planner.
+
+The app includes a small `recipes.example.json` fixture. On a new device/browser, it loads only when no recipes are already saved.
 
 ## Default meals (`meals.csv`)
 
@@ -60,7 +73,7 @@ Once the repo is **public** on your personal account, anyone can use it with the
 
 ## Privacy note
 
-Your **weekly plan** lives in the visitor’s browser only. The **default** meal list is whatever you commit as `meals.csv` in this repo (public if the repo is public). Sharing a **Share** link or file sends that plan snapshot to whoever you give it to.
+Your **weekly plan** and saved **recipes** live in the visitor’s browser only. The **default** meal list and example recipes are whatever you commit as `meals.csv` and `recipes.example.json` in this repo (public if the repo is public). Sharing a **Share** link or file sends that plan/recipe snapshot to whoever you give it to.
 
 ## License
 

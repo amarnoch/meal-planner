@@ -46,6 +46,7 @@
   <header class="app-header">
     <h1>Meal Planner</h1>
     <div class="header-actions">
+      <button type="button" class="btn btn-secondary btn-sm" id="recipes-btn">Recipes</button>
       <button type="button" class="btn btn-secondary btn-sm" id="share-btn">Share</button>
       <button type="button" class="btn btn-secondary btn-sm" id="import-plan-btn">Import</button>
       <input type="file" id="import-plan-input" accept=".json" hidden>
@@ -56,6 +57,7 @@
   <nav class="mobile-tabs" aria-label="Navigation">
     <button type="button" class="mobile-tab active" data-tab="planner">Plan</button>
     <button type="button" class="mobile-tab" data-tab="sidebar">Meals</button>
+    <button type="button" class="mobile-tab" data-tab="recipes">Recipes</button>
     <button type="button" class="mobile-tab" data-tab="shopping">Shopping</button>
   </nav>
 
@@ -84,6 +86,29 @@
         </div>
       </div>
       <div id="planner-grid" class="planner-grid"></div>
+    </section>
+
+    <!-- Recipes -->
+    <section class="recipes-panel" aria-label="Recipes">
+      <div class="recipes-header">
+        <div>
+          <h2>Recipes</h2>
+          <p>Save recipes, toddler snacks, bakes and sides. Copy meal recipes into the meal list when you want to plan them.</p>
+        </div>
+        <div class="recipes-header-actions">
+          <button type="button" class="btn btn-primary btn-sm" id="add-recipe-btn">Add Recipe</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="import-recipes-btn">Import JSON</button>
+          <input type="file" id="import-recipes-input" accept=".json" hidden>
+          <button type="button" class="btn btn-secondary btn-sm" id="export-recipes-btn">Export JSON</button>
+          <button type="button" class="btn btn-secondary btn-sm recipes-close-btn" id="close-recipes-btn">Back</button>
+        </div>
+      </div>
+      <div class="recipes-controls">
+        <input type="search" id="recipe-search" placeholder="Search recipes">
+        <div id="recipe-category-filters" class="recipe-category-filters" aria-label="Recipe categories"></div>
+      </div>
+      <div id="recipes-list" class="recipes-list" role="list"></div>
+      <div id="recipe-detail" class="recipe-detail" hidden></div>
     </section>
 
     <!-- Right panel: Shopping List -->
@@ -186,6 +211,42 @@
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary" id="assign-meal-back" hidden>Back</button>
         <button type="button" class="btn btn-secondary" id="assign-meal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/import recipe modal -->
+  <div id="recipe-modal-overlay" class="modal-overlay" aria-hidden="true">
+    <div class="modal recipe-modal">
+      <h2>Add Recipe</h2>
+      <p class="form-hint">Paste a recipe JSON object from ChatGPT/Claude, or use the prompt below with an Instagram link, web link, screenshot, or manual recipe notes.</p>
+
+      <label for="recipe-source-type">Source type</label>
+      <select id="recipe-source-type">
+        <option value="manual">Manual / notes</option>
+        <option value="instagram">Instagram link</option>
+        <option value="web">Web page link</option>
+        <option value="screenshot">Screenshot</option>
+      </select>
+
+      <label for="recipe-source-url">Source URL (optional)</label>
+      <input type="url" id="recipe-source-url" placeholder="https://...">
+
+      <label for="recipe-source-notes">Source notes (optional)</label>
+      <textarea id="recipe-source-notes" rows="3" placeholder="Paste rough recipe notes, or describe the screenshot you will attach in ChatGPT/Claude."></textarea>
+
+      <div class="recipe-prompt-actions">
+        <button type="button" class="btn btn-secondary btn-sm" id="copy-recipe-prompt-btn">Copy extraction prompt</button>
+        <span id="recipe-prompt-copied" class="share-copied-toast" hidden>Copied!</span>
+      </div>
+
+      <label for="recipe-json-input">Recipe JSON</label>
+      <textarea id="recipe-json-input" rows="10" placeholder='{"title":"Spinach & Cheese Muffins", ...}'></textarea>
+      <p id="recipe-json-error" class="form-error" hidden></p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="recipe-modal-cancel">Cancel</button>
+        <button type="button" class="btn btn-primary" id="save-recipe-json-btn">Save Recipe</button>
       </div>
     </div>
   </div>
