@@ -34,21 +34,10 @@
     return DAY_ABBREV[day] || day;
   }
 
-  const RECIPE_CATEGORIES = [
-    { id: 'all', label: 'All' },
-    { id: 'meal', label: 'Meals' },
-    { id: 'toddler_snack', label: 'Toddler snacks' },
-    { id: 'baking', label: 'Baking' },
-    { id: 'side', label: 'Sides' },
-    { id: 'other', label: 'Other' }
-  ];
-
-  const RECIPE_CATEGORY_LABELS = RECIPE_CATEGORIES.reduce((acc, cat) => {
-    acc[cat.id] = cat.label;
-    return acc;
-  }, {});
-
-  let activeRecipeCategory = 'all';
+  // Recipe categories are now free-form strings (each unique value = a "Cookbook").
+  // Andy adds a new cookbook by writing `category: "Whatever"` on a recipe in recipes.json.
+  let recipesView = 'cookbooks'; // 'cookbooks' | 'cookbook' | 'detail'
+  let activeCookbook = null;
   let activeRecipeId = null;
   let recipeWizardStep = 1;
   let mealSearchTerm = '';
@@ -879,7 +868,12 @@
   }
 
   function getRecipeCategoryLabel(category) {
-    return RECIPE_CATEGORY_LABELS[category] || RECIPE_CATEGORY_LABELS.other;
+    if (!category) return 'Uncategorized';
+    return String(category)
+      .split(/[_\-\s]+/)
+      .filter(Boolean)
+      .map((w, i) => i === 0 ? w.charAt(0).toUpperCase() + w.slice(1) : w.toLowerCase())
+      .join(' ');
   }
 
   function normaliseRecipeIngredient(ingredient) {
@@ -1045,76 +1039,177 @@
     return state.recipes.find(recipe => recipe.id === id) || null;
   }
 
-  function renderRecipeCategories() {
-    const container = document.getElementById('recipe-category-filters');
-    if (!container) return;
-    container.innerHTML = '';
-    for (const cat of RECIPE_CATEGORIES) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'recipe-category-chip' + (activeRecipeCategory === cat.id ? ' active' : '');
-      btn.dataset.category = cat.id;
-      const count = cat.id === 'all'
-        ? state.recipes.length
-        : state.recipes.filter(recipe => recipe.category === cat.id).length;
-      btn.textContent = `${cat.label} (${count})`;
-      container.appendChild(btn);
+  function getRecipeSearchTerm() {
+    return (document.getElementById('recipe-search')?.value || '').trim().toLowerCase();
+  }
+
+  function recipeMatchesSearch(recipe, query) {
+    if (!query) return true;
+    const haystack = [
+      recipe.title,
+      recipe.category,
+      ...(recipe.tags || []),
+      ...(recipe.ingredients || []).map(i => i.name)
+    ].join(' ').toLowerCase();
+    return haystack.includes(query);
+  }
+
+  function getCookbooks() {
+    const map = new Map();
+    for (const recipe of state.recipes) {
+      const raw = recipe.category || '__uncategorized__';
+      if (!map.has(raw)) map.set(raw, []);
+      map.get(raw).push(recipe);
     }
+    const cookbooks = Array.from(map.entries()).map(([raw, recipes]) => ({
+      raw,
+      name: raw === '__uncategorized__' ? 'Uncategorized' : getRecipeCategoryLabel(raw),
+      recipes,
+      count: recipes.length,
+      thumbs: recipes.slice(0, 4)
+    }));
+    cookbooks.sort((a, b) => {
+      if (a.raw === '__uncategorized__') return 1;
+      if (b.raw === '__uncategorized__') return -1;
+      return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+    });
+    return cookbooks;
   }
 
-  function getFilteredRecipes() {
-    const query = (document.getElementById('recipe-search')?.value || '').trim().toLowerCase();
-    return state.recipes
-      .filter(recipe => activeRecipeCategory === 'all' || recipe.category === activeRecipeCategory)
-      .filter(recipe => {
-        if (!query) return true;
-        const haystack = [
-          recipe.title,
-          recipe.category,
-          ...(recipe.tags || []),
-          ...(recipe.ingredients || []).map(i => i.name)
-        ].join(' ').toLowerCase();
-        return haystack.includes(query);
-      })
-      .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+  function makeRecipeCard(recipe) {
+    const card = document.createElement('article');
+    card.className = 'recipe-card';
+    card.setAttribute('role', 'listitem');
+    card.dataset.recipeId = recipe.id;
+    const meta = [getRecipeCategoryLabel(recipe.category)];
+    if (recipe.servings) meta.push(`${recipe.servings} serving${recipe.servings === 1 ? '' : 's'}`);
+    const copied = recipe.mealName ? '<span class="recipe-card-status">In meals</span>' : '';
+    const thumb = recipe.imageUrl
+      ? `<img src="${escapeHtml(recipe.imageUrl)}" alt="">`
+      : `<span class="recipe-card-thumb-emoji">${escapeHtml((recipe.ingredients?.[0]?.emoji) || '🍽')}</span>`;
+    card.innerHTML = `
+      <div class="recipe-card-thumb">${thumb}</div>
+      <div class="recipe-card-body">
+        <div class="recipe-card-title-row">
+          <h3>${escapeHtml(recipe.title)}</h3>
+          ${copied}
+        </div>
+        <p class="recipe-card-meta">${meta.map(escapeHtml).join(' · ')}</p>
+      </div>
+    `;
+    return card;
   }
 
-  function renderRecipesList() {
-    renderRecipeCategories();
+  function renderCookbookCollage(thumbs) {
+    const cells = [];
+    for (let i = 0; i < 4; i++) {
+      const r = thumbs[i];
+      if (r) {
+        const inner = r.imageUrl
+          ? `<img src="${escapeHtml(r.imageUrl)}" alt="">`
+          : `<span>${escapeHtml((r.ingredients?.[0]?.emoji) || '🍽')}</span>`;
+        cells.push(`<div class="cookbook-collage-cell">${inner}</div>`);
+      } else {
+        cells.push('<div class="cookbook-collage-cell empty"></div>');
+      }
+    }
+    return `<div class="cookbook-collage">${cells.join('')}</div>`;
+  }
+
+  function renderCookbooksList() {
     const list = document.getElementById('recipes-list');
     const detail = document.getElementById('recipe-detail');
     if (!list) return;
     if (detail) detail.hidden = true;
     list.hidden = false;
     list.innerHTML = '';
-    const recipes = getFilteredRecipes();
-    if (recipes.length === 0) {
-      list.innerHTML = '<p class="recipes-empty">No recipes yet. The shared library loads from <code>recipes.json</code> after deploy, or use <strong>Extract recipe</strong> to validate JSON before adding it in git.</p>';
+    list.classList.remove('recipes-flat');
+    list.classList.add('cookbooks-grid');
+    const cookbooks = getCookbooks();
+    if (cookbooks.length === 0) {
+      list.innerHTML = '<p class="recipes-empty">No recipes yet. The shared library loads from <code>recipes.json</code> after deploy.</p>';
       return;
     }
-    for (const recipe of recipes) {
-      const card = document.createElement('article');
-      card.className = 'recipe-card';
-      card.setAttribute('role', 'listitem');
-      card.dataset.recipeId = recipe.id;
-      const meta = [getRecipeCategoryLabel(recipe.category)];
-      if (recipe.servings) meta.push(`${recipe.servings} serving${recipe.servings === 1 ? '' : 's'}`);
-      const copied = recipe.mealName ? '<span class="recipe-card-status">In meals</span>' : '';
-      const thumb = recipe.imageUrl
-        ? `<img src="${escapeHtml(recipe.imageUrl)}" alt="">`
-        : `<span class="recipe-card-thumb-emoji">${escapeHtml((recipe.ingredients?.[0]?.emoji) || '🍽')}</span>`;
-      card.innerHTML = `
-        <div class="recipe-card-thumb">${thumb}</div>
-        <div class="recipe-card-body">
-          <div class="recipe-card-title-row">
-            <h3>${escapeHtml(recipe.title)}</h3>
-            ${copied}
-          </div>
-          <p class="recipe-card-meta">${meta.map(escapeHtml).join(' · ')}</p>
-        </div>
+    for (const cb of cookbooks) {
+      const tile = document.createElement('article');
+      tile.className = 'cookbook-tile';
+      tile.dataset.cookbook = cb.raw;
+      tile.innerHTML = `
+        ${renderCookbookCollage(cb.thumbs)}
+        <h3>${escapeHtml(cb.name)}</h3>
+        <p>${cb.count} recipe${cb.count !== 1 ? 's' : ''}</p>
       `;
-      list.appendChild(card);
+      tile.addEventListener('click', () => {
+        activeCookbook = cb.raw;
+        recipesView = 'cookbook';
+        renderRecipes();
+      });
+      list.appendChild(tile);
     }
+  }
+
+  function renderCookbookView(rawCookbook) {
+    const list = document.getElementById('recipes-list');
+    const detail = document.getElementById('recipe-detail');
+    if (!list) return;
+    if (detail) detail.hidden = true;
+    list.hidden = false;
+    list.innerHTML = '';
+    list.classList.remove('cookbooks-grid');
+    list.classList.add('recipes-flat');
+
+    const header = document.createElement('div');
+    header.className = 'cookbook-header';
+    const name = rawCookbook === '__uncategorized__' ? 'Uncategorized' : getRecipeCategoryLabel(rawCookbook);
+    header.innerHTML = `
+      <button type="button" class="btn btn-secondary btn-sm" id="back-to-cookbooks-btn">← All cookbooks</button>
+      <h3>${escapeHtml(name)}</h3>
+    `;
+    header.querySelector('#back-to-cookbooks-btn').addEventListener('click', () => {
+      activeCookbook = null;
+      recipesView = 'cookbooks';
+      renderRecipes();
+    });
+    list.appendChild(header);
+
+    const recipes = state.recipes
+      .filter(r => (r.category || '__uncategorized__') === rawCookbook)
+      .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+    if (recipes.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'recipes-empty';
+      empty.textContent = 'No recipes in this cookbook.';
+      list.appendChild(empty);
+      return;
+    }
+    for (const recipe of recipes) list.appendChild(makeRecipeCard(recipe));
+  }
+
+  function renderFlatSearchResults(query) {
+    const list = document.getElementById('recipes-list');
+    const detail = document.getElementById('recipe-detail');
+    if (!list) return;
+    if (detail) detail.hidden = true;
+    list.hidden = false;
+    list.innerHTML = '';
+    list.classList.remove('cookbooks-grid');
+    list.classList.add('recipes-flat');
+    const matches = state.recipes
+      .filter(r => recipeMatchesSearch(r, query))
+      .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+    if (matches.length === 0) {
+      list.innerHTML = `<p class="recipes-empty">No recipes match "${escapeHtml(query)}".</p>`;
+      return;
+    }
+    for (const recipe of matches) list.appendChild(makeRecipeCard(recipe));
+  }
+
+  function renderRecipesList() {
+    // Top-level recipe rendering. Dispatched from renderRecipes().
+    const query = getRecipeSearchTerm();
+    if (query) return renderFlatSearchResults(query);
+    if (recipesView === 'cookbook' && activeCookbook) return renderCookbookView(activeCookbook);
+    return renderCookbooksList();
   }
 
   function formatRecipeIngredient(ingredient, includeQty) {
@@ -1873,6 +1968,61 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     overlay.style.display = 'flex';
   }
 
+  function openMealInfoModal(mealName) {
+    const meal = getMealByName(mealName);
+    if (!meal) return;
+    const heading = document.getElementById('assign-meal-heading');
+    const subtitle = document.getElementById('assign-meal-subtitle');
+    const hint = document.getElementById('assign-meal-step-hint');
+    const body = document.getElementById('assign-meal-body');
+    const backBtn = document.getElementById('assign-meal-back');
+    const overlay = document.getElementById('assign-meal-overlay');
+    if (!overlay || !heading || !subtitle || !hint || !body) return;
+    assignFlowState = null;
+    if (backBtn) backBtn.hidden = true;
+    body.innerHTML = '';
+    const emoji = getMealEmoji(meal);
+    heading.textContent = 'Ingredients';
+    subtitle.innerHTML = (emoji ? `<span class="meal-emoji-display">${escapeHtml(emoji)}</span>` : '') + escapeHtml(mealName);
+    hint.textContent = '';
+
+    const renderList = (items) => `<ul class="meal-info-list">${items.map(i => `<li>${escapeHtml(i)}</li>`).join('')}</ul>`;
+    const sections = [];
+    const hasVariants = meal.variants && meal.variants.length > 0;
+    const hasSides = meal.sides && meal.sides.length > 0;
+
+    if (hasVariants) {
+      const common = (meal.commonIngredients || []).map(s => String(s).trim()).filter(Boolean);
+      if (common.length) {
+        sections.push(`<section class="meal-info-section"><h4>Common</h4>${renderList(common)}</section>`);
+      }
+      sections.push(`<section class="meal-info-section"><h4>Variants</h4>${
+        meal.variants.map(v => {
+          const ing = (v.ingredients || []).map(s => String(s).trim()).filter(Boolean);
+          return `<div class="meal-info-block"><strong>${escapeHtml(v.name)}</strong>${ing.length ? renderList(ing) : '<p class="meal-info-empty">No extra ingredients</p>'}</div>`;
+        }).join('')
+      }</section>`);
+    } else {
+      const ing = (meal.ingredients || []).map(s => String(s).trim()).filter(Boolean);
+      sections.push(ing.length
+        ? `<section class="meal-info-section"><h4>Ingredients</h4>${renderList(ing)}</section>`
+        : '<p class="meal-info-empty">No ingredients listed.</p>');
+    }
+
+    if (hasSides) {
+      sections.push(`<section class="meal-info-section"><h4>Sides</h4>${
+        meal.sides.map(sd => {
+          const ing = (sd.ingredients || []).map(s => String(s).trim()).filter(Boolean);
+          return `<div class="meal-info-block"><strong>${escapeHtml(sd.name)}</strong>${ing.length ? renderList(ing) : '<p class="meal-info-empty">No extra ingredients</p>'}</div>`;
+        }).join('')
+      }</section>`);
+    }
+
+    body.innerHTML = sections.join('');
+    overlay.setAttribute('aria-hidden', 'false');
+    overlay.style.display = 'flex';
+  }
+
   function openPlannedMealActions(day, mealType) {
     const mealName = getPlannedMeal(day, mealType);
     const meal = mealName ? getMealByName(mealName) : null;
@@ -2035,12 +2185,17 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         <div class="meal-card-header">
           <div class="meal-name"><span class="meal-emoji-display">${emoji}</span>${escapeHtml(meal.meal_name)}${meal.quick ? ' <span class="meal-quick-icon" title="Quick meal">⚡</span>' : ''}${hasVariants ? ' <span class="meal-variant-badge">' + meal.variants.length + ' options</span>' : ''}${hasSides ? ' <span class="meal-variant-badge">' + meal.sides.length + ' sides</span>' : ''}</div>
           <div class="meal-card-actions">
+            <button type="button" class="btn-icon info-meal-btn" title="View ingredients" aria-label="View ingredients">&#9432;</button>
             <button type="button" class="btn-icon edit-meal-btn" title="Edit">&#9998;</button>
             <button type="button" class="btn-icon delete-meal-btn" title="Delete">&times;</button>
           </div>
         </div>
         <div class="meal-ingredients">${escapeHtml(desc)}</div>
       `;
+      card.querySelector('.info-meal-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openMealInfoModal(meal.meal_name);
+      });
       card.querySelector('.edit-meal-btn').addEventListener('click', (e) => {
         e.stopPropagation();
         openMealModal(meal.meal_name);
@@ -2368,21 +2523,18 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       activeRecipeId = null;
       renderRecipesList();
     });
-    document.getElementById('recipe-category-filters')?.addEventListener('click', (e) => {
-      const btn = e.target.closest('.recipe-category-chip');
-      if (!btn) return;
-      activeRecipeCategory = btn.dataset.category || 'all';
-      activeRecipeId = null;
-      renderRecipesList();
-    });
     document.getElementById('recipes-list')?.addEventListener('click', (e) => {
       const card = e.target.closest('.recipe-card');
-      if (card) renderRecipeDetail(card.dataset.recipeId);
+      if (card) {
+        recipesView = 'detail';
+        renderRecipeDetail(card.dataset.recipeId);
+      }
     });
     document.getElementById('recipe-detail')?.addEventListener('click', (e) => {
       if (e.target.closest('#back-to-recipes-btn')) {
         activeRecipeId = null;
-        renderRecipesList();
+        recipesView = activeCookbook ? 'cookbook' : 'cookbooks';
+        renderRecipes();
       }
       if (e.target.closest('#copy-recipe-to-meal-btn')) copyRecipeToMeal(activeRecipeId);
     });

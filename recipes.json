@@ -9,7 +9,7 @@
     },
     "imageUrl": null,
     "servings": 12,
-    "category": "toddler_snack",
+    "category": "Toddler",
     "tags": ["toddler snack", "healthy snack", "1 year old", "baking"],
     "ingredients": [
       { "qty": "50", "unit": "g", "name": "butter", "notes": "plus extra for greasing", "emoji": "🧈" },
@@ -33,6 +33,45 @@
     ],
     "notes": "Toddler-friendly snack. Keep as recipe-only by default rather than adding to the weekly meal list.",
     "createdAt": "2026-04-25T21:09:00Z",
+    "mealName": null
+  },
+  {
+    "id": "rec_coconut_chicken_curry",
+    "title": "Coconut Chicken Curry",
+    "source": {
+      "type": "web",
+      "url": "https://www.jocooks.com/recipes/coconut-chicken-curry/#wprm-recipe-container-25005",
+      "label": "Jo Cooks"
+    },
+    "imageUrl": "https://www.jocooks.com/wp-content/uploads/2019/10/coconut-chicken-curry-1-10.jpg",
+    "servings": 6,
+    "category": "Indian & curries",
+    "tags": ["dinner", "one pot", "30 minutes", "chicken", "indian", "curry", "family friendly", "freezer friendly"],
+    "ingredients": [
+      { "qty": "2", "unit": "tbsp", "name": "olive oil", "notes": null, "emoji": "🫒" },
+      { "qty": "2", "unit": "lb", "name": "chicken breasts", "notes": "skinless and boneless, cut into bite size pieces", "emoji": "🍗" },
+      { "qty": "1/2", "unit": "tsp", "name": "salt", "notes": "or to taste", "emoji": "🧂" },
+      { "qty": "1/2", "unit": "tsp", "name": "pepper", "notes": "or to taste", "emoji": "" },
+      { "qty": "1", "unit": "", "name": "small onion", "notes": "chopped", "emoji": "🧅" },
+      { "qty": "3", "unit": "clove", "name": "garlic", "notes": "minced", "emoji": "🧄" },
+      { "qty": "2", "unit": "tbsp", "name": "curry powder", "notes": null, "emoji": "🌶" },
+      { "qty": "1", "unit": "cup", "name": "chicken broth", "notes": "low sodium", "emoji": "" },
+      { "qty": "14", "unit": "oz", "name": "coconut milk", "notes": "1 can", "emoji": "🥥" },
+      { "qty": "14.5", "unit": "oz", "name": "diced tomatoes", "notes": "1 can", "emoji": "🍅" },
+      { "qty": "2", "unit": "tbsp", "name": "tomato paste", "notes": null, "emoji": "" },
+      { "qty": "2", "unit": "tbsp", "name": "sugar", "notes": null, "emoji": "" },
+      { "qty": "2", "unit": "tbsp", "name": "parsley", "notes": "chopped", "emoji": "🌿" }
+    ],
+    "steps": [
+      "Heat the olive oil in a large skillet or Dutch oven, add the chicken and season with salt and pepper.",
+      "Cook the chicken for about 5 minutes or until no longer pink.",
+      "Add the onion, garlic and curry powder, stir and cook for 2 more minutes.",
+      "Add the chicken broth, coconut milk, diced tomatoes, tomato paste and sugar, then stir everything together.",
+      "Bring to a boil, cover with a lid, turn the heat down and simmer for 15 to 20 minutes.",
+      "Garnish with chopped parsley and serve over rice."
+    ],
+    "notes": "Store in an airtight container in the fridge for up to 3 days, or freeze in a shallow container once fully cooled and stir well while reheating. Curry powder blends vary in heat — start with 1 tablespoon if unsure, then adjust. Mild curry powder works best for a family-friendly version.",
+    "createdAt": "2026-04-26T20:45:00Z",
     "mealName": null
   }
 ]
