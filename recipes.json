@@ -87,35 +87,24 @@
     "category": "Japanese",
     "tags": ["dinner", "japanese", "comfort food", "family friendly", "kid friendly", "eggs"],
     "ingredients": [
-      { "qty": "800", "unit": "g", "name": "cooked rice (warm)", "notes": null, "emoji": "🍚" },
-      { "qty": "200", "unit": "g", "name": "chicken thigh", "notes": "cut into 1cm dice", "emoji": "🍗" },
-      { "qty": "1", "unit": "", "name": "onion", "notes": "5–7mm dice", "emoji": "🧅" },
-      { "qty": "1", "unit": "", "name": "carrot", "notes": "4–5mm dice", "emoji": "🥕" },
-      { "qty": "6", "unit": "tbsp", "name": "tomato ketchup", "notes": "for the chicken rice", "emoji": "🍅" },
-      { "qty": "2", "unit": "tbsp", "name": "tomato puree", "notes": "adds depth, cuts ketchup sweetness", "emoji": "" },
-      { "qty": "20", "unit": "g", "name": "butter", "notes": "for the chicken rice", "emoji": "🧈" },
-      { "qty": "1", "unit": "tbsp", "name": "olive oil", "notes": null, "emoji": "" },
-      { "qty": "1/2", "unit": "tsp", "name": "salt", "notes": "for finishing the chicken rice, plus a pinch earlier", "emoji": "🧂" },
-      { "qty": "", "unit": "", "name": "black pepper", "notes": "to taste", "emoji": "" },
+      { "qty": "1", "unit": "batch", "name": "Chicken Rice", "notes": "see the Chicken Rice recipe in this cookbook — make it first, divide into 4 portions, keep warm", "emoji": "🍚" },
       { "qty": "8", "unit": "", "name": "eggs", "notes": "2 per portion, cook one portion at a time", "emoji": "🥚" },
-      { "qty": "", "unit": "", "name": "salt for eggs", "notes": "2 pinches per 2-egg portion", "emoji": "" },
+      { "qty": "", "unit": "", "name": "salt for eggs", "notes": "2 pinches per 2-egg portion", "emoji": "🧂" },
       { "qty": "", "unit": "", "name": "butter for cooking eggs", "notes": "small knob per portion", "emoji": "🧈" },
       { "qty": "8", "unit": "tbsp", "name": "tomato ketchup", "notes": "for the ketchup-butter sauce", "emoji": "🍅" },
       { "qty": "3", "unit": "tbsp", "name": "water", "notes": "for the sauce", "emoji": "" },
       { "qty": "20", "unit": "g", "name": "butter", "notes": "for the sauce", "emoji": "🧈" }
     ],
     "steps": [
-      "Dice the carrot into 4–5mm pieces, the onion into 5–7mm pieces, and the chicken thigh into roughly 1cm cubes.",
-      "Heat the olive oil in a frying pan over medium heat, then add the onion, carrot and chicken together. Stir-fry for around 3 minutes until the onion turns translucent and the chicken is cooked through.",
-      "Season with a pinch of salt and pepper. Lower the heat slightly, then add the ketchup, tomato puree and butter. Stir until the butter melts and the ketchup coats everything evenly.",
-      "Add the warm rice and mix through until the colour is uniform. Season with 1/2 tsp salt and a little pepper, taste, and adjust. Divide into 4 portions and set aside.",
-      "For each serving, crack 2 eggs into a bowl, add 2 pinches of salt, and beat hard with chopsticks, dragging along the base of the bowl until no streaks of white remain.",
-      "Melt a knob of butter in a non-stick frying pan over medium heat, pour in the egg mixture, and stir gently as it sets so the surface stays half-cooked.",
-      "Place one portion of chicken rice in the centre of the egg, fold the sides over, then tip the pan to roll it onto a plate seam-side down. Repeat for the other three servings.",
+      "Make a batch of Chicken Rice (see the Chicken Rice recipe). Keep warm and divide into 4 portions.",
+      "For each portion: crack 2 eggs into a bowl, add 2 pinches of salt, and beat hard with chopsticks, dragging along the base of the bowl until no streaks of white remain.",
+      "Melt a knob of butter in a non-stick frying pan over medium heat. Pour in the egg mixture and stir gently as it sets so the surface stays half-cooked.",
+      "Place one portion of chicken rice in the centre of the egg, fold the sides over, then tip the pan to roll it onto a plate seam-side down.",
+      "Repeat for the remaining three servings.",
       "Make the ketchup-butter sauce: combine 8 tbsp ketchup, 3 tbsp water and ~20g butter in a small pan over low heat, stirring until the butter melts and the sauce is glossy.",
       "Spoon the sauce over each omurice and serve immediately."
     ],
-    "notes": "Scaled to serve 4 (UK family). Chicken rice can be made the day before. The ketchup-butter sauce is the signature finishing touch on this recipe.",
+    "notes": "Built on top of the Chicken Rice recipe — make that first, then this becomes a quick assembly. The ketchup-butter sauce is the signature finishing touch.",
     "createdAt": "2026-04-26T20:55:00Z",
     "mealName": null
   },
@@ -329,6 +318,41 @@
     ],
     "notes": "Family recipe. Freezer-friendly. Pairs with rice or jacket potatoes; for kid-friendly, dial back the chilli powder.",
     "createdAt": "2026-04-26T23:00:00Z",
+    "mealName": null
+  },
+  {
+    "id": "rec_chicken_rice",
+    "title": "Chicken Rice (チキンライス)",
+    "source": {
+      "type": "web",
+      "url": "https://www.sirogohan.com/sp/recipe/tikirice/",
+      "label": "Sirogohan.com — チキンライス"
+    },
+    "imageUrl": "https://www.sirogohan.com/_files/recipe/images/omuraisu/tikirice7669.JPG",
+    "servings": 4,
+    "category": "Japanese",
+    "tags": ["dinner", "rice", "yoshoku", "kid friendly", "freezer friendly", "1 year old"],
+    "ingredients": [
+      { "qty": "600", "unit": "g", "name": "cooked rice (warm)", "notes": null, "emoji": "🍚" },
+      { "qty": "200", "unit": "g", "name": "chicken thigh", "notes": "diced into roughly 1cm cubes", "emoji": "🍗" },
+      { "qty": "1/2", "unit": "", "name": "onion", "notes": "diced 5–7mm", "emoji": "🧅" },
+      { "qty": "1/2", "unit": "", "name": "carrot", "notes": "diced 4–5mm", "emoji": "🥕" },
+      { "qty": "3", "unit": "tbsp", "name": "tomato ketchup", "notes": "use 3.5 tbsp if you skip the tomato puree", "emoji": "🍅" },
+      { "qty": "1", "unit": "tbsp", "name": "tomato puree", "notes": "3× concentrated; halve if using tomato paste; optional but adds depth", "emoji": "" },
+      { "qty": "15", "unit": "g", "name": "salted butter", "notes": "unsalted is fine — adjust salt at the end", "emoji": "🧈" },
+      { "qty": "", "unit": "", "name": "salt", "notes": "to taste, added at the finish", "emoji": "🧂" },
+      { "qty": "", "unit": "", "name": "black pepper", "notes": "to taste", "emoji": "" }
+    ],
+    "steps": [
+      "Dice the chicken thigh into ~1cm cubes, the carrot into 4–5mm pieces, and the onion into 5–7mm pieces.",
+      "Melt about half the butter (~7g) in a frying pan over medium heat. Add the chicken and cook for 2–3 minutes until no longer pink.",
+      "Add the onion and carrot. Stir-fry for 3–4 minutes until the onion turns translucent and the carrot starts to soften.",
+      "Push the ingredients to one side of the pan and add the ketchup and tomato puree to the empty space. Let them bubble for a moment to take the raw edge off.",
+      "Add the warm rice and stir-fry to combine, breaking up any clumps until everything is evenly coloured.",
+      "Stir in the remaining butter, season with salt and pepper to taste, and serve."
+    ],
+    "notes": "Japanese yōshoku classic — also the base for our Omurice recipe (wrap a portion in a folded omelette and top with ketchup-butter sauce). Keeps ~3 days in the fridge or ~1 month frozen.",
+    "createdAt": "2026-04-26T23:30:00Z",
     "mealName": null
   }
 ]
