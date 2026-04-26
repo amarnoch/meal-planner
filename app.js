@@ -36,6 +36,8 @@
 
   // Recipe categories are now free-form strings (each unique value = a "Cookbook").
   // Andy adds a new cookbook by writing `category: "Whatever"` on a recipe in recipes.json.
+  // Recipes in these "main meal" cookbooks get a "+ meal idea" badge if not already in meals.csv.
+  const MAIN_COOKBOOKS = ['Italian', 'Japanese', 'Indian & curries', 'British classics', 'Tex-Mex', 'Other mains'];
   let recipesView = 'cookbooks'; // 'cookbooks' | 'cookbook' | 'detail'
   let activeCookbook = null;
   let activeRecipeId = null;
@@ -1077,14 +1079,19 @@
     card.dataset.recipeId = recipe.id;
     const meta = [getRecipeCategoryLabel(recipe.category)];
     if (recipe.servings) meta.push(`${recipe.servings} serving${recipe.servings === 1 ? '' : 's'}`);
-    const copied = recipe.mealName ? '<span class="recipe-card-status">In meals</span>' : '';
+    let badge = '';
+    if (recipe.mealName) {
+      badge = '<span class="recipe-card-status">In meals</span>';
+    } else if (MAIN_COOKBOOKS.includes(recipe.category)) {
+      badge = '<span class="recipe-card-status recipe-card-needs-meal">+ meal idea</span>';
+    }
     const thumb = recipeThumbHtml(recipe, 'recipe-card-thumb-emoji');
     card.innerHTML = `
       <div class="recipe-card-thumb">${thumb}</div>
       <div class="recipe-card-body">
         <div class="recipe-card-title-row">
           <h3>${escapeHtml(recipe.title)}</h3>
-          ${copied}
+          ${badge}
         </div>
         <p class="recipe-card-meta">${meta.map(escapeHtml).join(' · ')}</p>
       </div>
@@ -1300,7 +1307,9 @@ Schema:
 Rules:
 - imageUrl: pick the largest cooked-dish photo from the source page (absolute URL, http/https). Return null only if the source has no usable image.
 - category: pick the cookbook that best fits the dish. Match case exactly ("Italian", not "italian"). Suggest a new cookbook name only if none of the listed ones fit.
-- qty as written ("1", "1/2", "1-2"); unit lowercase ("g", "ml", "can", "tbsp", "clove", "handful", "" if none).
+- units: use UK metric — g for solids, ml for liquids, kg for >1kg, plus tbsp/tsp/cloves where appropriate. Convert any US measures: 1 cup ≈ 250ml; 1 oz ≈ 28g; 1 lb ≈ 450g; 1 fl oz ≈ 30ml. Use UK ingredient names: "stock" not "broth"; "chopped tomatoes" not "diced tomatoes"; "courgette" not "zucchini"; "aubergine" not "eggplant"; "coriander" not "cilantro"; "spring onion" not "scallion".
+- servings: default to 4 (a UK family of 4 with 2 small kids). If the source is sized differently (e.g. serves 6 or 8), scale ingredient quantities down to feed 4 and set "servings": 4. Round cans to whole cans, whole-piece items (onions/eggs/carrots) up to the next whole, grams/ml to the nearest 5–10. Exception: batch bakes (muffins, traybakes, biscuits, cookies) — keep the original batch size and note it; don't downscale.
+- qty as written ("1", "1/2", "1-2", "400"); unit lowercase ("g", "ml", "can", "tbsp", "clove", "handful", "" if none).
 - One emoji per ingredient if obvious, otherwise "".
 - Steps are imperative sentences with no numbering inside the string.
 - Include useful tags like healthy, freezer friendly, vegetarian, quick, 1 year old, dinner, snack.

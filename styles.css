@@ -1223,6 +1223,13 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   padding: 0.25rem 0.55rem;
 }
 
+.recipe-card-needs-meal {
+  background: rgba(232, 143, 94, 0.18);
+  border-color: rgba(232, 143, 94, 0.4);
+  color: var(--accent);
+  font-weight: 600;
+}
+
 .recipes-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
