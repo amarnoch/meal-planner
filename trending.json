@@ -1,52 +1,52 @@
 {
   "sources": [
     {
-      "name": "BBC Good Food",
-      "url": "https://www.bbcgoodfood.com/recipes",
-      "tagline": "UK staple"
+      "name": "What Mummy Makes",
+      "url": "https://www.instagram.com/whatmummymakes/",
+      "tagline": "One meal for everyone (BLW-friendly)"
+    },
+    {
+      "name": "Feeding Finn",
+      "url": "https://www.instagram.com/feedingfinn/",
+      "tagline": "UK weaning + family food"
     },
     {
       "name": "Mob",
       "url": "https://www.mob.co.uk/recipes",
-      "tagline": "Quick & modern"
+      "tagline": "Quick & modern weeknights"
     },
     {
-      "name": "Felicity Cloake",
-      "url": "https://www.theguardian.com/profile/felicitycloake/all",
-      "tagline": "Perfect classics"
+      "name": "The Batch Lady",
+      "url": "https://www.instagram.com/thebatchlady/",
+      "tagline": "Freezer-friendly batch cooking"
     },
     {
-      "name": "Anna Jones",
-      "url": "https://annajones.substack.com",
-      "tagline": "Veg-forward"
-    },
-    {
-      "name": "Jamie Oliver",
-      "url": "https://www.jamieoliver.com/recipes/",
-      "tagline": "Family-friendly"
+      "name": "BBC Good Food",
+      "url": "https://www.bbcgoodfood.com/recipes/collection/family-recipes",
+      "tagline": "Reliable family classics"
     }
   ],
   "trending": [
     {
-      "title": "Mob's easy weeknight dinners",
-      "source": "Mob",
+      "title": "What Mummy Makes — one meal, the whole family",
+      "source": "Instagram · @whatmummymakes",
+      "url": "https://www.instagram.com/whatmummymakes/",
+      "image": "https://images.unsplash.com/photo-1576089073624-b5751a8f4de9?fm=jpg&q=70&w=600&auto=format&fit=crop",
+      "note": "Rebecca Wilson's specialty — works for the 10mo, 3yo and adults at the same table."
+    },
+    {
+      "title": "Feeding Finn — real UK weaning meals",
+      "source": "Instagram · @feedingfinn",
+      "url": "https://www.instagram.com/feedingfinn/",
+      "image": "https://images.unsplash.com/photo-1643539541155-73134fdaa82c?fm=jpg&q=70&w=600&auto=format&fit=crop",
+      "note": "Less polished, more real. Strong for the 10mo BLW phase."
+    },
+    {
+      "title": "Mob — easy weeknight dinners",
+      "source": "mob.co.uk",
       "url": "https://www.mob.co.uk/recipes/collections/mobs-easy-weeknight-dinner-recipes",
-      "image": null,
-      "note": "Speedy pasta bakes, simple family curries — straight into the rotation."
-    },
-    {
-      "title": "Family favourites collection",
-      "source": "BBC Good Food",
-      "url": "https://www.bbcgoodfood.com/recipes/collection/family-recipes",
-      "image": null,
-      "note": "Crowd-tested classics — good place to find a new staple."
-    },
-    {
-      "title": "Felicity Cloake's perfect column",
-      "source": "Guardian",
-      "url": "https://www.theguardian.com/profile/felicitycloake/all",
-      "image": null,
-      "note": "One dish at a time, perfected — great for upgrading a regular meal."
+      "image": "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?fm=jpg&q=70&w=600&auto=format&fit=crop",
+      "note": "Adult-grade flavour, kid-friendly enough — for when you and Laura want something good."
     }
   ]
 }

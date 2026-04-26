@@ -1311,32 +1311,71 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 
 /* Discover panel — fresh-recipe ideas above the cookbooks landing */
 .discover-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 0.85rem 0.85rem 1rem;
   background: var(--surface-raised);
   border: 1px solid var(--border-light);
   border-radius: var(--radius);
+  overflow: hidden;
 }
 
-.discover-heading {
+.discover-panel > .discover-heading {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.7rem 0.85rem;
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--accent);
+  user-select: none;
+  transition: background var(--transition);
 }
 
-.discover-trending-row {
+.discover-panel > .discover-heading::-webkit-details-marker { display: none; }
+
+.discover-panel > .discover-heading:hover {
+  background: rgba(232, 143, 94, 0.08);
+}
+
+.discover-panel > .discover-heading::after {
+  content: '⌃';
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--accent);
+  transform: rotate(180deg);
+  transition: transform var(--transition);
+}
+
+.discover-panel:not([open]) > .discover-heading::after {
+  transform: rotate(0deg);
+}
+
+.discover-panel[open] > .discover-heading {
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* Children of <details> are direct kids of .discover-panel.
+   Use a wrapping spacing rule for the body content. */
+.discover-panel > :not(.discover-heading) {
+  margin: 0;
+}
+
+.discover-panel > .discover-trending-row {
+  padding: 0.85rem 0.85rem 0.4rem;
+  margin: 0;
   display: flex;
   gap: 0.6rem;
   overflow-x: auto;
-  margin: 0 -0.85rem;
-  padding: 0 0.85rem 0.4rem;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+}
+
+.discover-panel > .discover-sources {
+  padding: 0.5rem 0.85rem 0.85rem;
 }
 
 .discover-trending-card {

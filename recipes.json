@@ -295,5 +295,40 @@
     "notes": "Family recipe — thin French-style crepes. Sweet (lemon and sugar, Nutella) or savoury (cheese and ham). Makes 6–8 crepes.",
     "createdAt": "2026-04-26T22:15:00Z",
     "mealName": null
+  },
+  {
+    "id": "rec_chilli_con_carne",
+    "title": "Chilli con carne",
+    "source": {
+      "type": "manual",
+      "url": null,
+      "label": "Family recipe"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1633983055303-2e33e153b7dc?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 4,
+    "category": "Tex-Mex",
+    "tags": ["dinner", "freezer friendly", "beef", "one pot"],
+    "ingredients": [
+      { "qty": "1", "unit": "", "name": "onion", "notes": "diced", "emoji": "🧅" },
+      { "qty": "1", "unit": "", "name": "pepper", "notes": "diced", "emoji": "🫑" },
+      { "qty": "1", "unit": "tbsp", "name": "chilli spice mix", "notes": "chilli powder, cumin, paprika to taste", "emoji": "🌶" },
+      { "qty": "500", "unit": "g", "name": "beef mince", "notes": null, "emoji": "🥩" },
+      { "qty": "200", "unit": "ml", "name": "beef stock", "notes": null, "emoji": "" },
+      { "qty": "1", "unit": "can", "name": "chopped tomatoes", "notes": "400g can", "emoji": "🍅" },
+      { "qty": "2", "unit": "tbsp", "name": "tomato puree", "notes": null, "emoji": "" },
+      { "qty": "1", "unit": "can", "name": "kidney beans", "notes": "drained", "emoji": "🫘" },
+      { "qty": "", "unit": "", "name": "salt and pepper", "notes": "to season", "emoji": "🧂" }
+    ],
+    "steps": [
+      "Fry the onion for 5 minutes until softening.",
+      "Add the pepper and spices and cook for another 5 minutes.",
+      "Add the beef mince and brown for 5–10 minutes.",
+      "Pour in the stock, chopped tomatoes and tomato puree, season well and stir.",
+      "Cover and simmer for 20 minutes with the lid on.",
+      "Stir in the kidney beans and cook for a further 10 minutes with the lid off."
+    ],
+    "notes": "Family recipe. Freezer-friendly. Pairs with rice or jacket potatoes; for kid-friendly, dial back the chilli powder.",
+    "createdAt": "2026-04-26T23:00:00Z",
+    "mealName": null
   }
 ]

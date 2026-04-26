@@ -1122,9 +1122,15 @@
     const hasSources = Array.isArray(sources) && sources.length > 0;
     if (!hasTrending && !hasSources) return null;
 
-    const section = document.createElement('section');
+    const section = document.createElement('details');
     section.className = 'discover-panel';
-    section.innerHTML = `<h3 class="discover-heading">Discover ideas</h3>`;
+    // Persist open/closed state across sessions so user's preference sticks
+    const stored = localStorage.getItem('mealPlanner_discoverOpen');
+    section.open = stored === null ? true : stored === '1';
+    section.addEventListener('toggle', () => {
+      localStorage.setItem('mealPlanner_discoverOpen', section.open ? '1' : '0');
+    });
+    section.innerHTML = `<summary class="discover-heading"><span>Discover ideas</span></summary>`;
 
     if (hasTrending) {
       const row = document.createElement('div');
