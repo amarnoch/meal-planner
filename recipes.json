@@ -155,5 +155,145 @@
     "notes": "Laura's tweaks applied: 2 cans of butter beans, lentils added, tomato purée and cream doubled. Lentils added with the beans — if using dried lentils rather than pre-cooked, add extra liquid and simmer longer until tender.",
     "createdAt": "2026-04-26T21:05:00Z",
     "mealName": null
+  },
+  {
+    "id": "rec_japanese_curry",
+    "title": "Japanese Curry",
+    "source": {
+      "type": "manual",
+      "url": null,
+      "label": "Family recipe"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1679279726946-a158b8bcaa23?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 4,
+    "category": "Japanese",
+    "tags": ["dinner", "japanese", "curry", "family friendly", "freezer friendly", "comfort food", "one pot"],
+    "ingredients": [
+      { "qty": "1", "unit": "", "name": "onion", "notes": "diced", "emoji": "🧅" },
+      { "qty": "", "unit": "", "name": "meat (beef, chicken, pork or prawns)", "notes": "brown first; skip for a vegetarian version", "emoji": "🍖" },
+      { "qty": "", "unit": "", "name": "water", "notes": "enough to cover", "emoji": "" },
+      { "qty": "", "unit": "", "name": "carrots", "notes": "chopped into bite-size pieces", "emoji": "🥕" },
+      { "qty": "", "unit": "", "name": "potatoes", "notes": "chopped into bite-size pieces", "emoji": "🥔" },
+      { "qty": "1", "unit": "handful", "name": "fresh tomatoes (or 1/4 tin chopped tomatoes)", "notes": null, "emoji": "🍅" },
+      { "qty": "1", "unit": "tsp", "name": "sugar", "notes": "optional, balances the acidity", "emoji": "" },
+      { "qty": "", "unit": "", "name": "salt and pepper", "notes": "to season", "emoji": "🧂" },
+      { "qty": "1", "unit": "tbsp", "name": "garam masala", "notes": "plus optional extra 1 tsp at the end", "emoji": "" },
+      { "qty": "", "unit": "", "name": "Japanese curry cubes", "notes": "e.g. S&B Golden Curry — choose mild for kid-friendly", "emoji": "🍛" },
+      { "qty": "", "unit": "", "name": "milk or extra water", "notes": "to loosen if the sauce is too thick", "emoji": "🥛" },
+      { "qty": "", "unit": "", "name": "rice or udon noodles", "notes": "to serve", "emoji": "🍚" }
+    ],
+    "steps": [
+      "Dice the onion. In a large pan or pot, brown your chosen meat (beef, chicken, pork or prawns) with the onion. Skip the meat for a vegetarian version.",
+      "Add enough water to cover, then add the carrots and potatoes.",
+      "Add a handful of fresh tomatoes (or 1/4 tin of chopped tomatoes) and stir in 1 tsp sugar if using.",
+      "Season with salt, pepper and 1 tbsp garam masala.",
+      "Simmer with meat for 1–2 hours; for vegetable-only, simmer up to 45 minutes.",
+      "Lower the heat. Drop in the Japanese curry cubes and stir until they dissolve and the sauce is smooth.",
+      "If the sauce is too thick, loosen with a splash of milk or water.",
+      "Optionally add another 1 tsp of garam masala at the end for a stronger spice hit.",
+      "Optional: serve alongside katsu chicken, pork or prawns.",
+      "Serve over rice or udon noodles."
+    ],
+    "notes": "Family recipe. Flexible — works with any protein or veg-only. Japanese curry cubes (S&B Golden Curry, House Vermont Curry, etc.) are the key flavour base; choose mild for the toddler-friendly version. Long meat simmer (1–2h) makes the meat tender; reduce to 45 minutes for veg-only.",
+    "createdAt": "2026-04-26T22:00:00Z",
+    "mealName": "Japanese Curry"
+  },
+  {
+    "id": "rec_miso_soup",
+    "title": "Miso Soup",
+    "source": {
+      "type": "manual",
+      "url": null,
+      "label": "Family recipe"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1591224876006-be862c0f1d7a?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 4,
+    "category": "Japanese",
+    "tags": ["japanese", "soup", "vegetarian", "light", "comfort food", "make ahead"],
+    "ingredients": [
+      { "qty": "", "unit": "", "name": "water", "notes": "for the broth", "emoji": "💧" },
+      { "qty": "1", "unit": "", "name": "dashi tea bag", "notes": "remove once boiled", "emoji": "🍵" },
+      { "qty": "1", "unit": "tsp", "name": "dashi powder", "notes": "to taste", "emoji": "" },
+      { "qty": "1", "unit": "", "name": "white onion", "notes": "sliced", "emoji": "🧅" },
+      { "qty": "1", "unit": "", "name": "potato", "notes": "diced", "emoji": "🥔" },
+      { "qty": "1", "unit": "", "name": "carrot", "notes": "diced", "emoji": "🥕" },
+      { "qty": "1", "unit": "handful", "name": "mangetout", "notes": null, "emoji": "🌿" },
+      { "qty": "", "unit": "", "name": "tofu", "notes": "cubed", "emoji": "" },
+      { "qty": "", "unit": "", "name": "wakame seaweed", "notes": "dried, rehydrates in the soup", "emoji": "🌊" },
+      { "qty": "1", "unit": "tbsp", "name": "dark miso paste", "notes": "to taste — add residue at the bottom for flavour", "emoji": "" },
+      { "qty": "1", "unit": "tbsp", "name": "light miso paste", "notes": "to taste", "emoji": "" }
+    ],
+    "steps": [
+      "Bring water to the boil in a saucepan.",
+      "Add the dashi tea bag and let it infuse, then remove it once the water has boiled.",
+      "Stir in the dashi powder.",
+      "Add the white onion, potato and carrot. Simmer until just tender.",
+      "Add the mangetout and cook briefly.",
+      "Once everything is cooked through, turn off the heat.",
+      "Add the tofu (cubed) and wakame seaweed.",
+      "Stir in the dark miso paste — about 1 tbsp to taste — including any residue from the bottom of the tub for extra flavour.",
+      "Stir in the light miso paste — another 1 tbsp or so to taste.",
+      "Warm gently to serve. Don't boil after adding the miso — it dulls the flavour."
+    ],
+    "notes": "Family recipe. Keeps well in the fridge for up to 3 days; reheat gently rather than boiling.",
+    "createdAt": "2026-04-26T22:05:00Z",
+    "mealName": null
+  },
+  {
+    "id": "rec_yorkshire_puddings",
+    "title": "Yorkshire Puddings",
+    "source": {
+      "type": "manual",
+      "url": null,
+      "label": "Family recipe"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1765568741171-71bbaf721747?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 6,
+    "category": "Bakes",
+    "tags": ["british", "baking", "side", "sunday roast", "classic"],
+    "ingredients": [
+      { "qty": "70", "unit": "g", "name": "plain flour", "notes": null, "emoji": "🌾" },
+      { "qty": "2", "unit": "", "name": "eggs", "notes": null, "emoji": "🥚" },
+      { "qty": "100", "unit": "ml", "name": "milk", "notes": null, "emoji": "🥛" },
+      { "qty": "", "unit": "", "name": "vegetable oil", "notes": "a little, for the muffin tin", "emoji": "" }
+    ],
+    "steps": [
+      "Whisk the flour, eggs and milk together into a smooth batter.",
+      "Rest the batter in the fridge before cooking — it helps them rise.",
+      "Add a little oil to each cup of a muffin tin and preheat in a hot oven (220°C/200°C fan) until the oil is smoking hot.",
+      "Pour the batter into the hot oil — equal amounts per cup.",
+      "Return the tin straight back to the oven. Try not to open the door once they're in — they'll fail to rise.",
+      "Bake for 25–30 minutes until risen and golden."
+    ],
+    "notes": "Family recipe. Makes 6 small or 4 large puddings. The cold batter + smoking-hot oil contrast is what gives the rise.",
+    "createdAt": "2026-04-26T22:10:00Z",
+    "mealName": null
+  },
+  {
+    "id": "rec_pancakes_crepes",
+    "title": "Pancakes / Crepes",
+    "source": {
+      "type": "manual",
+      "url": null,
+      "label": "Family recipe"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1565087170449-fa23854a6100?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 6,
+    "category": "Bakes",
+    "tags": ["breakfast", "sweet", "savoury", "family friendly", "kid friendly", "quick"],
+    "ingredients": [
+      { "qty": "100", "unit": "g", "name": "plain flour", "notes": null, "emoji": "🌾" },
+      { "qty": "2", "unit": "", "name": "eggs", "notes": null, "emoji": "🥚" },
+      { "qty": "300", "unit": "ml", "name": "milk", "notes": null, "emoji": "🥛" }
+    ],
+    "steps": [
+      "Whisk flour, eggs and milk together into a smooth, thin batter.",
+      "Heat a medium pan to medium-hot, lightly greased.",
+      "Ladle the batter into the pan, swirling to coat the base in a thin layer.",
+      "Fry for 30–60 seconds per side until lightly golden."
+    ],
+    "notes": "Family recipe — thin French-style crepes. Sweet (lemon and sugar, Nutella) or savoury (cheese and ham). Makes 6–8 crepes.",
+    "createdAt": "2026-04-26T22:15:00Z",
+    "mealName": null
   }
 ]

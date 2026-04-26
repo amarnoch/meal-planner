@@ -1,6 +1,6 @@
 /* Meal Planner - CSS */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap');
 
 :root {
   /* Avo & Peach palette: sage green primary, peach accent, warm peach background */
@@ -8,9 +8,9 @@
   --surface: #fdf6ec;
   --surface-raised: #f3d8b6;
   --border: #d9b88a;
-  --border-light: #e8cea2;
+  --border-light: #d8b88a;
   --text: #1f1c1a;
-  --text-muted: #7a6f5f;
+  --text-muted: #5a4f3f;
   --primary: #5d9966;
   --primary-hover: #4a8054;
   --primary-light: rgba(93, 153, 102, 0.12);
@@ -45,9 +45,8 @@ body {
 }
 
 h1, h2, .recipe-detail-header h2, .recipe-card h3 {
-  font-family: 'Fraunces', 'Inter', Georgia, serif;
-  font-feature-settings: 'ss01' on, 'ss02' on;
-  letter-spacing: -0.01em;
+  font-family: 'Bricolage Grotesque', 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.015em;
 }
 
 :focus-visible {
@@ -229,16 +228,18 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   border: none;
   cursor: pointer;
   padding: 0.15rem 0.35rem;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   line-height: 1;
   border-radius: 4px;
-  color: var(--text-muted);
-  transition: background var(--transition), color var(--transition);
+  color: var(--text);
+  opacity: 0.85;
+  transition: background var(--transition), color var(--transition), opacity var(--transition);
 }
 
 .btn-icon:hover {
   background: var(--border-light);
   color: var(--text);
+  opacity: 1;
 }
 
 .delete-meal-btn:hover {

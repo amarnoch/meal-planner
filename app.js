@@ -1224,7 +1224,7 @@
     const isMeal = recipe.category === 'meal';
     const heroContent = recipeThumbHtml(recipe, 'recipe-detail-hero-emoji');
     detail.innerHTML = `
-      <button type="button" class="btn btn-secondary btn-sm" id="back-to-recipes-btn">← Back to recipes</button>
+      <button type="button" class="btn btn-secondary btn-sm" id="back-to-recipes-btn">← All cookbooks</button>
       <div class="recipe-detail-hero">${heroContent}</div>
       <div class="recipe-detail-header">
         <div>
@@ -2541,7 +2541,8 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     document.getElementById('recipe-detail')?.addEventListener('click', (e) => {
       if (e.target.closest('#back-to-recipes-btn')) {
         activeRecipeId = null;
-        recipesView = activeCookbook ? 'cookbook' : 'cookbooks';
+        activeCookbook = null;
+        recipesView = 'cookbooks';
         renderRecipes();
       }
       if (e.target.closest('#copy-recipe-to-meal-btn')) copyRecipeToMeal(activeRecipeId);
