@@ -73,5 +73,87 @@
     "notes": "Store in an airtight container in the fridge for up to 3 days, or freeze in a shallow container once fully cooled and stir well while reheating. Curry powder blends vary in heat — start with 1 tablespoon if unsure, then adjust. Mild curry powder works best for a family-friendly version.",
     "createdAt": "2026-04-26T20:45:00Z",
     "mealName": null
+  },
+  {
+    "id": "rec_classic_omurice",
+    "title": "Classic Omurice (Japanese chicken rice omelette)",
+    "source": {
+      "type": "web",
+      "url": "https://www.sirogohan.com/sp/recipe/omuraisukihon/",
+      "label": "Sirogohan.com — 基本のオムライス"
+    },
+    "imageUrl": null,
+    "servings": 2,
+    "category": "Asian",
+    "tags": ["dinner", "japanese", "comfort food", "family friendly", "kid friendly", "eggs"],
+    "ingredients": [
+      { "qty": "400", "unit": "g", "name": "cooked rice (warm)", "notes": "[ASSUMPTION] quantity inferred from sirogohan chicken rice recipe — not stated explicitly on omurice page", "emoji": "🍚" },
+      { "qty": "100", "unit": "g", "name": "chicken thigh", "notes": "cut into 1cm dice", "emoji": "🍗" },
+      { "qty": "1/2", "unit": "", "name": "onion", "notes": "[ASSUMPTION] quantity inferred — page specifies 5–7mm dice", "emoji": "🧅" },
+      { "qty": "1/3", "unit": "", "name": "carrot", "notes": "[ASSUMPTION] quantity inferred — page specifies 4–5mm dice", "emoji": "🥕" },
+      { "qty": "3", "unit": "tbsp", "name": "tomato ketchup", "notes": "for the chicken rice", "emoji": "🍅" },
+      { "qty": "1", "unit": "tbsp", "name": "tomato puree", "notes": "adds depth, cuts ketchup sweetness", "emoji": "" },
+      { "qty": "10", "unit": "g", "name": "butter", "notes": "for the chicken rice", "emoji": "🧈" },
+      { "qty": "1/2", "unit": "tbsp", "name": "olive oil", "notes": null, "emoji": "" },
+      { "qty": "1/4", "unit": "tsp", "name": "salt", "notes": "for finishing the chicken rice, plus a pinch earlier", "emoji": "🧂" },
+      { "qty": "", "unit": "", "name": "black pepper", "notes": "to taste", "emoji": "" },
+      { "qty": "4", "unit": "", "name": "eggs", "notes": "2 per portion, cooked one portion at a time", "emoji": "🥚" },
+      { "qty": "4", "unit": "pinch", "name": "salt for eggs", "notes": "2 pinches per 2-egg portion", "emoji": "" },
+      { "qty": "", "unit": "", "name": "butter for cooking eggs", "notes": "[ASSUMPTION] small knob per portion — page mentions butter for the pan but exact qty not given in source snippets", "emoji": "🧈" },
+      { "qty": "4", "unit": "tbsp", "name": "tomato ketchup", "notes": "for the ketchup-butter sauce", "emoji": "🍅" },
+      { "qty": "1.5", "unit": "tbsp", "name": "water", "notes": "for the sauce", "emoji": "" },
+      { "qty": "10", "unit": "g", "name": "butter", "notes": "for the sauce", "emoji": "🧈" }
+    ],
+    "steps": [
+      "Dice the carrot into 4–5mm pieces, the onion into 5–7mm pieces, and the chicken thigh into roughly 1cm cubes.",
+      "Heat the olive oil in a frying pan over medium heat, then add the onion, carrot and chicken together. Stir-fry for around 3 minutes until the onion turns translucent and the chicken is cooked through.",
+      "Season with a pinch of salt and pepper. Lower the heat slightly, then add the ketchup, tomato puree and butter. Stir until the butter melts and the ketchup coats everything evenly.",
+      "Add the warm rice and mix through until the colour is uniform. Season with 1/4 tsp salt and a little pepper, taste, and adjust. Divide into 2 portions and set aside.",
+      "For each serving, crack 2 eggs into a bowl, add 2 pinches of salt, and beat hard with chopsticks, dragging along the base of the bowl until no streaks of white remain.",
+      "Melt a knob of butter in a non-stick frying pan over medium heat, pour in the egg mixture, and stir gently as it sets so the surface stays half-cooked.",
+      "Place one portion of chicken rice in the centre of the egg, fold the sides over, then tip the pan to roll it onto a plate seam-side down. Repeat for the second serving.",
+      "Make the ketchup-butter sauce: combine 4 tbsp ketchup, 1.5 tbsp water and ~10g butter in a small pan over low heat, stirring until the butter melts and the sauce is glossy.",
+      "Spoon the sauce over the omurice and serve immediately."
+    ],
+    "notes": "Source page did not fully render via web fetch — ingredient quantities reconstructed from search-result snippets of the sirogohan omurice page and the linked chicken rice recipe (sirogohan.com/recipe/tikirice/). [ASSUMPTION] flags mark items where exact source quantities were not visible; rice, onion and carrot quantities are best-guess based on the related chicken rice recipe and standard 2-portion sirogohan ratios. Chicken rice can be made the day before. The ketchup-butter sauce is the signature finishing touch on this recipe.",
+    "createdAt": "2026-04-26T20:55:00Z",
+    "mealName": null
+  },
+  {
+    "id": "rec_caramelised_onion_butter_beans",
+    "title": "Smoky & Creamy Caramelised Onion Butter Beans",
+    "source": {
+      "type": "screenshot",
+      "url": null,
+      "label": "carolefood"
+    },
+    "imageUrl": null,
+    "servings": 4,
+    "category": "Other mains",
+    "tags": ["vegetarian", "dinner", "quick", "comfort food"],
+    "ingredients": [
+      { "qty": "3", "unit": "", "name": "onions, finely sliced", "notes": null, "emoji": "🧅" },
+      { "qty": "2", "unit": "clove", "name": "garlic, finely chopped", "notes": null, "emoji": "🧄" },
+      { "qty": "60", "unit": "g", "name": "tomato purée", "notes": "doubled per Laura's note", "emoji": "🍅" },
+      { "qty": "1.5", "unit": "tsp", "name": "smoked paprika", "notes": null, "emoji": "" },
+      { "qty": "50", "unit": "ml", "name": "white wine", "notes": "optional", "emoji": "🍷" },
+      { "qty": "200", "unit": "ml", "name": "double cream", "notes": "doubled per Laura's note", "emoji": "🥛" },
+      { "qty": "2", "unit": "can", "name": "butter beans (400g each)", "notes": "doubled per Laura's note", "emoji": "🫘" },
+      { "qty": "1", "unit": "handful", "name": "lentils", "notes": "added per Laura's note", "emoji": "" },
+      { "qty": "1/2", "unit": "", "name": "lemon, juiced", "notes": null, "emoji": "🍋" },
+      { "qty": "1", "unit": "handful", "name": "parsley and basil, chopped", "notes": "optional topping", "emoji": "🌿" }
+    ],
+    "steps": [
+      "In a medium frying pan over medium heat, add a couple of tbsp of oil then the onions. Fry until softened and caramelised, stirring often.",
+      "Add the garlic and tomato purée and cook for 2 minutes, stirring frequently.",
+      "Deglaze the pan with the white wine and simmer for a couple of minutes until mostly evaporated. Skip if no wine to hand.",
+      "Add the butter beans with their liquid and the lentils.",
+      "Add the double cream and bring to a simmer for 5 minutes.",
+      "Squeeze in the lemon juice and taste for seasoning.",
+      "Top with chopped parsley and basil if using, and serve."
+    ],
+    "notes": "Laura's tweaks applied: 2 cans of butter beans, lentils added, tomato purée and cream doubled. Lentils added with the beans — if using dried lentils rather than pre-cooked, add extra liquid and simmer longer until tender.",
+    "createdAt": "2026-04-26T21:05:00Z",
+    "mealName": null
   }
 ]
