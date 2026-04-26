@@ -1,0 +1,52 @@
+{
+  "sources": [
+    {
+      "name": "BBC Good Food",
+      "url": "https://www.bbcgoodfood.com/recipes",
+      "tagline": "UK staple"
+    },
+    {
+      "name": "Mob",
+      "url": "https://www.mob.co.uk/recipes",
+      "tagline": "Quick & modern"
+    },
+    {
+      "name": "Felicity Cloake",
+      "url": "https://www.theguardian.com/profile/felicitycloake/all",
+      "tagline": "Perfect classics"
+    },
+    {
+      "name": "Anna Jones",
+      "url": "https://annajones.substack.com",
+      "tagline": "Veg-forward"
+    },
+    {
+      "name": "Jamie Oliver",
+      "url": "https://www.jamieoliver.com/recipes/",
+      "tagline": "Family-friendly"
+    }
+  ],
+  "trending": [
+    {
+      "title": "Mob's easy weeknight dinners",
+      "source": "Mob",
+      "url": "https://www.mob.co.uk/recipes/collections/mobs-easy-weeknight-dinner-recipes",
+      "image": null,
+      "note": "Speedy pasta bakes, simple family curries — straight into the rotation."
+    },
+    {
+      "title": "Family favourites collection",
+      "source": "BBC Good Food",
+      "url": "https://www.bbcgoodfood.com/recipes/collection/family-recipes",
+      "image": null,
+      "note": "Crowd-tested classics — good place to find a new staple."
+    },
+    {
+      "title": "Felicity Cloake's perfect column",
+      "source": "Guardian",
+      "url": "https://www.theguardian.com/profile/felicitycloake/all",
+      "image": null,
+      "note": "One dish at a time, perfected — great for upgrading a regular meal."
+    }
+  ]
+}

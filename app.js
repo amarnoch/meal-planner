@@ -17,6 +17,8 @@
   const BUNDLED_MEALS_CSV = 'meals.csv';
   /** Shared recipe library: fetched on every load when available (canonical); merged with local notes/meal links and local-only drafts. */
   const BUNDLED_RECIPES_JSON = 'recipes.json';
+  /** Curated discover sources + trending recipe ideas for the Recipes tab landing. */
+  const BUNDLED_TRENDING_JSON = 'trending.json';
 
   const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -354,7 +356,8 @@
     planVariants: {},
     planSides: {},
     shoppingChecked: {},
-    recipes: []
+    recipes: [],
+    discover: null
   };
 
   function loadState() {
@@ -529,7 +532,7 @@
   }
 
   function mealsToCsv() {
-    const header = 'meal_name,emoji,quick,common_ingredients,variants_json,sides_json';
+    const header = 'meal_name,emoji,quick,common_ingredients,variants_json,sides_json,category';
     const rows = state.meals.map(m => {
       const hasVariants = m.variants && m.variants.length > 0;
       const common = hasVariants ? (m.commonIngredients || []).join(';') : (m.ingredients || []).join(';');
@@ -537,7 +540,8 @@
       const sidesJson = (m.sides && m.sides.length > 0) ? JSON.stringify(m.sides) : '[]';
       const emoji = getMealEmoji(m);
       const quick = m.quick ? 'yes' : '';
-      return `${escapeCsvField(m.meal_name)},${escapeCsvField(emoji)},${escapeCsvField(quick)},${escapeCsvField(common)},${escapeCsvField(variantsJson)},${escapeCsvField(sidesJson)}`;
+      const category = m.category || '';
+      return `${escapeCsvField(m.meal_name)},${escapeCsvField(emoji)},${escapeCsvField(quick)},${escapeCsvField(common)},${escapeCsvField(variantsJson)},${escapeCsvField(sidesJson)},${escapeCsvField(category)}`;
     });
     return [header, ...rows].join('\n');
   }
@@ -654,6 +658,8 @@
       }
       if (meal && emojiStr) meal.emoji = emojiStr;
       if (meal && (quickStr === 'yes' || quickStr === '1' || quickStr === 'true')) meal.quick = true;
+      const categoryStr = (row.category || '').trim();
+      if (meal && categoryStr) meal.category = categoryStr;
       if (meal && !state.meals.some(m => m.meal_name === name)) {
         state.meals.push(meal);
       }
@@ -1109,6 +1115,66 @@
     return `<div class="cookbook-collage">${cells.join('')}</div>`;
   }
 
+  function makeDiscoverSection() {
+    if (!state.discover) return null;
+    const { sources, trending } = state.discover;
+    const hasTrending = Array.isArray(trending) && trending.length > 0;
+    const hasSources = Array.isArray(sources) && sources.length > 0;
+    if (!hasTrending && !hasSources) return null;
+
+    const section = document.createElement('section');
+    section.className = 'discover-panel';
+    section.innerHTML = `<h3 class="discover-heading">Discover ideas</h3>`;
+
+    if (hasTrending) {
+      const row = document.createElement('div');
+      row.className = 'discover-trending-row';
+      for (const item of trending) {
+        if (!item || !item.url) continue;
+        const card = document.createElement('a');
+        card.className = 'discover-trending-card';
+        card.href = item.url;
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
+        const img = item.image
+          ? `<div class="discover-trending-thumb"><img src="${escapeHtml(item.image)}" alt="" loading="lazy"></div>`
+          : '<div class="discover-trending-thumb discover-trending-thumb--empty"><span>🍴</span></div>';
+        card.innerHTML = `
+          ${img}
+          <div class="discover-trending-body">
+            <p class="discover-trending-source">${escapeHtml(item.source || 'Source')}</p>
+            <h4>${escapeHtml(item.title || 'Recipe idea')}</h4>
+            ${item.note ? `<p class="discover-trending-note">${escapeHtml(item.note)}</p>` : ''}
+          </div>
+        `;
+        row.appendChild(card);
+      }
+      section.appendChild(row);
+    }
+
+    if (hasSources) {
+      const sourcesWrap = document.createElement('div');
+      sourcesWrap.className = 'discover-sources';
+      sourcesWrap.innerHTML = '<p class="discover-sources-label">Trusted sources</p>';
+      const links = document.createElement('div');
+      links.className = 'discover-sources-list';
+      for (const s of sources) {
+        if (!s || !s.url) continue;
+        const a = document.createElement('a');
+        a.className = 'discover-source-pill';
+        a.href = s.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.innerHTML = `<strong>${escapeHtml(s.name || 'Source')}</strong>${s.tagline ? ` <span>${escapeHtml(s.tagline)}</span>` : ''} <span class="discover-source-arrow">↗</span>`;
+        links.appendChild(a);
+      }
+      sourcesWrap.appendChild(links);
+      section.appendChild(sourcesWrap);
+    }
+
+    return section;
+  }
+
   function renderCookbooksList() {
     const list = document.getElementById('recipes-list');
     const detail = document.getElementById('recipe-detail');
@@ -1118,11 +1184,21 @@
     list.innerHTML = '';
     list.classList.remove('recipes-flat');
     list.classList.add('cookbooks-grid');
+
+    const discover = makeDiscoverSection();
+    if (discover) list.appendChild(discover);
+
     const cookbooks = getCookbooks();
     if (cookbooks.length === 0) {
-      list.innerHTML = '<p class="recipes-empty">No recipes yet. The shared library loads from <code>recipes.json</code> after deploy.</p>';
+      const empty = document.createElement('p');
+      empty.className = 'recipes-empty';
+      empty.innerHTML = 'No recipes yet. The shared library loads from <code>recipes.json</code> after deploy.';
+      list.appendChild(empty);
       return;
     }
+
+    const inner = document.createElement('div');
+    inner.className = 'cookbooks-grid-inner';
     for (const cb of cookbooks) {
       const tile = document.createElement('article');
       tile.className = 'cookbook-tile';
@@ -1137,8 +1213,9 @@
         recipesView = 'cookbook';
         renderRecipes();
       });
-      list.appendChild(tile);
+      inner.appendChild(tile);
     }
+    list.appendChild(inner);
   }
 
   function renderCookbookView(rawCookbook) {
@@ -1205,6 +1282,46 @@
     return renderCookbooksList();
   }
 
+  /** Plain-text ingredient list — suitable for WhatsApp / Notes paste. */
+  function formatRecipeIngredientsForClipboard(recipe) {
+    if (!recipe) return '';
+    const lines = [];
+    const titlePrefix = recipe.servings ? ` (serves ${recipe.servings})` : '';
+    lines.push(`${recipe.title}${titlePrefix}`);
+    lines.push('');
+    for (const ing of recipe.ingredients || []) {
+      const qty = [ing.qty, ing.unit].map(s => String(s || '').trim()).filter(Boolean).join(' ');
+      const emoji = ing.emoji ? `${ing.emoji} ` : '';
+      const qtyPart = qty ? `${qty} ` : '';
+      const notes = ing.notes ? ` (${ing.notes})` : '';
+      lines.push(`${emoji}${qtyPart}${ing.name}${notes}`.trim());
+    }
+    if (recipe.source && recipe.source.url) {
+      lines.push('');
+      lines.push(`Source: ${recipe.source.label || recipe.source.url}`);
+      lines.push(recipe.source.url);
+    }
+    return lines.join('\n');
+  }
+
+  function copyRecipeIngredients(recipeId, btn) {
+    const recipe = getRecipeById(recipeId);
+    if (!recipe) return;
+    const text = formatRecipeIngredientsForClipboard(recipe);
+    const flash = (label) => {
+      if (!btn) return;
+      const original = btn.textContent;
+      btn.textContent = label;
+      btn.disabled = true;
+      setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 1500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => flash('✓ Copied')).catch(() => flash('Copy failed'));
+    } else {
+      flash('Clipboard not supported');
+    }
+  }
+
   function renderRecipeDetail(recipeId) {
     const recipe = getRecipeById(recipeId);
     const list = document.getElementById('recipes-list');
@@ -1243,7 +1360,10 @@
       </div>
       ${tags ? `<div class="recipe-tags">${tags}</div>` : ''}
       <section class="recipe-detail-section">
-        <h3>Ingredients</h3>
+        <div class="recipe-section-heading">
+          <h3>Ingredients</h3>
+          <button type="button" class="btn btn-secondary btn-sm copy-ingredients-btn" id="copy-ingredients-btn" title="Copy the ingredient list to clipboard — paste into WhatsApp or Notes">📋 Copy list</button>
+        </div>
         <ul class="recipe-ingredients">${ingredients}</ul>
       </section>
       <section class="recipe-detail-section">
@@ -1459,6 +1579,23 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         saveRecipes();
       })
       .catch(() => { /* offline, file://, or missing file — keep recipes from loadState */ });
+  }
+
+  function loadDiscoverFromBundle() {
+    return fetch(BUNDLED_TRENDING_JSON, { cache: 'no-store' })
+      .then(r => {
+        if (!r.ok) throw new Error('trending.json unavailable');
+        return r.json();
+      })
+      .then(data => {
+        if (data && typeof data === 'object') {
+          state.discover = {
+            sources: Array.isArray(data.sources) ? data.sources : [],
+            trending: Array.isArray(data.trending) ? data.trending : []
+          };
+        }
+      })
+      .catch(() => { state.discover = null; });
   }
 
   // --- Planner grid ---
@@ -2143,6 +2280,66 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     return haystack.includes(term);
   }
 
+  // Order of meal cookbooks in the library — mirrors the Recipes cookbook ordering
+  const MEAL_COOKBOOK_ORDER = [
+    'Italian', 'Japanese', 'Asian', 'Indian & curries', 'British classics',
+    'Tex-Mex', 'Other mains', 'Sides', 'Toddler', 'Bakes', 'Treats'
+  ];
+
+  function makeMealCard(meal) {
+    const card = document.createElement('div');
+    card.className = 'meal-card';
+    card.dataset.mealName = meal.meal_name;
+    card.setAttribute('role', 'listitem');
+    const hasVariants = meal.variants && meal.variants.length > 0;
+    const hasSides = meal.sides && meal.sides.length > 0;
+    let desc = '';
+    if (hasVariants) {
+      desc = 'Options: ' + meal.variants.map(v => v.name).join(', ');
+    } else {
+      desc = (meal.ingredients || []).join(', ');
+    }
+    if (hasSides) desc = (desc ? desc + ' · ' : '') + 'Sides: ' + meal.sides.map(s => s.name).join(', ');
+    const emoji = getMealEmoji(meal);
+    card.innerHTML = `
+      <div class="meal-card-header">
+        <div class="meal-name"><span class="meal-emoji-display">${emoji}</span>${escapeHtml(meal.meal_name)}${meal.quick ? ' <span class="meal-quick-icon" title="Quick meal">⚡</span>' : ''}${hasVariants ? ' <span class="meal-variant-badge">' + meal.variants.length + ' options</span>' : ''}${hasSides ? ' <span class="meal-variant-badge">' + meal.sides.length + ' sides</span>' : ''}</div>
+        <div class="meal-card-actions">
+          <button type="button" class="btn-icon info-meal-btn" title="View ingredients" aria-label="View ingredients">&#9432;</button>
+          <button type="button" class="btn-icon edit-meal-btn" title="Edit">&#9998;</button>
+          <button type="button" class="btn-icon delete-meal-btn" title="Delete">&times;</button>
+        </div>
+      </div>
+      <div class="meal-ingredients">${escapeHtml(desc)}</div>
+    `;
+    card.querySelector('.info-meal-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openMealInfoModal(meal.meal_name);
+    });
+    card.querySelector('.edit-meal-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openMealModal(meal.meal_name);
+    });
+    card.querySelector('.delete-meal-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (confirm(`Delete "${meal.meal_name}"?`)) {
+        removeMeal(meal.meal_name);
+        renderMealLibrary();
+        renderPlannerGrid();
+        renderShoppingList();
+      }
+    });
+    card.addEventListener('click', function (e) {
+      if (e.target.closest('.btn-icon')) return;
+      if (isMobileViewport()) {
+        openAssignMealFlow(meal.meal_name);
+        return;
+      }
+      card.classList.toggle('show-ingredients');
+    });
+    return card;
+  }
+
   function renderMealLibrary(shuffleOrder) {
     const container = document.getElementById('meal-library');
     if (!container) return;
@@ -2151,66 +2348,49 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       container.innerHTML = '<p class="meal-library-empty">No meals yet — tap Add Meal to start.</p>';
       return;
     }
-    const baseList = shuffleOrder ? shuffleArray(state.meals) : state.meals;
     const term = (mealSearchTerm || '').trim().toLowerCase();
-    const mealsToShow = term ? baseList.filter(m => mealMatchesSearch(m, term)) : baseList;
-    if (mealsToShow.length === 0) {
-      container.innerHTML = `<p class="meal-library-empty">No meals match "${escapeHtml(mealSearchTerm)}".</p>`;
+    if (term) {
+      // Flat list when searching, ignore grouping
+      const matches = state.meals.filter(m => mealMatchesSearch(m, term));
+      if (matches.length === 0) {
+        container.innerHTML = `<p class="meal-library-empty">No meals match "${escapeHtml(mealSearchTerm)}".</p>`;
+        return;
+      }
+      matches.forEach(meal => container.appendChild(makeMealCard(meal)));
+      attachMealCardDragDrop();
       return;
     }
-    mealsToShow.forEach(meal => {
-      const card = document.createElement('div');
-      card.className = 'meal-card';
-      card.dataset.mealName = meal.meal_name;
-      card.setAttribute('role', 'listitem');
-      const hasVariants = meal.variants && meal.variants.length > 0;
-      const hasSides = meal.sides && meal.sides.length > 0;
-      let desc = '';
-      if (hasVariants) {
-        desc = 'Options: ' + meal.variants.map(v => v.name).join(', ');
-      } else {
-        desc = (meal.ingredients || []).join(', ');
-      }
-      if (hasSides) desc = (desc ? desc + ' · ' : '') + 'Sides: ' + meal.sides.map(s => s.name).join(', ');
-      const emoji = getMealEmoji(meal);
-      card.innerHTML = `
-        <div class="meal-card-header">
-          <div class="meal-name"><span class="meal-emoji-display">${emoji}</span>${escapeHtml(meal.meal_name)}${meal.quick ? ' <span class="meal-quick-icon" title="Quick meal">⚡</span>' : ''}${hasVariants ? ' <span class="meal-variant-badge">' + meal.variants.length + ' options</span>' : ''}${hasSides ? ' <span class="meal-variant-badge">' + meal.sides.length + ' sides</span>' : ''}</div>
-          <div class="meal-card-actions">
-            <button type="button" class="btn-icon info-meal-btn" title="View ingredients" aria-label="View ingredients">&#9432;</button>
-            <button type="button" class="btn-icon edit-meal-btn" title="Edit">&#9998;</button>
-            <button type="button" class="btn-icon delete-meal-btn" title="Delete">&times;</button>
-          </div>
-        </div>
-        <div class="meal-ingredients">${escapeHtml(desc)}</div>
-      `;
-      card.querySelector('.info-meal-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        openMealInfoModal(meal.meal_name);
-      });
-      card.querySelector('.edit-meal-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        openMealModal(meal.meal_name);
-      });
-      card.querySelector('.delete-meal-btn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (confirm(`Delete "${meal.meal_name}"?`)) {
-          removeMeal(meal.meal_name);
-          renderMealLibrary();
-          renderPlannerGrid();
-          renderShoppingList();
-        }
-      });
-      card.addEventListener('click', function (e) {
-        if (e.target.closest('.btn-icon')) return;
-        if (isMobileViewport()) {
-          openAssignMealFlow(meal.meal_name);
-          return;
-        }
-        card.classList.toggle('show-ingredients');
-      });
-      container.appendChild(card);
-    });
+
+    // Group by category (cookbook). Unknown / empty category goes to "Uncategorized".
+    const buckets = new Map();
+    const baseList = shuffleOrder ? shuffleArray(state.meals) : state.meals;
+    for (const meal of baseList) {
+      const cat = (meal.category || 'Uncategorized').trim() || 'Uncategorized';
+      if (!buckets.has(cat)) buckets.set(cat, []);
+      buckets.get(cat).push(meal);
+    }
+    const orderedCategories = [
+      ...MEAL_COOKBOOK_ORDER.filter(c => buckets.has(c)),
+      ...Array.from(buckets.keys()).filter(c => !MEAL_COOKBOOK_ORDER.includes(c) && c !== 'Uncategorized').sort(),
+      ...(buckets.has('Uncategorized') ? ['Uncategorized'] : [])
+    ];
+    for (const cat of orderedCategories) {
+      const meals = buckets.get(cat);
+      if (!meals || meals.length === 0) continue;
+      const group = document.createElement('details');
+      group.className = 'meal-library-group';
+      group.open = true;
+      const summary = document.createElement('summary');
+      summary.className = 'meal-library-group-heading';
+      summary.innerHTML = `<span>${escapeHtml(cat)}</span><span class="meal-library-group-count">${meals.length}</span>`;
+      group.appendChild(summary);
+      const list = document.createElement('div');
+      list.className = 'meal-library-group-list';
+      const sorted = shuffleOrder ? meals : meals.slice().sort((a, b) => a.meal_name.localeCompare(b.meal_name, undefined, { sensitivity: 'base' }));
+      sorted.forEach(meal => list.appendChild(makeMealCard(meal)));
+      group.appendChild(list);
+      container.appendChild(group);
+    }
     attachMealCardDragDrop();
   }
 
@@ -2412,7 +2592,34 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         .catch(function () { /* file missing, file://, or offline — empty-state fallback in meal library */ })
       : Promise.resolve();
 
-    Promise.all([mealsPromise, loadSharedRecipesFromBundle()]).finally(finishInit);
+    // One-time backfill: existing localStorage meals predate the `category` column.
+    // Fetch meals.csv and merge categories onto existing meals (no other fields touched).
+    const needsCategoryBackfill = state.meals.length > 0 && state.meals.some(m => !m.category);
+    const categoryBackfillPromise = needsCategoryBackfill
+      ? fetch(BUNDLED_MEALS_CSV, { cache: 'no-store' })
+        .then(r => r.ok ? r.text() : null)
+        .then(text => {
+          if (!text) return;
+          const byName = new Map();
+          for (const row of parseCsv(text)) {
+            const name = (row.meal_name || row.mealName || '').trim();
+            const category = (row.category || '').trim();
+            if (name && category) byName.set(name, category);
+          }
+          let changed = false;
+          for (const meal of state.meals) {
+            const cat = byName.get(meal.meal_name);
+            if (cat && meal.category !== cat) {
+              meal.category = cat;
+              changed = true;
+            }
+          }
+          if (changed) saveMeals();
+        })
+        .catch(() => {})
+      : Promise.resolve();
+
+    Promise.all([mealsPromise, categoryBackfillPromise, loadSharedRecipesFromBundle(), loadDiscoverFromBundle()]).finally(finishInit);
   }
 
   function wireEventListeners() {
@@ -2555,6 +2762,8 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         renderRecipes();
       }
       if (e.target.closest('#copy-recipe-to-meal-btn')) copyRecipeToMeal(activeRecipeId);
+      const copyBtn = e.target.closest('#copy-ingredients-btn');
+      if (copyBtn) copyRecipeIngredients(activeRecipeId, copyBtn);
     });
     document.getElementById('recipe-detail')?.addEventListener('input', (e) => {
       if (e.target.id !== 'recipe-notes-input' || !activeRecipeId) return;
