@@ -2043,11 +2043,13 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 
   .shopping-panel.mobile-visible {
     display: flex;
+    flex-direction: column;
     border-left: none;
     border-top: none;
     flex: 1;
     min-height: 0;
-    overflow: auto;
+    max-height: none;        /* override 1024px cap of 300px */
+    overflow: hidden;        /* let inner .shopping-list flex:1 scroll */
     padding: 1rem;
   }
 

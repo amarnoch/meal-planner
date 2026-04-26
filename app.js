@@ -2756,10 +2756,21 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     });
     document.getElementById('recipe-detail')?.addEventListener('click', (e) => {
       if (e.target.closest('#back-to-recipes-btn')) {
+        e.preventDefault();
+        e.stopPropagation();
         activeRecipeId = null;
         activeCookbook = null;
         recipesView = 'cookbooks';
+        // Defensive: force the visibility flip immediately so the navigation feels instant
+        const list = document.getElementById('recipes-list');
+        const detail = document.getElementById('recipe-detail');
+        if (detail) detail.hidden = true;
+        if (list) list.hidden = false;
         renderRecipes();
+        // Scroll the recipes panel back to the top so the user lands on the cookbook grid
+        const panel = document.querySelector('.recipes-panel');
+        if (panel) panel.scrollTop = 0;
+        return;
       }
       if (e.target.closest('#copy-recipe-to-meal-btn')) copyRecipeToMeal(activeRecipeId);
       const copyBtn = e.target.closest('#copy-ingredients-btn');
