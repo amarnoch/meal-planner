@@ -7,49 +7,10 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Wizard modal (first-run setup) -->
-  <div id="wizard-overlay" class="wizard-overlay" aria-hidden="true">
-    <div class="wizard-modal">
-      <div id="wizard-step-welcome" class="wizard-step">
-        <h2>Welcome to Meal Planner</h2>
-        <p>Plan your week: add meals, drag them onto the calendar, and get an automatic shopping list. Weekdays are dinner only; weekends include lunch too.</p>
-        <button type="button" class="btn btn-primary" data-wizard-next>Get started</button>
-      </div>
-      <div id="wizard-step-meals" class="wizard-step" hidden>
-        <h2>Add your meals</h2>
-        <p>Add at least 3 meals with their ingredients (comma-separated). You can add more later from the sidebar.</p>
-        <div id="wizard-meals-container"></div>
-        <button type="button" class="btn btn-secondary" id="wizard-add-meal">Add another meal</button>
-        <div class="wizard-actions">
-          <button type="button" class="btn btn-secondary" data-wizard-prev>Back</button>
-          <button type="button" class="btn btn-primary" data-wizard-next>Next</button>
-        </div>
-      </div>
-      <div id="wizard-step-plan" class="wizard-step" hidden>
-        <h2>Plan your week</h2>
-        <p>Drag meals from the list below into the day slots. You can change this anytime on the main screen.</p>
-        <div id="wizard-meals-drag" class="wizard-meals-drag"></div>
-        <div id="wizard-planner-preview" class="planner-preview"></div>
-        <div class="wizard-actions">
-          <button type="button" class="btn btn-secondary" data-wizard-prev>Back</button>
-          <button type="button" class="btn btn-primary" data-wizard-next>Done</button>
-        </div>
-      </div>
-      <div id="wizard-step-done" class="wizard-step" hidden>
-        <h2>You're all set</h2>
-        <p>Your meal plan is saved. Use the main screen to adjust meals and view your shopping list.</p>
-        <button type="button" class="btn btn-primary" id="wizard-close">Close</button>
-      </div>
-    </div>
-  </div>
-
   <header class="app-header">
     <h1>Meal Planner</h1>
     <div class="header-actions">
       <button type="button" class="btn btn-secondary btn-sm" id="recipes-btn">Recipes</button>
-      <button type="button" class="btn btn-secondary btn-sm" id="share-btn">Share</button>
-      <button type="button" class="btn btn-secondary btn-sm" id="import-plan-btn">Import</button>
-      <input type="file" id="import-plan-input" accept=".json" hidden>
     </div>
   </header>
 
@@ -66,14 +27,18 @@
     <aside class="sidebar">
       <h2>Meal Library</h2>
       <p class="meal-library-mobile-hint">Tap a meal to add it to the week (choose options, then pick a day).</p>
+      <input type="search" id="meal-search" class="meal-search" placeholder="Search meals" autocomplete="off">
       <button type="button" class="btn btn-primary" id="add-meal-btn">Add Meal</button>
       <div id="meal-library" class="meal-library" role="list"></div>
-      <div class="sidebar-footer">
-        <button type="button" class="btn btn-secondary" id="import-meals-btn">Import Meals CSV</button>
-        <input type="file" id="import-meals-input" accept=".csv" hidden>
-        <button type="button" class="btn btn-secondary" id="export-meals-btn">Export Meals CSV</button>
-        <button type="button" class="btn btn-secondary" id="export-plan-btn">Export Plan CSV</button>
-      </div>
+      <details class="sidebar-admin">
+        <summary>Manage meals</summary>
+        <div class="sidebar-footer">
+          <button type="button" class="btn btn-secondary" id="import-meals-btn">Import Meals CSV</button>
+          <input type="file" id="import-meals-input" accept=".csv" hidden>
+          <button type="button" class="btn btn-secondary" id="export-meals-btn">Export Meals CSV</button>
+          <button type="button" class="btn btn-secondary" id="export-plan-btn">Export Plan CSV</button>
+        </div>
+      </details>
     </aside>
 
     <!-- Center: Weekly Planner -->
@@ -90,26 +55,26 @@
 
     <!-- Recipes -->
     <section class="recipes-panel" aria-label="Recipes">
-      <div class="recipes-header">
-        <div>
-          <h2>Recipes</h2>
-          <p>Shared recipe library from <code>recipes.json</code> (same for everyone after deploy). Toddler snacks, bakes and sides stay recipe-only until you copy a meal into the meal list.</p>
-          <p class="recipes-header-hint">To add recipes: use <strong>Extract recipe</strong> → Claude/ChatGPT → paste JSON into git. <strong>Import backup file</strong> only restores a JSON snapshot on this device.</p>
-        </div>
-        <div class="recipes-header-actions">
-          <button type="button" class="btn btn-primary btn-sm" id="add-recipe-btn">Extract recipe</button>
-          <button type="button" class="btn btn-secondary btn-sm" id="import-recipes-btn">Import backup file</button>
-          <input type="file" id="import-recipes-input" accept=".json" hidden>
-          <button type="button" class="btn btn-secondary btn-sm" id="export-recipes-btn">Export backup</button>
-          <button type="button" class="btn btn-secondary btn-sm recipes-close-btn" id="close-recipes-btn">Back</button>
-        </div>
-      </div>
+      <header class="recipes-header">
+        <h2>Recipes</h2>
+        <button type="button" class="btn btn-secondary btn-sm recipes-close-btn" id="close-recipes-btn">Back</button>
+      </header>
       <div class="recipes-controls">
         <input type="search" id="recipe-search" placeholder="Search recipes">
         <div id="recipe-category-filters" class="recipe-category-filters" aria-label="Recipe categories"></div>
       </div>
       <div id="recipes-list" class="recipes-list" role="list"></div>
       <div id="recipe-detail" class="recipe-detail" hidden></div>
+      <details class="recipes-admin">
+        <summary>Manage recipes</summary>
+        <p class="recipes-admin-hint">To add new recipes: <strong>Extract recipe</strong> → Claude/ChatGPT → paste JSON into <code>recipes.json</code> in git.</p>
+        <div class="recipes-admin-actions">
+          <button type="button" class="btn btn-primary btn-sm" id="add-recipe-btn">Extract recipe</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="import-recipes-btn">Import backup file</button>
+          <input type="file" id="import-recipes-input" accept=".json" hidden>
+          <button type="button" class="btn btn-secondary btn-sm" id="export-recipes-btn">Export backup</button>
+        </div>
+      </details>
     </section>
 
     <!-- Right panel: Shopping List -->
@@ -119,7 +84,6 @@
         <div class="shopping-actions">
           <button type="button" class="btn btn-secondary btn-sm" id="restore-shopping-btn" hidden>Restore removed</button>
           <button type="button" class="btn btn-secondary btn-sm" id="copy-shopping-btn">Copy</button>
-          <button type="button" class="btn btn-secondary btn-sm" id="export-shopping-btn">Export CSV</button>
         </div>
       </div>
       <div id="shopping-list" class="shopping-list" role="list"></div>
@@ -247,16 +211,10 @@
       <div id="recipe-step-2" class="recipe-wizard-panel" hidden>
         <p class="form-hint">Copy the prompt, then paste it (and your link or screenshot) in Claude or ChatGPT. When the model returns JSON, go to the next step to check it.</p>
         <div class="recipe-prompt-actions recipe-prompt-actions-wrap">
-          <button type="button" class="btn btn-primary btn-sm" id="copy-recipe-prompt-open-claude-btn">Copy prompt &amp; open Claude</button>
-          <button type="button" class="btn btn-secondary btn-sm" id="copy-recipe-prompt-btn">Copy prompt only</button>
+          <button type="button" class="btn btn-primary btn-sm" id="copy-recipe-prompt-open-claude-btn">Copy &amp; open Claude</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="copy-recipe-prompt-open-chatgpt-btn">Copy &amp; open ChatGPT</button>
           <span id="recipe-prompt-copied" class="share-copied-toast" hidden>Copied!</span>
         </div>
-        <p class="recipe-external-links">
-          Or open in a new tab:
-          <a href="https://claude.ai/new" target="_blank" rel="noopener noreferrer">Open Claude</a>
-          ·
-          <a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">Open ChatGPT</a>
-        </p>
       </div>
 
       <div id="recipe-step-3" class="recipe-wizard-panel" hidden>
@@ -281,27 +239,6 @@
     </div>
   </div>
 
-  <!-- Share modal -->
-  <div id="share-overlay" class="modal-overlay" aria-hidden="true">
-    <div class="modal share-modal">
-      <h2>Share your plan</h2>
-      <p class="share-hint">Let someone scan the QR code or send them the plan file. They can open it and import to get your full meal plan.</p>
-      <div id="share-qr-container" class="share-qr-container"></div>
-      <p id="share-qr-fallback" class="share-qr-fallback" hidden>Plan is too large for a QR code. Use the download button to share the file instead.</p>
-      <div class="share-actions">
-        <button type="button" class="btn btn-primary" id="share-download-btn">Download plan file</button>
-        <button type="button" class="btn btn-secondary" id="share-copy-link-btn">Copy link</button>
-        <button type="button" class="btn btn-secondary" id="share-native-btn" hidden>Send via...</button>
-      </div>
-      <p id="share-copied-toast" class="share-copied-toast" hidden>Copied!</p>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-secondary" id="share-close-btn">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
