@@ -904,7 +904,7 @@
       ? raw.steps.map(step => String(step || '').trim()).filter(Boolean)
       : [];
     if (steps.length === 0) return { error: 'Recipe needs at least one step.' };
-    const category = RECIPE_CATEGORY_LABELS[raw.category] ? raw.category : 'other';
+    const category = raw.category ? String(raw.category).trim() : '';
     const source = raw.source && typeof raw.source === 'object' ? raw.source : {};
     const tags = Array.isArray(raw.tags)
       ? raw.tags.map(tag => String(tag || '').trim()).filter(Boolean)
@@ -1085,7 +1085,7 @@
     if (recipe.servings) meta.push(`${recipe.servings} serving${recipe.servings === 1 ? '' : 's'}`);
     const copied = recipe.mealName ? '<span class="recipe-card-status">In meals</span>' : '';
     const thumb = recipe.imageUrl
-      ? `<img src="${escapeHtml(recipe.imageUrl)}" alt="">`
+      ? `<img src="${escapeHtml(recipe.imageUrl)}" alt="" loading="lazy">`
       : `<span class="recipe-card-thumb-emoji">${escapeHtml((recipe.ingredients?.[0]?.emoji) || '🍽')}</span>`;
     card.innerHTML = `
       <div class="recipe-card-thumb">${thumb}</div>
@@ -1106,7 +1106,7 @@
       const r = thumbs[i];
       if (r) {
         const inner = r.imageUrl
-          ? `<img src="${escapeHtml(r.imageUrl)}" alt="">`
+          ? `<img src="${escapeHtml(r.imageUrl)}" alt="" loading="lazy">`
           : `<span>${escapeHtml((r.ingredients?.[0]?.emoji) || '🍽')}</span>`;
         cells.push(`<div class="cookbook-collage-cell">${inner}</div>`);
       } else {
@@ -1243,7 +1243,7 @@
     const steps = recipe.steps.map(step => `<li>${escapeHtml(step)}</li>`).join('');
     const isMeal = recipe.category === 'meal';
     const heroContent = recipe.imageUrl
-      ? `<img src="${escapeHtml(recipe.imageUrl)}" alt="">`
+      ? `<img src="${escapeHtml(recipe.imageUrl)}" alt="" loading="lazy">`
       : `<span class="recipe-detail-hero-emoji">${escapeHtml((recipe.ingredients?.[0]?.emoji) || '🍽')}</span>`;
     detail.innerHTML = `
       <button type="button" class="btn btn-secondary btn-sm" id="back-to-recipes-btn">← Back to recipes</button>
@@ -1310,9 +1310,9 @@ Schema:
 {
   "title": "string",
   "source": {"type": "instagram|web|screenshot|manual", "url": "string|null", "label": "string|null"},
-  "imageUrl": "string|null",
+  "imageUrl": "absolute URL of the dish's hero photo from the source, or null if none is available",
   "servings": 4,
-  "category": "meal|toddler_snack|baking|side|other",
+  "category": "Cookbook name — one of: Italian, Asian, Indian & curries, British classics, Tex-Mex, Other mains, Sides, Toddler, Bakes, Treats. Or invent a new name if none fit.",
   "tags": ["string"],
   "ingredients": [{"qty": "string", "unit": "string", "name": "string", "notes": "string|null", "emoji": "single emoji or empty"}],
   "steps": ["string"],
@@ -1320,7 +1320,8 @@ Schema:
 }
 
 Rules:
-- Pick exactly one category. Use toddler_snack for baby/toddler snacks such as muffins, banana bread, oat bars, pancakes, fritters or lunchbox snacks.
+- imageUrl: pick the largest cooked-dish photo from the source page (absolute URL, http/https). Return null only if the source has no usable image.
+- category: pick the cookbook that best fits the dish. Match case exactly ("Italian", not "italian"). Suggest a new cookbook name only if none of the listed ones fit.
 - qty as written ("1", "1/2", "1-2"); unit lowercase ("g", "ml", "can", "tbsp", "clove", "handful", "" if none).
 - One emoji per ingredient if obvious, otherwise "".
 - Steps are imperative sentences with no numbering inside the string.

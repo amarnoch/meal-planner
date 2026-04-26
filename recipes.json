@@ -7,7 +7,7 @@
       "url": null,
       "label": null
     },
-    "imageUrl": null,
+    "imageUrl": "https://images.unsplash.com/photo-1718307495601-5231e6290d8a?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 12,
     "category": "Toddler",
     "tags": ["toddler snack", "healthy snack", "1 year old", "baking"],
@@ -82,7 +82,7 @@
       "url": "https://www.sirogohan.com/sp/recipe/omuraisukihon/",
       "label": "Sirogohan.com — 基本のオムライス"
     },
-    "imageUrl": null,
+    "imageUrl": "https://www.sirogohan.com/_files/recipe/images/omuraisu/omuraisu9142.JPG",
     "servings": 2,
     "category": "Asian",
     "tags": ["dinner", "japanese", "comfort food", "family friendly", "kid friendly", "eggs"],
@@ -127,7 +127,7 @@
       "url": null,
       "label": "carolefood"
     },
-    "imageUrl": null,
+    "imageUrl": "https://images.unsplash.com/photo-1637668895982-893b7df2a59a?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
     "category": "Other mains",
     "tags": ["vegetarian", "dinner", "quick", "comfort food"],
