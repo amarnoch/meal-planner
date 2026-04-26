@@ -42,6 +42,13 @@
       "url": "https://www.mob.co.uk/recipes/collections/mobs-easy-weeknight-dinner-recipes",
       "image": "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?fm=jpg&q=70&w=600&auto=format&fit=crop",
       "note": "Adult-grade flavour, kid-friendly enough — for when you and Laura want something good."
+    },
+    {
+      "title": "BBC Good Food — family classics",
+      "source": "bbcgoodfood.com",
+      "url": "https://www.bbcgoodfood.com/recipes/collection/family-recipes",
+      "image": "https://images.unsplash.com/photo-1766701753169-5ed4a00d4217?fm=jpg&q=70&w=600&auto=format&fit=crop",
+      "note": "Crowd-tested family staples — reliable when you want something safe."
     }
   ]
 }
