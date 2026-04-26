@@ -84,7 +84,7 @@
     },
     "imageUrl": "https://www.sirogohan.com/_files/recipe/images/omuraisu/omuraisu9142.JPG",
     "servings": 2,
-    "category": "Asian",
+    "category": "Japanese",
     "tags": ["dinner", "japanese", "comfort food", "family friendly", "kid friendly", "eggs"],
     "ingredients": [
       { "qty": "400", "unit": "g", "name": "cooked rice (warm)", "notes": "[ASSUMPTION] quantity inferred from sirogohan chicken rice recipe — not stated explicitly on omurice page", "emoji": "🍚" },

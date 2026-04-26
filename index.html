@@ -94,6 +94,7 @@
   <!-- Add/Edit Meal modal -->
   <div id="meal-modal-overlay" class="modal-overlay" aria-hidden="true">
     <div class="modal">
+      <button type="button" class="modal-close-btn" data-close-target="meal-modal-overlay" aria-label="Close">×</button>
       <h2 id="meal-modal-title">Add Meal</h2>
       <form id="meal-form">
         <label for="meal-name">Meal name</label>
@@ -146,6 +147,7 @@
   <!-- Variant picker (when dropping a meal that has variants) -->
   <div id="variant-picker-overlay" class="modal-overlay" aria-hidden="true">
     <div class="modal modal-sm">
+      <button type="button" class="modal-close-btn" data-close-target="variant-picker-overlay" aria-label="Close">×</button>
       <h2>Choose option</h2>
       <p id="variant-picker-meal-name" class="variant-picker-meal"></p>
       <div id="variant-picker-options"></div>
@@ -158,6 +160,7 @@
   <!-- Side picker (when dropping a meal that has sides) -->
   <div id="side-picker-overlay" class="modal-overlay" aria-hidden="true">
     <div class="modal modal-sm">
+      <button type="button" class="modal-close-btn" data-close-target="side-picker-overlay" aria-label="Close">×</button>
       <h2>Choose side</h2>
       <p id="side-picker-meal-name" class="variant-picker-meal"></p>
       <div id="side-picker-options"></div>
@@ -170,6 +173,7 @@
   <!-- Mobile: assign meal to a day/slot (tap meal in library) -->
   <div id="assign-meal-overlay" class="modal-overlay" aria-hidden="true">
     <div class="modal modal-sm assign-meal-modal">
+      <button type="button" class="modal-close-btn" data-close-target="assign-meal-overlay" aria-label="Close">×</button>
       <h2 id="assign-meal-heading">Add to plan</h2>
       <p id="assign-meal-subtitle" class="variant-picker-meal"></p>
       <p id="assign-meal-step-hint" class="assign-meal-hint"></p>
@@ -184,6 +188,7 @@
   <!-- Extract recipe helper (batch workflow: JSON goes into recipes.json in git) -->
   <div id="recipe-modal-overlay" class="modal-overlay" aria-hidden="true">
     <div class="modal recipe-modal">
+      <button type="button" class="modal-close-btn" data-close-target="recipe-modal-overlay" aria-label="Close">×</button>
       <h2>Extract recipe</h2>
       <p class="form-hint">Three steps: describe the source, copy a prompt into Claude or ChatGPT, then validate JSON before you paste it into <code>recipes.json</code> in the repo.</p>
 

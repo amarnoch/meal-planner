@@ -659,21 +659,6 @@
     saveMeals();
   }
 
-  function importPlanFromCsv(text) {
-    const rows = parseCsv(text);
-    for (const row of rows) {
-      const day = (row.day || '').trim();
-      const mealType = (row.meal_type || row.mealType || '').trim();
-      const name = (row.meal_name || row.mealName || '').trim();
-      const variant = (row.variant_name || row.variantName || '').trim() || undefined;
-      const sideRaw = (row.side_name || row.sideName || '').trim();
-      const side = sideRaw === SIDE_NONE ? SIDE_NONE : (sideRaw || undefined);
-      if (day && mealType && name && DAYS.includes(day)) {
-        setPlannedMeal(day, mealType, name, variant, side);
-      }
-    }
-  }
-
   // --- Shopping list ---
   let shoppingRemoved = new Set();
 
@@ -1076,6 +1061,15 @@
     return cookbooks;
   }
 
+  /** Image or emoji-fallback markup for a recipe — used by card, collage, hero. */
+  function recipeThumbHtml(recipe, fallbackClass) {
+    if (recipe.imageUrl) return `<img src="${escapeHtml(recipe.imageUrl)}" alt="" loading="lazy">`;
+    const emoji = (recipe.ingredients?.[0]?.emoji) || '🍽';
+    return fallbackClass
+      ? `<span class="${fallbackClass}">${escapeHtml(emoji)}</span>`
+      : `<span>${escapeHtml(emoji)}</span>`;
+  }
+
   function makeRecipeCard(recipe) {
     const card = document.createElement('article');
     card.className = 'recipe-card';
@@ -1084,9 +1078,7 @@
     const meta = [getRecipeCategoryLabel(recipe.category)];
     if (recipe.servings) meta.push(`${recipe.servings} serving${recipe.servings === 1 ? '' : 's'}`);
     const copied = recipe.mealName ? '<span class="recipe-card-status">In meals</span>' : '';
-    const thumb = recipe.imageUrl
-      ? `<img src="${escapeHtml(recipe.imageUrl)}" alt="" loading="lazy">`
-      : `<span class="recipe-card-thumb-emoji">${escapeHtml((recipe.ingredients?.[0]?.emoji) || '🍽')}</span>`;
+    const thumb = recipeThumbHtml(recipe, 'recipe-card-thumb-emoji');
     card.innerHTML = `
       <div class="recipe-card-thumb">${thumb}</div>
       <div class="recipe-card-body">
@@ -1104,14 +1096,8 @@
     const cells = [];
     for (let i = 0; i < 4; i++) {
       const r = thumbs[i];
-      if (r) {
-        const inner = r.imageUrl
-          ? `<img src="${escapeHtml(r.imageUrl)}" alt="" loading="lazy">`
-          : `<span>${escapeHtml((r.ingredients?.[0]?.emoji) || '🍽')}</span>`;
-        cells.push(`<div class="cookbook-collage-cell">${inner}</div>`);
-      } else {
-        cells.push('<div class="cookbook-collage-cell empty"></div>');
-      }
+      if (r) cells.push(`<div class="cookbook-collage-cell">${recipeThumbHtml(r)}</div>`);
+      else cells.push('<div class="cookbook-collage-cell empty"></div>');
     }
     return `<div class="cookbook-collage">${cells.join('')}</div>`;
   }
@@ -1212,12 +1198,6 @@
     return renderCookbooksList();
   }
 
-  function formatRecipeIngredient(ingredient, includeQty) {
-    const qty = [ingredient.qty, ingredient.unit].map(s => String(s || '').trim()).filter(Boolean).join(' ');
-    const base = includeQty && qty ? `${qty} ${ingredient.name}` : ingredient.name;
-    return ingredient.notes ? `${base} (${ingredient.notes})` : base;
-  }
-
   function renderRecipeDetail(recipeId) {
     const recipe = getRecipeById(recipeId);
     const list = document.getElementById('recipes-list');
@@ -1242,9 +1222,7 @@
     }).join('');
     const steps = recipe.steps.map(step => `<li>${escapeHtml(step)}</li>`).join('');
     const isMeal = recipe.category === 'meal';
-    const heroContent = recipe.imageUrl
-      ? `<img src="${escapeHtml(recipe.imageUrl)}" alt="" loading="lazy">`
-      : `<span class="recipe-detail-hero-emoji">${escapeHtml((recipe.ingredients?.[0]?.emoji) || '🍽')}</span>`;
+    const heroContent = recipeThumbHtml(recipe, 'recipe-detail-hero-emoji');
     detail.innerHTML = `
       <button type="button" class="btn btn-secondary btn-sm" id="back-to-recipes-btn">← Back to recipes</button>
       <div class="recipe-detail-hero">${heroContent}</div>
@@ -1312,7 +1290,7 @@ Schema:
   "source": {"type": "instagram|web|screenshot|manual", "url": "string|null", "label": "string|null"},
   "imageUrl": "absolute URL of the dish's hero photo from the source, or null if none is available",
   "servings": 4,
-  "category": "Cookbook name — one of: Italian, Asian, Indian & curries, British classics, Tex-Mex, Other mains, Sides, Toddler, Bakes, Treats. Or invent a new name if none fit.",
+  "category": "Cookbook name — one of: Italian, Japanese, Indian & curries, British classics, Tex-Mex, Other mains, Sides, Toddler, Bakes, Treats. Or invent a new name if none fit (e.g. Thai, Korean, Mediterranean).",
   "tags": ["string"],
   "ingredients": [{"qty": "string", "unit": "string", "name": "string", "notes": "string|null", "emoji": "single emoji or empty"}],
   "steps": ["string"],
@@ -1591,6 +1569,17 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     el.innerHTML = parts.length ? parts.join('') : '<span class="week-summary-empty">No meals planned</span>';
   }
 
+  function attachMealCardDragDrop() {
+    document.querySelectorAll('.meal-card').forEach(card => {
+      const drag = !isMobileViewport();
+      card.setAttribute('draggable', drag ? 'true' : 'false');
+      if (drag) {
+        card.addEventListener('dragstart', onLibraryCardDragStart);
+        card.addEventListener('dragend', onMealDragEnd);
+      }
+    });
+  }
+
   function attachPlannerDragDrop() {
     document.querySelectorAll('.clear-day-btn').forEach(btn => {
       btn.addEventListener('click', () => clearDay(btn.dataset.day));
@@ -1620,14 +1609,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         openPlannedMealActions(btn.dataset.day, btn.dataset.mealType);
       });
     });
-    document.querySelectorAll('.meal-card').forEach(card => {
-      const drag = !isMobileViewport();
-      card.setAttribute('draggable', drag ? 'true' : 'false');
-      if (drag) {
-        card.addEventListener('dragstart', onLibraryCardDragStart);
-        card.addEventListener('dragend', onMealDragEnd);
-      }
-    });
+    attachMealCardDragDrop();
   }
 
   function onSlotDragover(e) {
@@ -2220,7 +2202,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       });
       container.appendChild(card);
     });
-    attachPlannerDragDrop();
+    attachMealCardDragDrop();
   }
 
   // --- Add/Edit Meal modal ---
@@ -2431,6 +2413,34 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       mealSearchTerm = this.value || '';
       renderMealLibrary();
     });
+
+    // Closes a modal by overlay id, calling the right cleanup function for state-bearing ones
+    function closeOverlayById(target) {
+      switch (target) {
+        case 'meal-modal-overlay': return closeMealModal();
+        case 'assign-meal-overlay': return closeAssignMealModal();
+        case 'recipe-modal-overlay': return closeRecipeModal();
+        default: {
+          const overlay = document.getElementById(target);
+          if (overlay) {
+            overlay.setAttribute('aria-hidden', 'true');
+            overlay.style.display = 'none';
+          }
+        }
+      }
+    }
+
+    // × close button on every modal
+    document.querySelectorAll('.modal-close-btn[data-close-target]').forEach(btn => {
+      btn.addEventListener('click', () => closeOverlayById(btn.dataset.closeTarget));
+    });
+
+    // Click-outside (on the overlay backdrop) closes the modal too
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeOverlayById(overlay.id);
+      });
+    });
     document.getElementById('meal-modal-cancel')?.addEventListener('click', closeMealModal);
     document.querySelectorAll('#meal-emoji-picker .emoji-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -2475,9 +2485,6 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     });
     document.getElementById('assign-meal-cancel')?.addEventListener('click', closeAssignMealModal);
     document.getElementById('assign-meal-back')?.addEventListener('click', goBackAssignStep);
-    document.getElementById('assign-meal-overlay')?.addEventListener('click', (e) => {
-      if (e.target.id === 'assign-meal-overlay') closeAssignMealModal();
-    });
 
     document.getElementById('import-meals-btn')?.addEventListener('click', () => document.getElementById('import-meals-input').click());
     document.getElementById('import-meals-input')?.addEventListener('change', function () {

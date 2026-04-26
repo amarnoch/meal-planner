@@ -3,20 +3,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&display=swap');
 
 :root {
-  /* Confetti palette: coral pink primary, teal accent, mustard secondary accent */
-  --bg: #fef8f4;
-  --surface: #ffffff;
-  --surface-raised: #faf3ee;
-  --border: #e7e0d8;
-  --border-light: #f0e8e0;
+  /* Avo & Peach palette: sage green primary, peach accent, warm peach background */
+  --bg: #f7e2c4;
+  --surface: #fdf6ec;
+  --surface-raised: #f3d8b6;
+  --border: #d9b88a;
+  --border-light: #e8cea2;
   --text: #1f1c1a;
-  --text-muted: #807870;
-  --primary: #e85a78;
-  --primary-hover: #c4435e;
-  --primary-light: rgba(232, 90, 120, 0.10);
-  --primary-lighter: rgba(232, 90, 120, 0.05);
-  --accent: #3a9aa0;
-  --accent-2: #dc9a3a;
+  --text-muted: #7a6f5f;
+  --primary: #5d9966;
+  --primary-hover: #4a8054;
+  --primary-light: rgba(93, 153, 102, 0.12);
+  --primary-lighter: rgba(93, 153, 102, 0.06);
+  --accent: #e88f5e;
+  --accent-2: #d6a847;
   --secondary: #7a736c;
   --success: #2f7d4f;
   --danger: #c84545;
@@ -82,7 +82,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   font-size: 1.5rem;
   font-weight: 900;
   letter-spacing: -0.03em;
-  background: linear-gradient(135deg, var(--primary), #c4435e);
+  background: linear-gradient(135deg, var(--primary), #4a8054);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -352,7 +352,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 }
 
 .week-summary-meatfree {
-  background: rgba(58, 154, 160, 0.22);
+  background: rgba(232, 143, 94, 0.20);
   color: var(--accent);
   font-weight: 600;
 }
@@ -456,7 +456,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 .planner-day[data-day="Sunday"] .planner-day-header {
   background: var(--primary-lighter);
   color: var(--primary);
-  border-color: rgba(232, 90, 120, 0.15);
+  border-color: rgba(93, 153, 102, 0.15);
 }
 
 .planner-slot {
@@ -472,7 +472,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   border-color: var(--primary);
   border-style: solid;
   background: var(--primary-light);
-  box-shadow: inset 0 0 0 1px rgba(232, 90, 120, 0.15);
+  box-shadow: inset 0 0 0 1px rgba(93, 153, 102, 0.15);
 }
 
 .planner-slot .slot-label {
@@ -485,7 +485,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 }
 
 .planner-slot .planned-meal {
-  background: linear-gradient(135deg, var(--primary), #c4435e);
+  background: linear-gradient(135deg, var(--primary), #4a8054);
   color: white;
   border-radius: var(--radius-sm);
   padding: 0.55rem 0.7rem;
@@ -496,7 +496,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   text-align: left;
   width: 100%;
   transition: opacity var(--transition), transform var(--transition), box-shadow var(--transition);
-  box-shadow: 0 3px 10px rgba(232, 90, 120, 0.30);
+  box-shadow: 0 3px 10px rgba(93, 153, 102, 0.30);
   line-height: 1.35;
   display: flex;
   flex-wrap: wrap;
@@ -511,7 +511,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 }
 
 .planner-slot .planned-meal:hover {
-  box-shadow: 0 4px 12px rgba(232, 90, 120, 0.35);
+  box-shadow: 0 4px 12px rgba(93, 153, 102, 0.35);
   transform: translateY(-1px);
 }
 
@@ -678,16 +678,16 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary), #c4435e);
+  background: linear-gradient(135deg, var(--primary), #4a8054);
   color: white;
   border-color: var(--primary);
-  box-shadow: 0 3px 8px rgba(232, 90, 120, 0.25);
+  box-shadow: 0 3px 8px rgba(93, 153, 102, 0.25);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--primary-hover), #a23653);
+  background: linear-gradient(135deg, var(--primary-hover), #386a3d);
   border-color: var(--primary-hover);
-  box-shadow: 0 5px 14px rgba(232, 90, 120, 0.35);
+  box-shadow: 0 5px 14px rgba(93, 153, 102, 0.35);
   transform: translateY(-1px);
 }
 
@@ -751,6 +751,38 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   max-height: 90vh;
   overflow-y: auto;
   animation: slideUp 0.2s ease-out;
+  position: relative;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  width: 2.1rem;
+  height: 2.1rem;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background var(--transition), color var(--transition);
+  z-index: 1;
+}
+
+.modal-close-btn:hover {
+  background: var(--surface-raised);
+  color: var(--text);
+}
+
+.modal-close-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 @keyframes slideUp {
@@ -1921,7 +1953,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   .planner-day[data-day="Saturday"] .planner-day-header,
   .planner-day[data-day="Sunday"] .planner-day-header {
     color: var(--primary);
-    border-right-color: rgba(232, 90, 120, 0.4);
+    border-right-color: rgba(93, 153, 102, 0.4);
     font-weight: 800;
   }
 
