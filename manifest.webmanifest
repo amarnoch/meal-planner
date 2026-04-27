@@ -1,0 +1,15 @@
+{
+  "name": "The Marnoch Pantry",
+  "short_name": "Marnoch Pantry",
+  "description": "Andy and Laura's household meal planner.",
+  "start_url": "/meal-planner/",
+  "display": "standalone",
+  "background_color": "#f7e2c4",
+  "theme_color": "#5d9966",
+  "icons": [
+    { "src": "mp-touch-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "mp-touch-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "mp-touch-256.png", "sizes": "256x256", "type": "image/png" },
+    { "src": "mp-touch-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
