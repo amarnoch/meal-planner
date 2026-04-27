@@ -2437,6 +2437,10 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     if (!container) return;
     container.innerHTML = '';
     container.classList.remove('meal-library-drilldown', 'meal-library-cuisines', 'meal-library-flat');
+    const countEl = document.getElementById('meal-library-count');
+    if (countEl) {
+      countEl.textContent = state.meals.length ? `· ${state.meals.length} meals` : '';
+    }
     if (state.meals.length === 0) {
       container.innerHTML = '<p class="meal-library-empty">No meals yet — tap Add Meal to start.</p>';
       return;

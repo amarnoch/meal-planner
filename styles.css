@@ -122,6 +122,15 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   letter-spacing: 0.06em;
 }
 
+.meal-library-count {
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-muted);
+  margin-left: 0.25rem;
+  opacity: 0.85;
+}
+
 #add-meal-btn {
   margin-bottom: 1rem;
   width: 100%;
