@@ -154,7 +154,105 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   padding-right: 0.25rem;
 }
 
-/* Meal library — grouped by cookbook (collapsible <details>) */
+/* Meal library — cuisine tiles landing + drilldown view */
+.meal-library {
+  display: flex;
+  flex-direction: column;
+}
+
+.meal-library.meal-library-cuisines {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  align-content: start;
+}
+
+.meal-library.meal-library-flat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.meal-library.meal-library-drilldown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.meal-cuisine-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.55rem;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.meal-cuisine-tile:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.meal-cuisine-tile:active {
+  transform: scale(0.98);
+}
+
+.meal-cuisine-tile h3 {
+  margin: 0.1rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+
+.meal-cuisine-tile p {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.meal-cuisine-collage {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2px;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--border-light);
+}
+
+.meal-cuisine-collage-cell {
+  background: var(--primary-lighter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.meal-cuisine-collage-cell.empty {
+  background: var(--surface-raised);
+}
+
+.meal-cuisine-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.meal-cuisine-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Legacy collapsible groups — keep selectors for the drilldown's group-list reuse below */
 .meal-library-group {
   margin-bottom: 0.6rem;
 }
@@ -2416,8 +2514,8 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
     padding: 0.05rem 0.3rem;
   }
 
-  /* Search results aren't grouped — apply the same grid directly */
-  .meal-library:not(:has(.meal-library-group)) {
+  /* Search-flatten path uses the same 2-col grid */
+  .meal-library.meal-library-flat {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.45rem;

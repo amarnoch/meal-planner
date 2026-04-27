@@ -45,6 +45,8 @@
   let activeRecipeId = null;
   let recipeWizardStep = 1;
   let mealSearchTerm = '';
+  let mealsView = 'cuisines'; // 'cuisines' | 'cuisine'
+  let activeMealCuisine = null;
   /** Stored in planSides when user explicitly skips a side (no side ingredients). */
   const SIDE_NONE = '__none__';
 
@@ -1135,7 +1137,9 @@
     if (hasTrending) {
       const row = document.createElement('div');
       row.className = 'discover-trending-row';
-      for (const item of trending) {
+      // Shuffle on each render so the carousel feels fresh on refresh
+      const shuffled = shuffleArray(trending.slice());
+      for (const item of shuffled) {
         if (!item || !item.url) continue;
         const card = document.createElement('a');
         card.className = 'discover-trending-card';
@@ -2346,18 +2350,101 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     return card;
   }
 
+  function getMealCuisines() {
+    const buckets = new Map();
+    for (const meal of state.meals) {
+      const cat = (meal.category || 'Uncategorized').trim() || 'Uncategorized';
+      if (!buckets.has(cat)) buckets.set(cat, []);
+      buckets.get(cat).push(meal);
+    }
+    const orderedKeys = [
+      ...MEAL_COOKBOOK_ORDER.filter(c => buckets.has(c)),
+      ...Array.from(buckets.keys()).filter(c => !MEAL_COOKBOOK_ORDER.includes(c) && c !== 'Uncategorized').sort(),
+      ...(buckets.has('Uncategorized') ? ['Uncategorized'] : [])
+    ];
+    return orderedKeys.map(key => {
+      const meals = buckets.get(key) || [];
+      return {
+        name: key,
+        meals,
+        count: meals.length,
+        thumbs: meals.slice(0, 4)
+      };
+    });
+  }
+
+  function renderMealCuisineTile(cuisine) {
+    const tile = document.createElement('article');
+    tile.className = 'meal-cuisine-tile';
+    tile.dataset.cuisine = cuisine.name;
+    const cells = [];
+    for (let i = 0; i < 4; i++) {
+      const m = cuisine.thumbs[i];
+      if (m) {
+        const e = getMealEmoji(m) || '🍽';
+        cells.push(`<div class="meal-cuisine-collage-cell"><span>${escapeHtml(e)}</span></div>`);
+      } else {
+        cells.push('<div class="meal-cuisine-collage-cell empty"></div>');
+      }
+    }
+    tile.innerHTML = `
+      <div class="meal-cuisine-collage">${cells.join('')}</div>
+      <h3>${escapeHtml(cuisine.name)}</h3>
+      <p>${cuisine.count} meal${cuisine.count !== 1 ? 's' : ''}</p>
+    `;
+    tile.addEventListener('click', () => {
+      activeMealCuisine = cuisine.name;
+      mealsView = 'cuisine';
+      renderMealLibrary();
+    });
+    return tile;
+  }
+
+  function renderMealCuisineDrilldown(container, cuisineName) {
+    container.classList.add('meal-library-drilldown');
+    const cuisine = getMealCuisines().find(c => c.name === cuisineName);
+    const meals = cuisine ? cuisine.meals.slice() : [];
+
+    const header = document.createElement('div');
+    header.className = 'meal-cuisine-header';
+    header.innerHTML = `
+      <button type="button" class="btn btn-secondary btn-sm" id="back-to-cuisines-btn">← All cuisines</button>
+      <h3>${escapeHtml(cuisineName)}</h3>
+    `;
+    header.querySelector('#back-to-cuisines-btn').addEventListener('click', () => {
+      activeMealCuisine = null;
+      mealsView = 'cuisines';
+      renderMealLibrary();
+    });
+    container.appendChild(header);
+
+    if (meals.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'meal-library-empty';
+      empty.textContent = 'No meals in this cuisine.';
+      container.appendChild(empty);
+      return;
+    }
+    const list = document.createElement('div');
+    list.className = 'meal-library-group-list';
+    const sorted = meals.slice().sort((a, b) => a.meal_name.localeCompare(b.meal_name, undefined, { sensitivity: 'base' }));
+    sorted.forEach(meal => list.appendChild(makeMealCard(meal)));
+    container.appendChild(list);
+  }
+
   function renderMealLibrary(shuffleOrder) {
     const container = document.getElementById('meal-library');
     if (!container) return;
     container.innerHTML = '';
+    container.classList.remove('meal-library-drilldown', 'meal-library-cuisines', 'meal-library-flat');
     if (state.meals.length === 0) {
       container.innerHTML = '<p class="meal-library-empty">No meals yet — tap Add Meal to start.</p>';
       return;
     }
     const term = (mealSearchTerm || '').trim().toLowerCase();
     if (term) {
-      // Flat list when searching, ignore grouping
       const matches = state.meals.filter(m => mealMatchesSearch(m, term));
+      container.classList.add('meal-library-flat');
       if (matches.length === 0) {
         container.innerHTML = `<p class="meal-library-empty">No meals match "${escapeHtml(mealSearchTerm)}".</p>`;
         return;
@@ -2367,37 +2454,21 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       return;
     }
 
-    // Group by category (cookbook). Unknown / empty category goes to "Uncategorized".
-    const buckets = new Map();
-    const baseList = shuffleOrder ? shuffleArray(state.meals) : state.meals;
-    for (const meal of baseList) {
-      const cat = (meal.category || 'Uncategorized').trim() || 'Uncategorized';
-      if (!buckets.has(cat)) buckets.set(cat, []);
-      buckets.get(cat).push(meal);
+    if (mealsView === 'cuisine' && activeMealCuisine) {
+      renderMealCuisineDrilldown(container, activeMealCuisine);
+      attachMealCardDragDrop();
+      return;
     }
-    const orderedCategories = [
-      ...MEAL_COOKBOOK_ORDER.filter(c => buckets.has(c)),
-      ...Array.from(buckets.keys()).filter(c => !MEAL_COOKBOOK_ORDER.includes(c) && c !== 'Uncategorized').sort(),
-      ...(buckets.has('Uncategorized') ? ['Uncategorized'] : [])
-    ];
-    for (const cat of orderedCategories) {
-      const meals = buckets.get(cat);
-      if (!meals || meals.length === 0) continue;
-      const group = document.createElement('details');
-      group.className = 'meal-library-group';
-      group.open = true;
-      const summary = document.createElement('summary');
-      summary.className = 'meal-library-group-heading';
-      summary.innerHTML = `<span>${escapeHtml(cat)}</span><span class="meal-library-group-count">${meals.length}</span>`;
-      group.appendChild(summary);
-      const list = document.createElement('div');
-      list.className = 'meal-library-group-list';
-      const sorted = shuffleOrder ? meals : meals.slice().sort((a, b) => a.meal_name.localeCompare(b.meal_name, undefined, { sensitivity: 'base' }));
-      sorted.forEach(meal => list.appendChild(makeMealCard(meal)));
-      group.appendChild(list);
-      container.appendChild(group);
+
+    // Default: 2-col grid of cuisine tiles
+    container.classList.add('meal-library-cuisines');
+    const cuisines = getMealCuisines();
+    if (cuisines.length === 0) {
+      container.innerHTML = '<p class="meal-library-empty">No cuisines yet.</p>';
+      return;
     }
-    attachMealCardDragDrop();
+    cuisines.forEach(c => container.appendChild(renderMealCuisineTile(c)));
+    // shuffleOrder param kept for API compat (used by init render); cuisines are stable-ordered
   }
 
   // --- Add/Edit Meal modal ---
