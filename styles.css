@@ -2480,44 +2480,17 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
     padding-right: 0;
   }
 
-  /* 2-col grid for meal cards within each cookbook group */
+  /* Meal cards inside a cuisine drilldown — single-row list (not grid) */
   .meal-library-group-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 0.45rem;
   }
 
-  .meal-library-group-list .meal-card {
-    padding: 0.5rem 0.6rem;
-    min-width: 0;
-  }
-
-  .meal-library-group-list .meal-card .meal-name {
-    font-size: 0.82rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    line-height: 1.3;
-  }
-
-  .meal-library-group-list .meal-card-actions {
-    gap: 0.05rem;
-  }
-
-  .meal-library-group-list .meal-card .btn-icon {
-    padding: 0.1rem 0.25rem;
-    font-size: 0.85rem;
-  }
-
-  .meal-library-group-list .meal-variant-badge {
-    font-size: 0.55rem;
-    padding: 0.05rem 0.3rem;
-  }
-
-  /* Search-flatten path uses the same 2-col grid */
+  /* Search-flatten path also single-row */
   .meal-library.meal-library-flat {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 0.45rem;
   }
 
