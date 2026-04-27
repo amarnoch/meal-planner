@@ -354,5 +354,35 @@
     "notes": "Japanese yōshoku classic — also the base for our Omurice recipe (wrap a portion in a folded omelette and top with ketchup-butter sauce). Keeps ~3 days in the fridge or ~1 month frozen.",
     "createdAt": "2026-04-26T23:30:00Z",
     "mealName": null
+  },
+  {
+    "id": "rec_yoghurt_flatbreads",
+    "title": "Easy Yoghurt Flatbreads",
+    "source": {
+      "type": "web",
+      "url": "https://www.bbcgoodfood.com/user/12304531/recipe/easy-yoghurt-flatbreads-varying-sizes",
+      "label": "BBC Good Food (community)"
+    },
+    "imageUrl": "https://plus.unsplash.com/premium_photo-1675382377369-c8f4cd69cfee?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 4,
+    "category": "Sides",
+    "tags": ["quick", "vegetarian", "side", "no yeast", "1 year old", "kid friendly", "toddler"],
+    "ingredients": [
+      { "qty": "250", "unit": "g", "name": "self-raising flour", "notes": "plus extra for dusting", "emoji": "🌾" },
+      { "qty": "1", "unit": "tsp", "name": "baking powder", "notes": null, "emoji": "" },
+      { "qty": "1/2", "unit": "tsp", "name": "salt", "notes": null, "emoji": "🧂" },
+      { "qty": "250", "unit": "g", "name": "natural yoghurt", "notes": "full-fat works best", "emoji": "🥛" },
+      { "qty": "1", "unit": "tbsp", "name": "olive oil", "notes": "for the pan", "emoji": "🫒" }
+    ],
+    "steps": [
+      "Mix the flour, baking powder and salt in a bowl, then stir in the yoghurt with a wooden spoon until it forms a rough dough.",
+      "Tip onto a lightly floured surface and knead briefly until smooth, adding a little more flour if sticky.",
+      "Divide into 4 equal balls and roll each out to roughly the size of a saucer, about 3–4mm thick.",
+      "Heat a dry frying pan (or lightly oiled) over a medium-high heat. Cook each flatbread for 1–2 minutes per side until puffed and charred in spots.",
+      "Stack and wrap in a clean tea towel to keep warm and soft while you cook the rest."
+    ],
+    "notes": "Toddler-friendly side. Quantities make 4 dinner-plate rounds — divide into 6 medium or 8 small if you'd rather. Optional: brush with melted garlic butter and chopped coriander after cooking. [ASSUMPTION] Quantities follow the standard BBC Good Food / UK 2-ingredient yoghurt flatbread formula (equal weights flour + yoghurt) — the source page wasn't directly fetchable; verify before relying on it.",
+    "createdAt": "2026-04-27T08:00:00Z",
+    "mealName": null
   }
 ]
