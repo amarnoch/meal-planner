@@ -579,7 +579,7 @@
   }
 
   function mealsToCsv() {
-    const header = 'meal_name,emoji,quick,common_ingredients,variants_json,sides_json,category';
+    const header = 'meal_name,emoji,quick,common_ingredients,variants_json,sides_json,category,image_url';
     const rows = state.meals.map(m => {
       const hasVariants = m.variants && m.variants.length > 0;
       const common = hasVariants ? (m.commonIngredients || []).join(';') : (m.ingredients || []).join(';');
@@ -588,7 +588,8 @@
       const emoji = getMealEmoji(m);
       const quick = m.quick ? 'yes' : '';
       const category = m.category || '';
-      return `${escapeCsvField(m.meal_name)},${escapeCsvField(emoji)},${escapeCsvField(quick)},${escapeCsvField(common)},${escapeCsvField(variantsJson)},${escapeCsvField(sidesJson)},${escapeCsvField(category)}`;
+      const imageUrl = m.image_url || '';
+      return `${escapeCsvField(m.meal_name)},${escapeCsvField(emoji)},${escapeCsvField(quick)},${escapeCsvField(common)},${escapeCsvField(variantsJson)},${escapeCsvField(sidesJson)},${escapeCsvField(category)},${escapeCsvField(imageUrl)}`;
     });
     return [header, ...rows].join('\n');
   }
@@ -698,6 +699,8 @@
       if (meal && (quickStr === 'yes' || quickStr === '1' || quickStr === 'true')) meal.quick = true;
       const categoryStr = (row.category || '').trim();
       if (meal && categoryStr) meal.category = categoryStr;
+      const imageUrlStr = (row.image_url || row.imageUrl || '').trim();
+      if (meal && imageUrlStr) meal.image_url = imageUrlStr;
       if (meal && !state.meals.some(m => m.meal_name === name)) {
         state.meals.push(meal);
       }
@@ -2381,7 +2384,10 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
   }
 
   function getRecipeImageForMeal(mealName) {
-    if (!mealName || !Array.isArray(state.recipes)) return null;
+    if (!mealName) return null;
+    const meal = getMealByName(mealName);
+    if (meal && meal.image_url) return meal.image_url;
+    if (!Array.isArray(state.recipes)) return null;
     const lower = mealName.toLowerCase();
     const recipe = state.recipes.find(r => r.mealName && r.mealName.toLowerCase() === lower);
     return (recipe && recipe.imageUrl) || null;
@@ -2687,10 +2693,11 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         .catch(function () { /* file missing, file://, or offline — empty-state fallback in meal library */ })
       : Promise.resolve();
 
-    // One-time backfill: existing localStorage meals predate the `category` column.
-    // Fetch meals.csv and merge categories onto existing meals (no other fields touched).
+    // One-time backfill: merge `category` and `image_url` from the bundled CSV onto
+    // existing localStorage meals (existing users predate these columns).
     const needsCategoryBackfill = state.meals.length > 0 && !localStorage.getItem('mealPlanner_categoryBackfilled') && state.meals.some(m => !m.category);
-    const categoryBackfillPromise = needsCategoryBackfill
+    const needsImageBackfill = state.meals.length > 0 && !localStorage.getItem('mealPlanner_imageUrlBackfilled') && state.meals.some(m => !m.image_url);
+    const categoryBackfillPromise = (needsCategoryBackfill || needsImageBackfill)
       ? fetch(BUNDLED_MEALS_CSV, { cache: 'no-store' })
         .then(r => r.ok ? r.text() : null)
         .then(text => {
@@ -2698,19 +2705,24 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
           const byName = new Map();
           for (const row of parseCsv(text)) {
             const name = (row.meal_name || row.mealName || '').trim();
-            const category = (row.category || '').trim();
-            if (name && category) byName.set(name, category);
+            if (name) byName.set(name, { category: (row.category || '').trim(), image_url: (row.image_url || '').trim() });
           }
           let changed = false;
           for (const meal of state.meals) {
-            const cat = byName.get(meal.meal_name);
-            if (cat && meal.category !== cat) {
-              meal.category = cat;
+            const row = byName.get(meal.meal_name);
+            if (!row) continue;
+            if (needsCategoryBackfill && row.category && meal.category !== row.category) {
+              meal.category = row.category;
+              changed = true;
+            }
+            if (needsImageBackfill && row.image_url && meal.image_url !== row.image_url) {
+              meal.image_url = row.image_url;
               changed = true;
             }
           }
           if (changed) saveMeals();
-          localStorage.setItem('mealPlanner_categoryBackfilled', '1');
+          if (needsCategoryBackfill) localStorage.setItem('mealPlanner_categoryBackfilled', '1');
+          if (needsImageBackfill) localStorage.setItem('mealPlanner_imageUrlBackfilled', '1');
         })
         .catch(() => {})
       : Promise.resolve();
