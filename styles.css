@@ -2432,14 +2432,14 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
      card, no slot label). Tuned so all 7 days fit one iPhone 13 screen but
      stay readable. Sat/Sun keep larger sizing for their wrapped 2-card layout. */
   .planner-day:not([data-day="Saturday"]):not([data-day="Sunday"]) .planner-slot {
-    min-height: 2.2rem;
-    padding: 0.22rem 0.32rem;
+    min-height: 3.85rem;
+    padding: 0.3rem 0.4rem;
   }
 
   .planner-day:not([data-day="Saturday"]):not([data-day="Sunday"]) .planner-slot .planned-meal {
-    font-size: 0.78rem;
-    padding: 0.28rem 0.45rem;
-    line-height: 1.22;
+    font-size: 0.82rem;
+    padding: 0.4rem 0.55rem;
+    line-height: 1.25;
   }
 
   .planner-day:not([data-day="Saturday"]):not([data-day="Sunday"]) {
@@ -2447,10 +2447,10 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
     padding: 0.2rem 0.35rem;
   }
 
-  /* Weekdays: toolbar buttons sit side-by-side (not stacked) so the day
-     header doesn't dictate row height. Buttons sized for thumb tapping. */
+  /* Weekdays: keep dice / × stacked vertically (matches weekend layout) but
+     a touch smaller. Row height grows to fit the stack so labels stay readable. */
   .planner-day:not([data-day="Saturday"]):not([data-day="Sunday"]) .planner-day-header .planner-day-toolbar {
-    flex-direction: row;
+    flex-direction: column;
     gap: 0.15rem;
   }
 
