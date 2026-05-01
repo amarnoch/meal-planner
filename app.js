@@ -1100,6 +1100,10 @@
     return haystack.includes(query);
   }
 
+  // Same pattern as cuisineOrderCache: shuffled once per page load, stable
+  // within the session, new cookbooks appended in order they appear.
+  let cookbookOrderCache = null;
+
   function getCookbooks() {
     const map = new Map();
     for (const recipe of state.recipes) {
@@ -1114,10 +1118,22 @@
       count: recipes.length,
       thumbs: recipes.slice(0, 4)
     }));
+    if (!cookbookOrderCache) {
+      // Shuffle real cookbooks; pin Uncategorized to the end
+      const real = cookbooks.filter(c => c.raw !== '__uncategorized__').map(c => c.raw);
+      cookbookOrderCache = shuffleArray(real);
+    } else {
+      for (const c of cookbooks) {
+        if (c.raw !== '__uncategorized__' && !cookbookOrderCache.includes(c.raw)) {
+          cookbookOrderCache.push(c.raw);
+        }
+      }
+    }
+    const order = new Map(cookbookOrderCache.map((raw, i) => [raw, i]));
     cookbooks.sort((a, b) => {
       if (a.raw === '__uncategorized__') return 1;
       if (b.raw === '__uncategorized__') return -1;
-      return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+      return (order.get(a.raw) ?? 9999) - (order.get(b.raw) ?? 9999);
     });
     return cookbooks;
   }
