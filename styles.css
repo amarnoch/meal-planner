@@ -2432,14 +2432,14 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
      card, no slot label). Tuned so all 7 days fit one iPhone 13 screen but
      stay readable. Sat/Sun keep larger sizing for their wrapped 2-card layout. */
   .planner-day:not([data-day="Saturday"]):not([data-day="Sunday"]) .planner-slot {
-    min-height: 2rem;
-    padding: 0.18rem 0.3rem;
+    min-height: 2.2rem;
+    padding: 0.22rem 0.32rem;
   }
 
   .planner-day:not([data-day="Saturday"]):not([data-day="Sunday"]) .planner-slot .planned-meal {
-    font-size: 0.72rem;
-    padding: 0.22rem 0.4rem;
-    line-height: 1.2;
+    font-size: 0.78rem;
+    padding: 0.28rem 0.45rem;
+    line-height: 1.22;
   }
 
   .planner-day:not([data-day="Saturday"]):not([data-day="Sunday"]) {
@@ -2456,11 +2456,11 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 
   .planner-day:not([data-day="Saturday"]):not([data-day="Sunday"]) .planner-day-header .random-day-btn,
   .planner-day:not([data-day="Saturday"]):not([data-day="Sunday"]) .planner-day-header .clear-day-btn {
-    width: 1.7rem;
-    height: 1.7rem;
-    min-width: 1.7rem;
-    min-height: 1.7rem;
-    font-size: 0.78rem;
+    width: 1.85rem;
+    height: 1.85rem;
+    min-width: 1.85rem;
+    min-height: 1.85rem;
+    font-size: 0.82rem;
   }
 
   .planner-slot .slot-label {
