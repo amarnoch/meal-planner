@@ -113,7 +113,7 @@
   }
 
   function isTakeawayMeal(meal) {
-    return meal && containsKeyword(meal.meal_name || '', ['takeaway', 'take away', 'take-out', 'take out', 'delivery']);
+    return meal && containsKeyword(meal.meal_name || '', ['takeaway', 'take away', 'take-out', 'take out', 'delivery', 'eating out', 'ready meal']);
   }
 
   function isQuickMeal(meal) {
@@ -121,7 +121,7 @@
   }
 
   function isLongMeal(meal) {
-    return meal && containsKeyword(meal.meal_name || '', ['lasagna', 'lasagne', 'roast dinner', 'japanese curry']);
+    return meal && containsKeyword(meal.meal_name || '', ['lasagna', 'lasagne', 'roast dinner', 'japanese curry', 'casserole', 'fish pie', 'paella']);
   }
 
   function mealCanBeMeatFree(meal) {
@@ -157,17 +157,8 @@
     }
     const salmonMeals = state.meals.filter(isSalmonMeal);
     const meatFreeCandidates = state.meals.filter(mealCanBeMeatFree);
-    const takeawayMeals = state.meals.filter(isTakeawayMeal);
     const quickMeals = state.meals.filter(isQuickMeal);
     const salmonSlotIndex = salmonMeals.length > 0 ? Math.floor(Math.random() * slots.length) : -1;
-    let takeawaySlotIndex = -1;
-    if (takeawayMeals.length > 0 && slots.length >= 5) {
-      const endSlots = [];
-      for (let j = 4; j < slots.length; j++) endSlots.push(j);
-      const avoid = salmonSlotIndex >= 0 ? [salmonSlotIndex] : [];
-      const choices = endSlots.filter(j => !avoid.includes(j));
-      takeawaySlotIndex = choices.length > 0 ? choices[Math.floor(Math.random() * choices.length)] : endSlots[0];
-    }
 
     for (const key of Object.keys(state.plan)) {
       delete state.plan[key];
@@ -187,8 +178,14 @@
       meatFreeDayIndices.add(Math.floor(Math.random() * 7));
     }
     const shuffledMeals = shuffleArray(state.meals);
+    const longMealDays = new Set();
 
-    const allowedForDay = (m, d) => (d === 'Saturday' || d === 'Sunday') || !isLongMeal(m);
+    const allowedForDay = (m, d) => {
+      if (!isLongMeal(m)) return true;
+      if (d !== 'Saturday' && d !== 'Sunday') return false;
+      const prevDay = DAYS[DAYS.indexOf(d) - 1];
+      return !longMealDays.has(prevDay);
+    };
     const notUsedThisWeek = (m) => !usedMealNames.has(m.meal_name);
 
     /** limitPool: only consider meals in this set after preferred is exhausted (e.g. meat-free days). */
@@ -212,8 +209,7 @@
       const dayIndex = DAYS.indexOf(day);
       const needMeatFreeDay = meatFreeDayIndices.has(dayIndex);
       const isSalmonSlot = i === salmonSlotIndex;
-      const isTakeawaySlot = i === takeawaySlotIndex;
-      const preferQuick = (day === 'Tuesday' || day === 'Thursday') && !isSalmonSlot && !isTakeawaySlot;
+      const preferQuick = (day === 'Tuesday' || day === 'Thursday') && !isSalmonSlot;
 
       let meal = null;
       let variantName = undefined;
@@ -221,8 +217,6 @@
 
       if (isSalmonSlot && salmonMeals.length > 0) {
         meal = pickFromPool(salmonMeals, day, true, salmonMeals);
-      } else if (isTakeawaySlot && takeawayMeals.length > 0) {
-        meal = pickFromPool(takeawayMeals, day, true, takeawayMeals);
       } else if (needMeatFreeDay && meatFreeCandidates.length > 0) {
         meal = pickFromPool(meatFreeCandidates, day, true, meatFreeCandidates);
       } else if (preferQuick && quickMeals.length > 0) {
@@ -232,6 +226,7 @@
         meal = pickFromPool(nonTakeaway.length > 0 ? nonTakeaway : shuffledMeals, day, true, shuffledMeals);
       }
       if (!meal) meal = shuffledMeals[0];
+      if (meal && isLongMeal(meal)) longMealDays.add(day);
 
       if (meal.variants && meal.variants.length > 0) {
         const needMeatFree = needMeatFreeDay && !isSalmonSlot;
@@ -286,15 +281,27 @@
 
     const daySlots = getSlotsForDay(day);
     const shuffledMeals = shuffleArray(state.meals);
-    const allowedForDay = (m, d) => (d === 'Saturday' || d === 'Sunday') || !isLongMeal(m);
+    const dayHasLongMeal = (d) => getSlotsForDay(d).some(mt => {
+      const name = getPlannedMeal(d, mt);
+      return name && isLongMeal(state.meals.find(m => m.meal_name === name));
+    });
+    const prevDay = DAYS[DAYS.indexOf(day) - 1];
+    const nextDay = DAYS[DAYS.indexOf(day) + 1];
+    const adjacentHasLongMeal = (prevDay && dayHasLongMeal(prevDay)) || (nextDay && dayHasLongMeal(nextDay));
+    const allowedForDay = (m, d) => {
+      if (!isLongMeal(m)) return true;
+      if (d !== 'Saturday' && d !== 'Sunday') return false;
+      return !adjacentHasLongMeal;
+    };
     const usedToday = new Set();
     let prevCarbTypes = new Set();
 
     for (const mealType of daySlots) {
       const preferQuick = (day === 'Tuesday' || day === 'Thursday') && daySlots.length === 1;
 
-      let pool = shuffledMeals.filter(m => allowedForDay(m, day) && !usedToday.has(m.meal_name));
-      if (pool.length === 0) pool = shuffledMeals.filter(m => allowedForDay(m, day));
+      let pool = shuffledMeals.filter(m => allowedForDay(m, day) && !usedToday.has(m.meal_name) && !isTakeawayMeal(m));
+      if (pool.length === 0) pool = shuffledMeals.filter(m => allowedForDay(m, day) && !isTakeawayMeal(m));
+      if (pool.length === 0) pool = shuffledMeals.filter(m => !isTakeawayMeal(m));
       if (pool.length === 0) pool = shuffledMeals.slice();
 
       if (preferQuick) {

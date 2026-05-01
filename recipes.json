@@ -318,7 +318,7 @@
     ],
     "notes": "Family recipe. Freezer-friendly. Pairs with rice or jacket potatoes; for kid-friendly, dial back the chilli powder.",
     "createdAt": "2026-04-26T23:00:00Z",
-    "mealName": null
+    "mealName": "Chilli con carne"
   },
   {
     "id": "rec_chicken_rice",
@@ -384,5 +384,329 @@
     "notes": "Toddler-friendly side. Quantities make 4 dinner-plate rounds — divide into 6 medium or 8 small if you'd rather. Optional: brush with melted garlic butter and chopped coriander after cooking. [ASSUMPTION] Quantities follow the standard BBC Good Food / UK 2-ingredient yoghurt flatbread formula (equal weights flour + yoghurt) — the source page wasn't directly fetchable; verify before relying on it.",
     "createdAt": "2026-04-27T08:00:00Z",
     "mealName": null
+  },
+  {
+    "id": "rec_shakshuka",
+    "title": "Shakshuka",
+    "source": {
+      "type": "manual",
+      "url": null,
+      "label": null
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1590412200988-a436970781fa?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 4,
+    "category": "Other mains",
+    "tags": ["dinner", "vegetarian", "quick", "one pot", "eggs", "family friendly", "kid friendly"],
+    "ingredients": [
+      { "qty": "2", "unit": "tbsp", "name": "olive oil", "notes": null, "emoji": "🫒" },
+      { "qty": "1", "unit": "", "name": "onion", "notes": "diced", "emoji": "🧅" },
+      { "qty": "1", "unit": "", "name": "red pepper", "notes": "diced", "emoji": "🫑" },
+      { "qty": "3", "unit": "clove", "name": "garlic", "notes": "minced", "emoji": "🧄" },
+      { "qty": "1", "unit": "tsp", "name": "smoked paprika", "notes": null, "emoji": "" },
+      { "qty": "1", "unit": "tsp", "name": "cumin", "notes": null, "emoji": "" },
+      { "qty": "1/2", "unit": "tsp", "name": "chilli flakes", "notes": "optional, or to taste", "emoji": "🌶" },
+      { "qty": "2", "unit": "can", "name": "chopped tomatoes", "notes": "400g cans", "emoji": "🍅" },
+      { "qty": "1", "unit": "tsp", "name": "sugar", "notes": "balances acidity", "emoji": "" },
+      { "qty": "", "unit": "", "name": "salt and pepper", "notes": "to taste", "emoji": "🧂" },
+      { "qty": "4", "unit": "", "name": "eggs", "notes": null, "emoji": "🥚" },
+      { "qty": "100", "unit": "g", "name": "feta cheese", "notes": "crumbled, optional", "emoji": "🧀" },
+      { "qty": "1", "unit": "handful", "name": "parsley or coriander", "notes": "chopped, to serve", "emoji": "🌿" }
+    ],
+    "steps": [
+      "Heat the olive oil in a wide, lidded frying pan over medium heat. Add the onion and pepper and cook for 8–10 minutes until softened.",
+      "Add the garlic, paprika, cumin and chilli flakes. Cook for 1 minute, stirring.",
+      "Pour in the chopped tomatoes and add the sugar. Season well, stir and simmer uncovered for 10 minutes until slightly thickened.",
+      "Make 4 wells in the sauce and crack an egg into each.",
+      "Cover with the lid and cook over low heat for 5–8 minutes, until the whites are just set but the yolks are still runny (or cook longer if you prefer firm yolks).",
+      "Scatter over crumbled feta and fresh herbs. Serve straight from the pan with flatbreads or crusty bread."
+    ],
+    "notes": "Quick one-pan weeknight meal. Skip the chilli flakes for a toddler-friendly version. Feta is optional but adds a salty, creamy contrast. Leftovers keep in the fridge for 1 day — reheat gently in a pan.",
+    "createdAt": "2026-05-01T09:00:00Z",
+    "mealName": "Shakshuka"
+  },
+  {
+    "id": "rec_lentil_dhal",
+    "title": "Red Lentil Dhal",
+    "source": {
+      "type": "manual",
+      "url": null,
+      "label": null
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 4,
+    "category": "Indian & curries",
+    "tags": ["dinner", "vegetarian", "vegan", "one pot", "freezer friendly", "family friendly", "1 year old", "toddler"],
+    "ingredients": [
+      { "qty": "2", "unit": "tbsp", "name": "vegetable oil", "notes": null, "emoji": "" },
+      { "qty": "1", "unit": "", "name": "onion", "notes": "diced", "emoji": "🧅" },
+      { "qty": "3", "unit": "clove", "name": "garlic", "notes": "minced", "emoji": "🧄" },
+      { "qty": "1", "unit": "thumb", "name": "fresh ginger", "notes": "grated, or 1 tsp ground ginger", "emoji": "" },
+      { "qty": "1", "unit": "tsp", "name": "cumin seeds", "notes": "or ground cumin", "emoji": "" },
+      { "qty": "1", "unit": "tsp", "name": "turmeric", "notes": null, "emoji": "" },
+      { "qty": "1", "unit": "tsp", "name": "garam masala", "notes": "plus extra to finish", "emoji": "" },
+      { "qty": "1/2", "unit": "tsp", "name": "chilli powder", "notes": "optional — skip for toddlers", "emoji": "🌶" },
+      { "qty": "300", "unit": "g", "name": "red lentils", "notes": "rinsed", "emoji": "" },
+      { "qty": "1", "unit": "can", "name": "chopped tomatoes", "notes": "400g can", "emoji": "🍅" },
+      { "qty": "400", "unit": "ml", "name": "coconut milk", "notes": "1 can", "emoji": "🥥" },
+      { "qty": "400", "unit": "ml", "name": "water or vegetable stock", "notes": null, "emoji": "" },
+      { "qty": "", "unit": "", "name": "salt", "notes": "to taste", "emoji": "🧂" },
+      { "qty": "2", "unit": "large handful", "name": "spinach", "notes": "optional, stirred in at the end", "emoji": "🥬" }
+    ],
+    "steps": [
+      "Heat the oil in a large pan over medium heat. Add the onion and cook for 8 minutes until softened and lightly golden.",
+      "Add the garlic, ginger, cumin, turmeric, garam masala and chilli powder (if using). Cook for 1–2 minutes, stirring.",
+      "Add the lentils and stir to coat in the spices.",
+      "Pour in the chopped tomatoes, coconut milk and water or stock. Stir and bring to the boil.",
+      "Reduce heat and simmer uncovered for 20–25 minutes, stirring occasionally, until the lentils are completely soft and the dhal has thickened.",
+      "Stir in the spinach (if using) and let it wilt for 1–2 minutes.",
+      "Season with salt, add an extra pinch of garam masala to taste, and serve with rice, naan or yoghurt flatbreads."
+    ],
+    "notes": "Vegan and toddler-friendly — just omit the chilli powder. Freezes very well; make a double batch and freeze half. Lentils thicken as they cool — add a splash of water when reheating.",
+    "createdAt": "2026-05-01T09:05:00Z",
+    "mealName": "Lentil Dhal"
+  },
+  {
+    "id": "rec_spaghetti_bolognese",
+    "title": "Spaghetti Bolognese",
+    "source": {
+      "type": "web",
+      "url": "https://www.recipetineats.com/spaghetti-bolognese/",
+      "label": "RecipeTin Eats"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 5,
+    "category": "Italian",
+    "tags": ["dinner", "italian", "pasta", "freezer friendly", "family friendly", "comfort food"],
+    "ingredients": [
+      { "qty": "1.5", "unit": "tbsp", "name": "olive oil", "notes": null, "emoji": "🫒" },
+      { "qty": "1", "unit": "", "name": "onion", "notes": "finely chopped", "emoji": "🧅" },
+      { "qty": "2", "unit": "clove", "name": "garlic", "notes": "minced", "emoji": "🧄" },
+      { "qty": "500", "unit": "g", "name": "beef mince", "notes": "or half beef, half pork", "emoji": "🥩" },
+      { "qty": "125", "unit": "ml", "name": "red wine", "notes": "dry; or beef stock", "emoji": "🍷" },
+      { "qty": "2", "unit": "", "name": "beef stock cubes", "notes": "crumbled", "emoji": "" },
+      { "qty": "800", "unit": "g", "name": "crushed tomatoes", "notes": "1 large tin or passata", "emoji": "🍅" },
+      { "qty": "2", "unit": "tbsp", "name": "tomato paste", "notes": null, "emoji": "" },
+      { "qty": "2", "unit": "tsp", "name": "Worcestershire sauce", "notes": null, "emoji": "" },
+      { "qty": "2", "unit": "", "name": "bay leaves", "notes": "dried", "emoji": "" },
+      { "qty": "2", "unit": "sprig", "name": "fresh thyme", "notes": "or ½ tsp dried", "emoji": "🌿" },
+      { "qty": "3/4", "unit": "tsp", "name": "salt", "notes": null, "emoji": "🧂" },
+      { "qty": "1/2", "unit": "tsp", "name": "black pepper", "notes": null, "emoji": "" },
+      { "qty": "400", "unit": "g", "name": "spaghetti", "notes": "to serve", "emoji": "🍝" },
+      { "qty": "", "unit": "", "name": "parmesan", "notes": "to serve", "emoji": "🧀" }
+    ],
+    "steps": [
+      "Heat oil in a large pot over medium-high. Add onion and garlic; cook 3 minutes until golden.",
+      "Increase heat to high, add mince and break up as it browns.",
+      "Add red wine and simmer 1 minute, scraping the pan, until the alcohol smell is gone.",
+      "Add the stock cubes, crushed tomatoes, tomato paste, Worcestershire sauce, bay leaves, thyme, salt and pepper. Stir, bring to a simmer.",
+      "Reduce to medium and simmer uncovered for 20–30 minutes, stirring occasionally, until the sauce thickens. Add a splash of water if it gets too thick.",
+      "Remove bay leaves and thyme sprigs. Taste and adjust salt.",
+      "Cook spaghetti to packet instructions. Drain, toss with sauce and serve with grated parmesan."
+    ],
+    "notes": "For a richer, slow-cooked version: add ¾ cup water, cover, and simmer on very low for 2–2.5 hours, stirring every 30 min, then uncover for 20 min to thicken. Freezes well.",
+    "createdAt": "2026-05-01T10:00:00Z",
+    "mealName": "Spaghetti Bolognese"
+  },
+  {
+    "id": "rec_chicken_tikka_masala",
+    "title": "Chicken Tikka Masala",
+    "source": {
+      "type": "web",
+      "url": "https://www.recipetineats.com/chicken-tikka-masala/",
+      "label": "RecipeTin Eats"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 4,
+    "category": "Indian & curries",
+    "tags": ["dinner", "indian", "curry", "chicken", "family friendly", "freezer friendly"],
+    "ingredients": [
+      { "qty": "600", "unit": "g", "name": "chicken thigh", "notes": "boneless, skinless, cut into 3cm cubes", "emoji": "🍗" },
+      { "qty": "125", "unit": "g", "name": "plain yoghurt", "notes": "full fat", "emoji": "🥛" },
+      { "qty": "6", "unit": "clove", "name": "garlic", "notes": "minced (3 for marinade, 3 for sauce)", "emoji": "🧄" },
+      { "qty": "2", "unit": "tbsp", "name": "fresh ginger", "notes": "grated (1 tbsp for marinade, 1 tbsp for sauce)", "emoji": "" },
+      { "qty": "1", "unit": "tsp", "name": "garam masala", "notes": "for marinade", "emoji": "" },
+      { "qty": "1", "unit": "tsp", "name": "cumin", "notes": "for marinade", "emoji": "" },
+      { "qty": "1", "unit": "tsp", "name": "ground coriander", "notes": "for marinade", "emoji": "" },
+      { "qty": "1", "unit": "tsp", "name": "paprika", "notes": "for marinade", "emoji": "" },
+      { "qty": "2", "unit": "tsp", "name": "lemon juice", "notes": "for marinade", "emoji": "🍋" },
+      { "qty": "1", "unit": "", "name": "onion", "notes": "finely chopped", "emoji": "🧅" },
+      { "qty": "1", "unit": "tbsp", "name": "paprika", "notes": "for sauce (not smoked)", "emoji": "" },
+      { "qty": "1", "unit": "tbsp", "name": "garam masala", "notes": "for sauce", "emoji": "" },
+      { "qty": "2", "unit": "tsp", "name": "turmeric", "notes": "for sauce", "emoji": "" },
+      { "qty": "400", "unit": "ml", "name": "tomato passata", "notes": null, "emoji": "🍅" },
+      { "qty": "400", "unit": "ml", "name": "water", "notes": null, "emoji": "" },
+      { "qty": "100", "unit": "ml", "name": "double cream", "notes": null, "emoji": "🥛" },
+      { "qty": "1", "unit": "tsp", "name": "sugar", "notes": null, "emoji": "" },
+      { "qty": "50", "unit": "g", "name": "butter", "notes": "for finishing the sauce", "emoji": "🧈" }
+    ],
+    "steps": [
+      "Mix marinade: yoghurt, 3 garlic cloves, 1 tbsp ginger, garam masala, cumin, coriander, paprika, lemon juice and salt. Add chicken, coat well, and marinate for at least 3 hours (overnight is best).",
+      "Sear chicken: heat 1 tbsp oil in a pan over high heat until smoking. Cook chicken in batches, leaving 2 minutes per side to get a char. The inside finishes cooking in the sauce. Set aside.",
+      "In the same pan over medium-high, melt butter with oil. Add onion, remaining garlic and ginger with a pinch of salt. Cook 5–7 minutes until golden.",
+      "Add paprika, garam masala and turmeric. Cook 2 minutes, stirring.",
+      "Add tomato passata and water. Bring to a simmer, cover and cook on low for 15 minutes.",
+      "Blend the sauce smooth with a stick blender. Return to the pan.",
+      "Stir in cream, sugar and butter. Add the chicken and simmer until cooked through, about 5 minutes.",
+      "Serve over basmati rice, garnished with coriander if using."
+    ],
+    "notes": "Marinating overnight makes a big difference to the flavour and texture. The sauce can be made ahead and frozen — add cream and chicken fresh when reheating. Dial back the cayenne (or skip it) for a family-friendly version.",
+    "createdAt": "2026-05-01T10:05:00Z",
+    "mealName": "Tikka Masala"
+  },
+  {
+    "id": "rec_mushroom_risotto",
+    "title": "Mushroom Risotto",
+    "source": {
+      "type": "web",
+      "url": "https://www.recipetineats.com/mushroom-risotto/",
+      "label": "RecipeTin Eats"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1476124369491-e7addf5db371?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 4,
+    "category": "Italian",
+    "tags": ["dinner", "italian", "vegetarian", "comfort food", "weekend"],
+    "ingredients": [
+      { "qty": "750", "unit": "g", "name": "mushrooms", "notes": "mix of sliced and quartered", "emoji": "🍄" },
+      { "qty": "3", "unit": "tbsp", "name": "butter", "notes": "for the mushrooms", "emoji": "🧈" },
+      { "qty": "2", "unit": "tbsp", "name": "olive oil", "notes": "for the mushrooms", "emoji": "🫒" },
+      { "qty": "3", "unit": "clove", "name": "garlic", "notes": "minced (2 for mushrooms, 1 for risotto)", "emoji": "🧄" },
+      { "qty": "2", "unit": "", "name": "shallots", "notes": "finely chopped (or ½ onion)", "emoji": "🧅" },
+      { "qty": "60", "unit": "ml", "name": "dry white wine", "notes": null, "emoji": "🍷" },
+      { "qty": "300", "unit": "g", "name": "arborio rice", "notes": null, "emoji": "🍚" },
+      { "qty": "1.25", "unit": "litre", "name": "chicken or veg stock", "notes": "warm, low sodium", "emoji": "" },
+      { "qty": "125", "unit": "ml", "name": "double cream", "notes": "optional but recommended", "emoji": "🥛" },
+      { "qty": "2", "unit": "tbsp", "name": "butter", "notes": "for finishing the risotto", "emoji": "🧈" },
+      { "qty": "50", "unit": "g", "name": "parmesan", "notes": "finely grated", "emoji": "🧀" },
+      { "qty": "", "unit": "", "name": "salt and pepper", "notes": "to taste", "emoji": "🧂" }
+    ],
+    "steps": [
+      "Sauté mushrooms in batches: heat oil and half the butter in a large pot over high heat. Cook half the mushrooms until golden (about 4 min). Add half the garlic, season, cook 1 more minute. Remove to a bowl. Repeat with the rest.",
+      "Reduce heat to medium. Melt 1 tbsp butter in the same pot. Add shallots and remaining garlic; cook 2 minutes until soft.",
+      "Add wine and simmer 2 minutes, scraping the base, until mostly evaporated.",
+      "Add the rice and stir for 1 minute until the edges turn translucent.",
+      "Add stock one ladleful at a time (about 1.5 cups per addition), stirring and waiting for it to absorb before adding the next. Continue for about 20 minutes until the rice is cooked but still has a little bite and the risotto is creamy.",
+      "Stir in the cream and remaining butter vigorously. Stir in the parmesan. Season well.",
+      "Fold in most of the mushrooms, reserving some for topping. Serve immediately, topped with reserved mushrooms and extra parmesan."
+    ],
+    "notes": "Risotto must be served immediately — it thickens as it sits. Keep the stock warm in a separate pan so it doesn't stop the cooking when added. Use a mix of mushrooms (chestnut, shiitake, portobello) for more depth.",
+    "createdAt": "2026-05-01T10:10:00Z",
+    "mealName": "Risotto"
+  },
+  {
+    "id": "rec_thai_green_curry",
+    "title": "Thai Green Curry",
+    "source": {
+      "type": "web",
+      "url": "https://www.recipetineats.com/thai-green-curry/",
+      "label": "RecipeTin Eats"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 4,
+    "category": "Asian",
+    "tags": ["dinner", "thai", "curry", "one pot", "30 minutes", "family friendly"],
+    "ingredients": [
+      { "qty": "2", "unit": "tbsp", "name": "vegetable oil", "notes": null, "emoji": "" },
+      { "qty": "4", "unit": "tbsp", "name": "Thai green curry paste", "notes": "Maesri recommended; use 3 tbsp for milder", "emoji": "" },
+      { "qty": "2", "unit": "clove", "name": "garlic", "notes": "minced", "emoji": "🧄" },
+      { "qty": "2", "unit": "tsp", "name": "fresh ginger", "notes": "finely grated", "emoji": "" },
+      { "qty": "1", "unit": "tbsp", "name": "lemongrass paste", "notes": "or 1 stalk, finely chopped", "emoji": "" },
+      { "qty": "250", "unit": "ml", "name": "chicken or vegetable stock", "notes": "low sodium", "emoji": "" },
+      { "qty": "400", "unit": "ml", "name": "coconut milk", "notes": "full fat, 1 can", "emoji": "🥥" },
+      { "qty": "1", "unit": "tsp", "name": "fish sauce", "notes": "to taste", "emoji": "" },
+      { "qty": "1", "unit": "tsp", "name": "sugar", "notes": "to taste", "emoji": "" },
+      { "qty": "6", "unit": "", "name": "kaffir lime leaves", "notes": "torn — dried is fine", "emoji": "" },
+      { "qty": "350", "unit": "g", "name": "chicken thigh", "notes": "skinless, boneless, sliced — or prawns", "emoji": "🍗" },
+      { "qty": "150", "unit": "g", "name": "sugar snap peas or courgette", "notes": "or any quick-cook veg", "emoji": "🥬" },
+      { "qty": "1", "unit": "handful", "name": "Thai basil or coriander", "notes": "to serve", "emoji": "🌿" },
+      { "qty": "1/2", "unit": "", "name": "lime", "notes": "juiced", "emoji": "🍋" }
+    ],
+    "steps": [
+      "Heat oil in a wide pan over medium-high. Add curry paste, garlic, ginger and lemongrass. Fry 2–3 minutes until fragrant and mostly dried out.",
+      "Add stock and coconut milk, stir to dissolve the paste.",
+      "Add fish sauce, sugar and kaffir lime leaves. Bring to a simmer.",
+      "Add chicken, reduce heat to medium and cook for 7 minutes.",
+      "Add vegetables and cook a further 3–5 minutes until just tender.",
+      "Taste and adjust fish sauce and sugar. Stir in lime juice.",
+      "Serve over jasmine rice, topped with fresh basil or coriander."
+    ],
+    "notes": "Maesri paste (small tins, Asian supermarkets) gives the best flavour. For a toddler-friendly version, use only 2 tbsp paste and skip extra chilli. Kaffir lime leaves can be found dried in most supermarkets. Swap chicken for prawns — add them at step 5 and cook 3 minutes.",
+    "createdAt": "2026-05-01T10:15:00Z",
+    "mealName": "Thai Green Curry"
+  },
+  {
+    "id": "rec_chicken_fajitas",
+    "title": "Chicken Fajitas",
+    "source": {
+      "type": "web",
+      "url": "https://www.recipetineats.com/chicken-fajitas/",
+      "label": "RecipeTin Eats"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 4,
+    "category": "Tex-Mex",
+    "tags": ["dinner", "tex-mex", "chicken", "quick", "family friendly", "kid friendly"],
+    "ingredients": [
+      { "qty": "700", "unit": "g", "name": "chicken thigh", "notes": "skinless, boneless — or 2 large chicken breasts, halved horizontally", "emoji": "🍗" },
+      { "qty": "60", "unit": "ml", "name": "lime juice", "notes": "about 2 limes", "emoji": "🍋" },
+      { "qty": "60", "unit": "ml", "name": "orange juice", "notes": null, "emoji": "" },
+      { "qty": "2", "unit": "tbsp", "name": "olive oil", "notes": "for the marinade", "emoji": "🫒" },
+      { "qty": "2", "unit": "clove", "name": "garlic", "notes": "minced", "emoji": "🧄" },
+      { "qty": "1", "unit": "tsp", "name": "cumin", "notes": null, "emoji": "" },
+      { "qty": "3", "unit": "", "name": "peppers", "notes": "mixed colours, deseeded and sliced", "emoji": "🫑" },
+      { "qty": "1", "unit": "large", "name": "onion", "notes": "halved and thickly sliced", "emoji": "🧅" },
+      { "qty": "8", "unit": "", "name": "small flour tortillas", "notes": "to serve", "emoji": "" },
+      { "qty": "1", "unit": "", "name": "avocado", "notes": "sliced, to serve", "emoji": "🥑" },
+      { "qty": "", "unit": "", "name": "soured cream", "notes": "to serve", "emoji": "" },
+      { "qty": "", "unit": "", "name": "lime wedges", "notes": "to serve", "emoji": "🍋" }
+    ],
+    "steps": [
+      "Mix lime juice, orange juice, olive oil, garlic, cumin, salt and pepper in a bowl. Add chicken, coat well. Marinate for at least 1 hour (up to 24 hours, or freeze and defrost overnight).",
+      "Heat 1 tbsp oil in a skillet over high heat until smoking. Cook peppers and onion in batches in a single layer — char for 45 seconds, toss with salt and pepper, repeat twice. Remove to a platter.",
+      "Heat 1 tbsp oil in the skillet over medium-high. Cook chicken 3–4 minutes per side until caramelised. Rest 3 minutes loosely covered with foil, then slice.",
+      "Warm tortillas. Serve chicken and peppers with tortillas, sliced avocado, soured cream and lime."
+    ],
+    "notes": "The citrus marinade is key — at least 1 hour but overnight is better. High heat and not moving the veg is what gives the char. Can sub beef strips or white fish.",
+    "createdAt": "2026-05-01T10:20:00Z",
+    "mealName": "Fajitas"
+  },
+  {
+    "id": "rec_yakisoba",
+    "title": "Yakisoba (Japanese Stir-Fried Noodles)",
+    "source": {
+      "type": "web",
+      "url": "https://www.japanesecooking101.com/yakisoba-recipe/",
+      "label": "Japanese Cooking 101"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 4,
+    "category": "Japanese",
+    "tags": ["dinner", "japanese", "noodles", "quick", "family friendly", "kid friendly"],
+    "ingredients": [
+      { "qty": "300", "unit": "g", "name": "yakisoba noodles", "notes": "pre-steamed chukamen noodles — 2 packs typically", "emoji": "🍜" },
+      { "qty": "250", "unit": "g", "name": "protein (pork belly, chicken or beef)", "notes": "thinly sliced", "emoji": "🍖" },
+      { "qty": "1", "unit": "small", "name": "onion", "notes": "thinly sliced", "emoji": "🧅" },
+      { "qty": "1/2", "unit": "small", "name": "carrot", "notes": "julienned or thinly sliced", "emoji": "🥕" },
+      { "qty": "1/4", "unit": "", "name": "green pepper", "notes": "thinly sliced", "emoji": "🫑" },
+      { "qty": "2", "unit": "cup", "name": "cabbage", "notes": "roughly chopped into 5cm squares", "emoji": "🥬" },
+      { "qty": "1", "unit": "cup", "name": "bean sprouts", "notes": null, "emoji": "" },
+      { "qty": "1", "unit": "tbsp", "name": "vegetable oil", "notes": null, "emoji": "" },
+      { "qty": "6", "unit": "tbsp", "name": "Tonkatsu sauce", "notes": "for the yakisoba sauce", "emoji": "" },
+      { "qty": "4", "unit": "tbsp", "name": "Worcestershire sauce", "notes": "for the yakisoba sauce", "emoji": "" },
+      { "qty": "1", "unit": "tbsp", "name": "soy sauce", "notes": "for the yakisoba sauce", "emoji": "" },
+      { "qty": "1", "unit": "tbsp", "name": "mirin", "notes": "for the yakisoba sauce", "emoji": "" },
+      { "qty": "", "unit": "", "name": "aonori and pickled ginger", "notes": "to garnish, optional", "emoji": "" }
+    ],
+    "steps": [
+      "Mix all sauce ingredients together in a small bowl and set aside.",
+      "Cut protein into bite-sized pieces. Prep all vegetables.",
+      "Heat oil in a large wok or frying pan over medium-high heat. Add the protein and cook until browned.",
+      "Add onion, carrot and pepper; stir-fry for 2 minutes. Add cabbage and bean sprouts and cook until starting to wilt.",
+      "Push everything to the sides of the wok. Add noodles to the centre, pressing them under the vegetables. Cover and lower heat for 2 minutes to steam and soften the noodles.",
+      "Stir everything together to combine. Pour in the sauce and toss well over medium heat for 1–2 minutes until the noodles are coated and glossy.",
+      "Season with salt and pepper if needed. Serve topped with aonori and pickled ginger."
+    ],
+    "notes": "Tonkatsu sauce is available in most Asian supermarkets (Bull-Dog brand is common). In a pinch, use extra Worcestershire with a dash of ketchup. Yakisoba noodles are sold pre-steamed in vacuum packs — use fresh rather than dried for best results.",
+    "createdAt": "2026-05-01T10:25:00Z",
+    "mealName": "Yaki Soba"
   }
 ]
