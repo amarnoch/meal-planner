@@ -634,11 +634,11 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 }
 
 .planner-slot {
-  min-height: 68px;
+  min-height: 56px;
   background: var(--surface);
   border: 2px dotted var(--border);
   border-radius: var(--radius-sm);
-  padding: 0.4rem;
+  padding: 0.3rem;
   transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
 }
 
@@ -662,8 +662,8 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   background: linear-gradient(135deg, var(--primary), var(--primary-hover));
   color: white;
   border-radius: var(--radius-sm);
-  padding: 0.45rem 0.65rem;
-  font-size: 0.82rem;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: grab;
   border: none;
