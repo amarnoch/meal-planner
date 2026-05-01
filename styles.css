@@ -81,7 +81,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   font-size: 1.5rem;
   font-weight: 900;
   letter-spacing: -0.03em;
-  background: linear-gradient(135deg, var(--primary), #4a8054);
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -241,6 +241,12 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   justify-content: center;
   font-size: 1.5rem;
   line-height: 1;
+}
+
+.meal-cuisine-collage-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .meal-cuisine-collage-cell.empty {
@@ -653,7 +659,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 }
 
 .planner-slot .planned-meal {
-  background: linear-gradient(135deg, var(--primary), #4a8054);
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
   color: white;
   border-radius: var(--radius-sm);
   padding: 0.55rem 0.7rem;
@@ -846,7 +852,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary), #4a8054);
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
   color: white;
   border-color: var(--primary);
   box-shadow: 0 3px 8px rgba(93, 153, 102, 0.25);

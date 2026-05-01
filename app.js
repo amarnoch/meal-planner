@@ -12,6 +12,7 @@
   const STORAGE_PLAN_SIDES = 'mealPlanner_planSides';
   const STORAGE_SHOPPING_CHECKED = 'mealPlanner_shoppingChecked';
   const STORAGE_RECIPES = 'mealPlanner_recipes';
+  const STORAGE_SHOPPING_REMOVED = 'mealPlanner_shoppingRemoved';
 
   /** Served next to index.html (e.g. GitHub Pages). Loaded when the meal library is empty. */
   const BUNDLED_MEALS_CSV = 'meals.csv';
@@ -54,9 +55,9 @@
   const MEAT_KEYWORDS = ['chicken', 'beef', 'pork', 'sausage', 'bacon', 'lamb', 'turkey', 'duck', 'ham', 'mince', 'steak'];
   const CARB_CATEGORIES = {
     rice: ['rice', 'risotto'],
-    pasta: ['pasta', 'spaghetti', 'penne', 'linguine', 'noodles', 'lasagne', 'lasagna'],
+    pasta: ['pasta', 'spaghetti', 'penne', 'linguine', 'noodles', 'lasagne', 'lasagna', 'orzo', 'macaroni', 'soba'],
     pizza: ['pizza'],
-    potato: ['potato', 'potatoes', 'chips', 'fries', 'wedges']
+    potato: ['potato', 'potatoes', 'chips', 'fries', 'wedges', 'mash', 'jacket']
   };
 
   // Slots: weekdays = dinner only; Sat/Sun = lunch + dinner
@@ -144,6 +145,41 @@
     return out;
   }
 
+  function hasNoCarbOverlap(meal, prevMealCarbTypes) {
+    const carbs = getCarbTypes(meal, null, SIDE_NONE);
+    return ![...carbs].some(c => prevMealCarbTypes.has(c));
+  }
+
+  function pickRandomVariantAndSide(meal, prevCarbTypes, needMeatFree) {
+    let variantName = undefined;
+    let sideName = undefined;
+    if (meal.variants && meal.variants.length > 0) {
+      let variantPool = meal.variants;
+      if (needMeatFree) {
+        const meatFreeVariants = meal.variants.filter(v => {
+          const sides = (meal.sides && meal.sides.length) ? meal.sides : [{ name: null }];
+          return sides.some(sd => !isMeaty(meal, v.name, sd.name));
+        });
+        if (meatFreeVariants.length > 0) variantPool = meatFreeVariants;
+      }
+      variantName = variantPool[Math.floor(Math.random() * variantPool.length)].name;
+    }
+    if (meal.sides && meal.sides.length > 0) {
+      const allowedSides = meal.sides.filter(s => {
+        const tags = getCarbTypes(meal, variantName, s.name);
+        return ![...tags].some(t => prevCarbTypes.has(t));
+      });
+      const sidePool = allowedSides.length > 0 ? allowedSides : meal.sides;
+      let sideCandidates = sidePool;
+      if (needMeatFree) {
+        const meatFreeSides = sidePool.filter(s => !isMeaty(meal, variantName, s.name));
+        if (meatFreeSides.length > 0) sideCandidates = meatFreeSides;
+      }
+      sideName = sideCandidates[Math.floor(Math.random() * sideCandidates.length)].name;
+    }
+    return { variantName, sideName };
+  }
+
   function autoFillWeek() {
     if (!state.meals.length) {
       alert('Add some meals to your library first.');
@@ -173,11 +209,13 @@
 
     const usedMealNames = new Set();
     let prevCarbTypes = new Set();
+    let prevMealCarbTypes = new Set();
     const meatFreeDayIndices = new Set();
     while (meatFreeDayIndices.size < 2 && meatFreeCandidates.length >= 1) {
       meatFreeDayIndices.add(Math.floor(Math.random() * 7));
     }
     const shuffledMeals = shuffleArray(state.meals);
+    const nonSalmonMeals = shuffledMeals.filter(m => !isSalmonMeal(m));
     const longMealDays = new Set();
 
     const allowedForDay = (m, d) => {
@@ -215,55 +253,36 @@
       let variantName = undefined;
       let sideName = undefined;
 
+      const noCarbOverlap = (m) => hasNoCarbOverlap(m, prevMealCarbTypes);
+
       if (isSalmonSlot && salmonMeals.length > 0) {
         meal = pickFromPool(salmonMeals, day, true, salmonMeals);
       } else if (needMeatFreeDay && meatFreeCandidates.length > 0) {
-        meal = pickFromPool(meatFreeCandidates, day, true, meatFreeCandidates);
+        const mfNonSalmon = meatFreeCandidates.filter(m => !isSalmonMeal(m));
+        const preferred = mfNonSalmon.filter(noCarbOverlap);
+        meal = pickFromPool(preferred.length > 0 ? preferred : mfNonSalmon.length > 0 ? mfNonSalmon : nonSalmonMeals, day, true, nonSalmonMeals);
       } else if (preferQuick && quickMeals.length > 0) {
-        meal = pickFromPool(quickMeals, day, true, shuffledMeals);
+        const quickNonSalmon = quickMeals.filter(m => !isSalmonMeal(m));
+        const preferred = quickNonSalmon.filter(noCarbOverlap);
+        meal = pickFromPool(preferred.length > 0 ? preferred : quickNonSalmon.length > 0 ? quickNonSalmon : nonSalmonMeals, day, true, nonSalmonMeals);
       } else {
-        const nonTakeaway = shuffledMeals.filter(m => !isTakeawayMeal(m));
-        meal = pickFromPool(nonTakeaway.length > 0 ? nonTakeaway : shuffledMeals, day, true, shuffledMeals);
+        const nonTakeawayNonSalmon = nonSalmonMeals.filter(m => !isTakeawayMeal(m));
+        const preferred = nonTakeawayNonSalmon.filter(noCarbOverlap);
+        meal = pickFromPool(preferred.length > 0 ? preferred : nonTakeawayNonSalmon.length > 0 ? nonTakeawayNonSalmon : nonSalmonMeals, day, true, nonSalmonMeals);
       }
       if (!meal) meal = shuffledMeals[0];
       if (meal && isLongMeal(meal)) longMealDays.add(day);
 
-      if (meal.variants && meal.variants.length > 0) {
-        const needMeatFree = needMeatFreeDay && !isSalmonSlot;
-        let variantPool = meal.variants;
-        if (needMeatFree) {
-          const meatFreeVariants = meal.variants.filter(v => {
-            const sides = (meal.sides && meal.sides.length) ? meal.sides : [{ name: null }];
-            return sides.some(sd => !isMeaty(meal, v.name, sd.name));
-          });
-          if (meatFreeVariants.length > 0) variantPool = meatFreeVariants;
-        }
-        variantName = variantPool[Math.floor(Math.random() * variantPool.length)].name;
-      }
-      if (meal.sides && meal.sides.length > 0) {
-        const allowedSides = meal.sides.filter(s => {
-          const tags = getCarbTypes(meal, variantName, s.name);
-          const overlap = [...tags].some(t => prevCarbTypes.has(t));
-          return !overlap;
-        });
-        const sidePool = allowedSides.length > 0 ? allowedSides : meal.sides;
-        const needMeatFree = needMeatFreeDay && !isSalmonSlot;
-        let sideCandidates = sidePool;
-        if (needMeatFree) {
-          const meatFreeSides = sidePool.filter(s => !isMeaty(meal, variantName, s.name));
-          if (meatFreeSides.length > 0) sideCandidates = meatFreeSides;
-        }
-        sideName = sideCandidates[Math.floor(Math.random() * sideCandidates.length)].name;
-      }
+      const needMeatFree = needMeatFreeDay && !isSalmonSlot;
+      ({ variantName, sideName } = pickRandomVariantAndSide(meal, prevCarbTypes, needMeatFree));
 
       setPlannedMeal(day, mealType, meal.meal_name, variantName, sideName);
       usedMealNames.add(meal.meal_name);
       prevCarbTypes = getCarbTypes(meal, variantName, sideName);
+      prevMealCarbTypes = getCarbTypes(meal, null, SIDE_NONE);
     }
 
-    renderPlannerGrid();
-    renderShoppingList();
-    renderWeekSummary();
+    refreshUI();
     if (state.meals.length < slots.length && meatFreeCandidates.length < 2) {
       setTimeout(() => alert('Filled with available meals. Add more (and more meat-free options) for better variety.'), 100);
     }
@@ -285,21 +304,38 @@
       const name = getPlannedMeal(d, mt);
       return name && isLongMeal(state.meals.find(m => m.meal_name === name));
     });
+    const adjDayHasSalmon = (d) => d && getSlotsForDay(d).some(mt => {
+      const name = getPlannedMeal(d, mt);
+      return name && isSalmonMeal(state.meals.find(m => m.meal_name === name));
+    });
     const prevDay = DAYS[DAYS.indexOf(day) - 1];
     const nextDay = DAYS[DAYS.indexOf(day) + 1];
     const adjacentHasLongMeal = (prevDay && dayHasLongMeal(prevDay)) || (nextDay && dayHasLongMeal(nextDay));
+    const adjacentHasSalmon = adjDayHasSalmon(prevDay) || adjDayHasSalmon(nextDay);
     const allowedForDay = (m, d) => {
+      if (isSalmonMeal(m) && adjacentHasSalmon) return false;
       if (!isLongMeal(m)) return true;
       if (d !== 'Saturday' && d !== 'Sunday') return false;
       return !adjacentHasLongMeal;
     };
     const usedToday = new Set();
     let prevCarbTypes = new Set();
+    // seed prevMealCarbTypes from the previous day's last planned meal
+    let prevMealCarbTypes = (() => {
+      if (!prevDay) return new Set();
+      const slots = getSlotsForDay(prevDay);
+      const name = getPlannedMeal(prevDay, slots[slots.length - 1]);
+      if (!name) return new Set();
+      const m = state.meals.find(meal => meal.meal_name === name);
+      return m ? getCarbTypes(m, null, SIDE_NONE) : new Set();
+    })();
 
     for (const mealType of daySlots) {
       const preferQuick = (day === 'Tuesday' || day === 'Thursday') && daySlots.length === 1;
+      const noCarbOverlap = (m) => hasNoCarbOverlap(m, prevMealCarbTypes);
 
-      let pool = shuffledMeals.filter(m => allowedForDay(m, day) && !usedToday.has(m.meal_name) && !isTakeawayMeal(m));
+      let pool = shuffledMeals.filter(m => allowedForDay(m, day) && !usedToday.has(m.meal_name) && !isTakeawayMeal(m) && noCarbOverlap(m));
+      if (pool.length === 0) pool = shuffledMeals.filter(m => allowedForDay(m, day) && !usedToday.has(m.meal_name) && !isTakeawayMeal(m));
       if (pool.length === 0) pool = shuffledMeals.filter(m => allowedForDay(m, day) && !isTakeawayMeal(m));
       if (pool.length === 0) pool = shuffledMeals.filter(m => !isTakeawayMeal(m));
       if (pool.length === 0) pool = shuffledMeals.slice();
@@ -312,29 +348,15 @@
       const meal = pool[Math.floor(Math.random() * pool.length)];
       if (!meal) continue;
 
-      let variantName = undefined;
-      let sideName = undefined;
-
-      if (meal.variants && meal.variants.length > 0) {
-        variantName = meal.variants[Math.floor(Math.random() * meal.variants.length)].name;
-      }
-      if (meal.sides && meal.sides.length > 0) {
-        const allowedSides = meal.sides.filter(s => {
-          const tags = getCarbTypes(meal, variantName, s.name);
-          return ![...tags].some(t => prevCarbTypes.has(t));
-        });
-        const sidePool = allowedSides.length > 0 ? allowedSides : meal.sides;
-        sideName = sidePool[Math.floor(Math.random() * sidePool.length)].name;
-      }
+      const { variantName, sideName } = pickRandomVariantAndSide(meal, prevCarbTypes, false);
 
       setPlannedMeal(day, mealType, meal.meal_name, variantName, sideName);
       usedToday.add(meal.meal_name);
       prevCarbTypes = getCarbTypes(meal, variantName, sideName);
+      prevMealCarbTypes = getCarbTypes(meal, null, SIDE_NONE);
     }
 
-    renderPlannerGrid();
-    renderShoppingList();
-    renderWeekSummary();
+    refreshUI();
   }
 
   function clearPlan() {
@@ -344,18 +366,33 @@
     savePlan();
     savePlanVariants();
     savePlanSides();
-    renderPlannerGrid();
-    renderShoppingList();
-    renderWeekSummary();
+    refreshUI();
   }
 
   function clearDay(day) {
     for (const mealType of getSlotsForDay(day)) {
       setPlannedMeal(day, mealType, null);
     }
+    refreshUI();
+  }
+
+  function refreshUI() {
     renderPlannerGrid();
     renderShoppingList();
-    renderWeekSummary();
+  }
+
+  function openOverlayById(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.setAttribute('aria-hidden', 'false');
+    el.style.display = 'flex';
+  }
+
+  function closeOverlay(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.setAttribute('aria-hidden', 'true');
+    el.style.display = 'none';
   }
 
   // --- State ---
@@ -387,6 +424,7 @@
       state = { meals: [], plan: {}, planVariants: {}, planSides: {}, shoppingChecked: {}, recipes: [] };
     }
     if (!Array.isArray(state.recipes)) state.recipes = [];
+    loadShoppingRemoved();
   }
 
   function saveMeals() {
@@ -616,17 +654,8 @@
     return out;
   }
 
-  function downloadCsv(content, filename) {
-    const blob = new Blob([content], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(a.href);
-  }
-
-  function downloadJson(content, filename) {
-    const blob = new Blob([content], { type: 'application/json;charset=utf-8' });
+  function downloadBlob(content, filename, mimeType) {
+    const blob = new Blob([content], { type: mimeType });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = filename;
@@ -678,6 +707,17 @@
 
   // --- Shopping list ---
   let shoppingRemoved = new Set();
+
+  function loadShoppingRemoved() {
+    try {
+      const json = localStorage.getItem(STORAGE_SHOPPING_REMOVED);
+      if (json) shoppingRemoved = new Set(JSON.parse(json));
+    } catch (_) { shoppingRemoved = new Set(); }
+  }
+
+  function saveShoppingRemoved() {
+    localStorage.setItem(STORAGE_SHOPPING_REMOVED, JSON.stringify([...shoppingRemoved]));
+  }
 
   // Morrisons aisle order (more-specific rules first; first match wins)
   const SHOPPING_CATEGORY_ORDER = [
@@ -829,6 +869,7 @@
         });
         li.querySelector('.remove-shopping-btn').addEventListener('click', () => {
           shoppingRemoved.add(label);
+          saveShoppingRemoved();
           renderShoppingList();
         });
         container.appendChild(li);
@@ -872,9 +913,9 @@
   function getRecipeCategoryLabel(category) {
     if (!category) return 'Uncategorized';
     return String(category)
-      .split(/[_\-\s]+/)
+      .split(/[_\s]+/)
       .filter(Boolean)
-      .map((w, i) => i === 0 ? w.charAt(0).toUpperCase() + w.slice(1) : w.toLowerCase())
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
       .join(' ');
   }
 
@@ -1417,7 +1458,7 @@
     saveMeals();
     saveRecipes();
     renderMealLibrary();
-    renderPlannerGrid();
+    refreshUI();
     renderRecipes();
     alert(`"${recipe.title}" is now in your meal list.`);
   }
@@ -1487,15 +1528,13 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     if (err) err.hidden = true;
     if (ok) ok.hidden = true;
     setRecipeWizardStep(1);
-    overlay.setAttribute('aria-hidden', 'false');
-    overlay.style.display = 'flex';
+    openOverlayById(overlay.id);
   }
 
   function closeRecipeModal() {
     const overlay = document.getElementById('recipe-modal-overlay');
     if (!overlay) return;
-    overlay.setAttribute('aria-hidden', 'true');
-    overlay.style.display = 'none';
+    closeOverlay(overlay.id);
   }
 
   function validateRecipeJsonFromTextarea() {
@@ -1556,7 +1595,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
   }
 
   function exportRecipesJson() {
-    downloadJson(JSON.stringify(state.recipes, null, 2), 'meal-planner-recipes-backup.json');
+    downloadBlob(JSON.stringify(state.recipes, null, 2), 'meal-planner-recipes-backup.json', 'application/json;charset=utf-8');
   }
 
   function importRecipesFile(e) {
@@ -1798,7 +1837,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     const meal = getMealByName(data.mealName);
     const hasVariants = meal && meal.variants && meal.variants.length > 0;
     const hasSides = meal && meal.sides && meal.sides.length > 0;
-    const done = () => { renderPlannerGrid(); renderShoppingList(); };
+    const done = () => { refreshUI(); };
     if (hasVariants && !data.variantName) {
       openVariantPicker(day, mealType, data.mealName, hasSides ? (variantName) => openSidePicker(day, mealType, data.mealName, variantName, done) : done);
     } else if (hasSides && !data.sideName) {
@@ -1809,85 +1848,68 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     }
   }
 
-  function openVariantPicker(day, mealType, mealName, onSelected) {
-    const meal = getMealByName(mealName);
-    if (!meal || !meal.variants || meal.variants.length === 0) return;
-    const overlay = document.getElementById('variant-picker-overlay');
-    const mealNameEl = document.getElementById('variant-picker-meal-name');
-    const optionsEl = document.getElementById('variant-picker-options');
+  function openOptionPicker({ overlayId, nameElId, optionsElId, mealName, meal, options, allowNone, noneLabel, onSelect }) {
+    if (!options || options.length === 0) return;
+    const overlay = document.getElementById(overlayId);
+    const mealNameEl = document.getElementById(nameElId);
+    const optionsEl = document.getElementById(optionsElId);
     if (!overlay || !mealNameEl || !optionsEl) return;
     const emoji = getMealEmoji(meal);
     mealNameEl.innerHTML = emoji ? `<span class="meal-emoji-display">${escapeHtml(emoji)}</span>${escapeHtml(mealName)}` : escapeHtml(mealName);
     optionsEl.innerHTML = '';
-    meal.variants.forEach(v => {
+    options.forEach(opt => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'btn btn-primary btn-block';
-      btn.textContent = v.name;
+      btn.textContent = opt.name;
       btn.addEventListener('click', () => {
-        setPlannedMeal(day, mealType, mealName, v.name);
-        overlay.setAttribute('aria-hidden', 'true');
-        overlay.style.display = 'none';
-        const hasSides = meal.sides && meal.sides.length > 0;
-        if (hasSides && typeof onSelected === 'function') {
-          onSelected(v.name);
-        } else if (typeof onSelected === 'function') {
-          onSelected();
-        } else {
-          renderPlannerGrid();
-          renderShoppingList();
-        }
+        closeOverlay(overlay.id);
+        onSelect(opt.name);
       });
       optionsEl.appendChild(btn);
     });
-    overlay.setAttribute('aria-hidden', 'false');
-    overlay.style.display = 'flex';
+    if (allowNone) {
+      const noneBtn = document.createElement('button');
+      noneBtn.type = 'button';
+      noneBtn.className = 'btn btn-secondary btn-block';
+      noneBtn.textContent = noneLabel || 'None';
+      noneBtn.addEventListener('click', () => {
+        closeOverlay(overlay.id);
+        onSelect(null);
+      });
+      optionsEl.appendChild(noneBtn);
+    }
+    openOverlayById(overlay.id);
+  }
+
+  function openVariantPicker(day, mealType, mealName, onSelected) {
+    const meal = getMealByName(mealName);
+    if (!meal) return;
+    const hasSides = meal.sides && meal.sides.length > 0;
+    openOptionPicker({
+      overlayId: 'variant-picker-overlay', nameElId: 'variant-picker-meal-name', optionsElId: 'variant-picker-options',
+      mealName, meal, options: meal.variants,
+      onSelect(variantName) {
+        setPlannedMeal(day, mealType, mealName, variantName);
+        if (hasSides && typeof onSelected === 'function') onSelected(variantName);
+        else if (typeof onSelected === 'function') onSelected();
+        else refreshUI();
+      }
+    });
   }
 
   function openSidePicker(day, mealType, mealName, variantName, onSelected) {
     const meal = getMealByName(mealName);
-    if (!meal || !meal.sides || meal.sides.length === 0) return;
-    const overlay = document.getElementById('side-picker-overlay');
-    const mealNameEl = document.getElementById('side-picker-meal-name');
-    const optionsEl = document.getElementById('side-picker-options');
-    if (!overlay || !mealNameEl || !optionsEl) return;
-    const emoji = getMealEmoji(meal);
-    mealNameEl.innerHTML = emoji ? `<span class="meal-emoji-display">${escapeHtml(emoji)}</span>${escapeHtml(mealName)}` : escapeHtml(mealName);
-    optionsEl.innerHTML = '';
-    meal.sides.forEach(s => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'btn btn-primary btn-block';
-      btn.textContent = s.name;
-      btn.addEventListener('click', () => {
-        setPlannedMeal(day, mealType, mealName, variantName || undefined, s.name);
-        overlay.setAttribute('aria-hidden', 'true');
-        overlay.style.display = 'none';
+    if (!meal) return;
+    openOptionPicker({
+      overlayId: 'side-picker-overlay', nameElId: 'side-picker-meal-name', optionsElId: 'side-picker-options',
+      mealName, meal, options: meal.sides, allowNone: true, noneLabel: 'No side',
+      onSelect(sideName) {
+        setPlannedMeal(day, mealType, mealName, variantName || undefined, sideName || SIDE_NONE);
         if (typeof onSelected === 'function') onSelected();
-        else {
-          renderPlannerGrid();
-          renderShoppingList();
-        }
-      });
-      optionsEl.appendChild(btn);
-    });
-    const noSideBtn = document.createElement('button');
-    noSideBtn.type = 'button';
-    noSideBtn.className = 'btn btn-secondary btn-block';
-    noSideBtn.textContent = 'No side';
-    noSideBtn.addEventListener('click', () => {
-      setPlannedMeal(day, mealType, mealName, variantName || undefined, SIDE_NONE);
-      overlay.setAttribute('aria-hidden', 'true');
-      overlay.style.display = 'none';
-      if (typeof onSelected === 'function') onSelected();
-      else {
-        renderPlannerGrid();
-        renderShoppingList();
+        else refreshUI();
       }
     });
-    optionsEl.appendChild(noSideBtn);
-    overlay.setAttribute('aria-hidden', 'false');
-    overlay.style.display = 'flex';
   }
 
   let assignFlowState = null;
@@ -1898,11 +1920,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
 
   function closeAssignMealModal() {
     assignFlowState = null;
-    const overlay = document.getElementById('assign-meal-overlay');
-    if (overlay) {
-      overlay.setAttribute('aria-hidden', 'true');
-      overlay.style.display = 'none';
-    }
+    closeOverlay('assign-meal-overlay');
     const backBtn = document.getElementById('assign-meal-back');
     if (backBtn) backBtn.hidden = true;
   }
@@ -1916,9 +1934,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     if (!s || !s.targetDay) return false;
     setPlannedMeal(s.targetDay, s.targetMealType, s.mealName, s.variantName || undefined, s.sideName || undefined);
     closeAssignMealModal();
-    renderPlannerGrid();
-    renderShoppingList();
-    renderWeekSummary();
+    refreshUI();
     return true;
   }
 
@@ -2033,9 +2049,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         btn.addEventListener('click', () => {
           setPlannedMeal(day, mealType, mealName, s.variantName || undefined, s.sideName || undefined);
           closeAssignMealModal();
-          renderPlannerGrid();
-          renderShoppingList();
-          renderWeekSummary();
+          refreshUI();
           if (isMobileViewport()) switchToPlannerTabMobile();
         });
         body.appendChild(btn);
@@ -2092,8 +2106,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     const overlay = document.getElementById('assign-meal-overlay');
     if (!overlay) return;
     renderAssignMealModal();
-    overlay.setAttribute('aria-hidden', 'false');
-    overlay.style.display = 'flex';
+    openOverlayById(overlay.id);
   }
 
   function openAssignFlowFromSlot(day, mealType) {
@@ -2110,8 +2123,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     const overlay = document.getElementById('assign-meal-overlay');
     if (!overlay) return;
     renderAssignMealModal();
-    overlay.setAttribute('aria-hidden', 'false');
-    overlay.style.display = 'flex';
+    openOverlayById(overlay.id);
   }
 
   function openMealInfoModal(mealName) {
@@ -2165,8 +2177,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     }
 
     body.innerHTML = sections.join('');
-    overlay.setAttribute('aria-hidden', 'false');
-    overlay.style.display = 'flex';
+    openOverlayById(overlay.id);
   }
 
   function openPlannedMealActions(day, mealType) {
@@ -2194,10 +2205,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     subtitle.innerHTML = (emoji ? `<span class="meal-emoji-display">${escapeHtml(emoji)}</span>` : '') + escapeHtml(label);
     hint.textContent = 'What would you like to do?';
 
-    const close = () => {
-      overlay.setAttribute('aria-hidden', 'true');
-      overlay.style.display = 'none';
-    };
+    const close = () => closeOverlay(overlay.id);
 
     const replaceBtn = document.createElement('button');
     replaceBtn.type = 'button';
@@ -2217,9 +2225,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       vBtn.addEventListener('click', () => {
         close();
         openVariantPicker(day, mealType, mealName, () => {
-          renderPlannerGrid();
-          renderShoppingList();
-          renderWeekSummary();
+          refreshUI();
         });
       });
       body.appendChild(vBtn);
@@ -2233,9 +2239,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       sBtn.addEventListener('click', () => {
         close();
         openSidePicker(day, mealType, mealName, variantName || undefined, () => {
-          renderPlannerGrid();
-          renderShoppingList();
-          renderWeekSummary();
+          refreshUI();
         });
       });
       body.appendChild(sBtn);
@@ -2248,14 +2252,11 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     clearBtn.addEventListener('click', () => {
       setPlannedMeal(day, mealType, null);
       close();
-      renderPlannerGrid();
-      renderShoppingList();
-      renderWeekSummary();
+      refreshUI();
     });
     body.appendChild(clearBtn);
 
-    overlay.setAttribute('aria-hidden', 'false');
-    overlay.style.display = 'flex';
+    openOverlayById(overlay.id);
   }
 
   function onMealDragStart(e) {
@@ -2342,8 +2343,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       if (confirm(`Delete "${meal.meal_name}"?`)) {
         removeMeal(meal.meal_name);
         renderMealLibrary();
-        renderPlannerGrid();
-        renderShoppingList();
+        refreshUI();
       }
     });
     card.addEventListener('click', function (e) {
@@ -2380,6 +2380,13 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     });
   }
 
+  function getRecipeImageForMeal(mealName) {
+    if (!mealName || !Array.isArray(state.recipes)) return null;
+    const lower = mealName.toLowerCase();
+    const recipe = state.recipes.find(r => r.mealName && r.mealName.toLowerCase() === lower);
+    return (recipe && recipe.imageUrl) || null;
+  }
+
   function renderMealCuisineTile(cuisine) {
     const tile = document.createElement('article');
     tile.className = 'meal-cuisine-tile';
@@ -2388,8 +2395,13 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     for (let i = 0; i < 4; i++) {
       const m = cuisine.thumbs[i];
       if (m) {
-        const e = getMealEmoji(m) || '🍽';
-        cells.push(`<div class="meal-cuisine-collage-cell"><span>${escapeHtml(e)}</span></div>`);
+        const imgUrl = getRecipeImageForMeal(m.meal_name);
+        if (imgUrl) {
+          cells.push(`<div class="meal-cuisine-collage-cell"><img src="${escapeHtml(imgUrl)}" alt="" loading="lazy"></div>`);
+        } else {
+          const e = getMealEmoji(m) || '🍽';
+          cells.push(`<div class="meal-cuisine-collage-cell"><span>${escapeHtml(e)}</span></div>`);
+        }
       } else {
         cells.push('<div class="meal-cuisine-collage-cell empty"></div>');
       }
@@ -2439,7 +2451,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     container.appendChild(list);
   }
 
-  function renderMealLibrary(shuffleOrder) {
+  function renderMealLibrary() {
     const container = document.getElementById('meal-library');
     if (!container) return;
     container.innerHTML = '';
@@ -2479,7 +2491,6 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       return;
     }
     cuisines.forEach(c => container.appendChild(renderMealCuisineTile(c)));
-    // shuffleOrder param kept for API compat (used by init render); cuisines are stable-ordered
   }
 
   // --- Add/Edit Meal modal ---
@@ -2531,8 +2542,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       const quickCheck = document.getElementById('meal-quick');
       if (quickCheck) quickCheck.checked = false;
     }
-    overlay.setAttribute('aria-hidden', 'false');
-    overlay.style.display = 'flex';
+    openOverlayById(overlay.id);
   }
 
   function renderVariantsList(variants) {
@@ -2599,8 +2609,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
 
   function closeMealModal() {
     const overlay = document.getElementById('meal-modal-overlay');
-    overlay.setAttribute('aria-hidden', 'true');
-    overlay.style.display = 'none';
+    closeOverlay(overlay.id);
   }
 
   function handleMealFormSubmit(e) {
@@ -2654,8 +2663,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     }
     closeMealModal();
     renderMealLibrary();
-    renderPlannerGrid();
-    renderShoppingList();
+    refreshUI();
   }
 
   // --- Init ---
@@ -2663,9 +2671,8 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     loadState();
 
     function finishInit() {
-      renderMealLibrary(true);
-      renderPlannerGrid();
-      renderShoppingList();
+      renderMealLibrary();
+      refreshUI();
       renderRecipesList();
       wireEventListeners();
     }
@@ -2682,7 +2689,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
 
     // One-time backfill: existing localStorage meals predate the `category` column.
     // Fetch meals.csv and merge categories onto existing meals (no other fields touched).
-    const needsCategoryBackfill = state.meals.length > 0 && state.meals.some(m => !m.category);
+    const needsCategoryBackfill = state.meals.length > 0 && !localStorage.getItem('mealPlanner_categoryBackfilled') && state.meals.some(m => !m.category);
     const categoryBackfillPromise = needsCategoryBackfill
       ? fetch(BUNDLED_MEALS_CSV, { cache: 'no-store' })
         .then(r => r.ok ? r.text() : null)
@@ -2703,6 +2710,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
             }
           }
           if (changed) saveMeals();
+          localStorage.setItem('mealPlanner_categoryBackfilled', '1');
         })
         .catch(() => {})
       : Promise.resolve();
@@ -2724,13 +2732,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         case 'meal-modal-overlay': return closeMealModal();
         case 'assign-meal-overlay': return closeAssignMealModal();
         case 'recipe-modal-overlay': return closeRecipeModal();
-        default: {
-          const overlay = document.getElementById(target);
-          if (overlay) {
-            overlay.setAttribute('aria-hidden', 'true');
-            overlay.style.display = 'none';
-          }
-        }
+        default: closeOverlay(target);
       }
     }
 
@@ -2779,14 +2781,8 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       `;
       container.appendChild(block);
     });
-    document.getElementById('variant-picker-cancel')?.addEventListener('click', () => {
-      document.getElementById('variant-picker-overlay').setAttribute('aria-hidden', 'true');
-      document.getElementById('variant-picker-overlay').style.display = 'none';
-    });
-    document.getElementById('side-picker-cancel')?.addEventListener('click', () => {
-      document.getElementById('side-picker-overlay').setAttribute('aria-hidden', 'true');
-      document.getElementById('side-picker-overlay').style.display = 'none';
-    });
+    document.getElementById('variant-picker-cancel')?.addEventListener('click', () => closeOverlay('variant-picker-overlay'));
+    document.getElementById('side-picker-cancel')?.addEventListener('click', () => closeOverlay('side-picker-overlay'));
     document.getElementById('assign-meal-cancel')?.addEventListener('click', closeAssignMealModal);
     document.getElementById('assign-meal-back')?.addEventListener('click', goBackAssignStep);
 
@@ -2798,24 +2794,24 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       reader.onload = () => {
         importMealsFromCsv(reader.result);
         renderMealLibrary();
-        renderPlannerGrid();
-        renderShoppingList();
+        refreshUI();
       };
       reader.readAsText(file);
       this.value = '';
     });
 
     document.getElementById('export-meals-btn')?.addEventListener('click', () => {
-      downloadCsv(mealsToCsv(), 'meals.csv');
+      downloadBlob(mealsToCsv(), 'meals.csv', 'text/csv;charset=utf-8');
     });
     document.getElementById('export-plan-btn')?.addEventListener('click', () => {
-      downloadCsv(planToCsv(), 'plan.csv');
+      downloadBlob(planToCsv(), 'plan.csv', 'text/csv;charset=utf-8');
     });
     document.getElementById('random-fill-btn')?.addEventListener('click', autoFillWeek);
     document.getElementById('clear-plan-btn')?.addEventListener('click', clearPlan);
 
     document.getElementById('restore-shopping-btn')?.addEventListener('click', () => {
       shoppingRemoved.clear();
+      saveShoppingRemoved();
       renderShoppingList();
     });
     document.getElementById('copy-shopping-btn')?.addEventListener('click', copyShoppingToClipboard);
