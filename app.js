@@ -2360,6 +2360,10 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     return card;
   }
 
+  // Cached once per page load — categories appear in a different random order
+  // each refresh, but stay stable while the user navigates the session.
+  let cuisineOrderCache = null;
+
   function getMealCuisines() {
     const buckets = new Map();
     for (const meal of state.meals) {
@@ -2367,11 +2371,15 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       if (!buckets.has(cat)) buckets.set(cat, []);
       buckets.get(cat).push(meal);
     }
-    const orderedKeys = [
-      ...MEAL_COOKBOOK_ORDER.filter(c => buckets.has(c)),
-      ...Array.from(buckets.keys()).filter(c => !MEAL_COOKBOOK_ORDER.includes(c) && c !== 'Uncategorized').sort(),
-      ...(buckets.has('Uncategorized') ? ['Uncategorized'] : [])
-    ];
+    if (!cuisineOrderCache) {
+      cuisineOrderCache = shuffleArray(Array.from(buckets.keys()));
+    } else {
+      // New categories added during the session get appended in stable order
+      for (const key of buckets.keys()) {
+        if (!cuisineOrderCache.includes(key)) cuisineOrderCache.push(key);
+      }
+    }
+    const orderedKeys = cuisineOrderCache.filter(k => buckets.has(k));
     return orderedKeys.map(key => {
       const meals = buckets.get(key) || [];
       return {
@@ -2398,8 +2406,10 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     tile.className = 'meal-cuisine-tile';
     tile.dataset.cuisine = cuisine.name;
     const cells = [];
+    const thumbs = cuisine.thumbs;
     for (let i = 0; i < 4; i++) {
-      const m = cuisine.thumbs[i];
+      // Cycle through thumbs so 1-3 meal categories still fill the 2x2 grid symmetrically.
+      const m = thumbs.length > 0 ? thumbs[i % thumbs.length] : null;
       if (m) {
         const imgUrl = getRecipeImageForMeal(m.meal_name);
         if (imgUrl) {
