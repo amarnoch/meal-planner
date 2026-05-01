@@ -1679,7 +1679,7 @@
     },
     "imageUrl": "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
-    "category": "Asian",
+    "category": "Thai",
     "tags": [
       "dinner",
       "thai",
@@ -2040,5 +2040,466 @@
     "notes": "Tonkatsu sauce is available in most Asian supermarkets (Bull-Dog brand is common). In a pinch, use extra Worcestershire with a dash of ketchup. Yakisoba noodles are sold pre-steamed in vacuum packs — use fresh rather than dried for best results.",
     "createdAt": "2026-05-01T10:25:00Z",
     "mealName": "Yaki Soba"
+  },
+  {
+    "title": "La Scala's Famous Chopped Salad",
+    "source": {
+      "type": "blog",
+      "url": "https://oliviaadriance.com/la-scalas-famous-chopped-salad/",
+      "label": "oliviaadriance.com · @that.salad.lady"
+    },
+    "imageUrl": "https://oliviaadriance.com/wp-content/uploads/2022/09/Final_5_La_Scalas-Famous_Chopped_Salad.jpg",
+    "servings": 4,
+    "category": "Salads",
+    "tags": [
+      "salad",
+      "chopped",
+      "lunch",
+      "main",
+      "italian"
+    ],
+    "ingredients": [
+      {
+        "qty": "80",
+        "unit": "ml",
+        "name": "olive oil",
+        "notes": null,
+        "emoji": "🫒"
+      },
+      {
+        "qty": "60",
+        "unit": "ml",
+        "name": "red wine vinegar",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "tsp",
+        "name": "Dijon mustard",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1/2",
+        "unit": "tsp",
+        "name": "salt",
+        "notes": null,
+        "emoji": "🧂"
+      },
+      {
+        "qty": "1/4",
+        "unit": "tsp",
+        "name": "black pepper",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "iceberg lettuce, shredded",
+        "notes": "1 large head",
+        "emoji": "🥗"
+      },
+      {
+        "qty": "115",
+        "unit": "g",
+        "name": "salami, thinly sliced then chopped",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "tin chickpeas, drained and rinsed",
+        "notes": "400g tin",
+        "emoji": ""
+      },
+      {
+        "qty": "1 1/2",
+        "unit": "tbsp",
+        "name": "nutritional yeast",
+        "notes": null,
+        "emoji": ""
+      }
+    ],
+    "steps": [
+      "Combine the olive oil, red wine vinegar, Dijon, salt and pepper in a jar and shake until emulsified.",
+      "Tip the chickpeas into a bowl, pour over a quarter of the dressing, stir and leave to marinate for an hour if you have time.",
+      "Add the shredded lettuce, salami and marinated chickpeas to a large bowl.",
+      "Sprinkle over the nutritional yeast, pour on the remaining dressing and toss well.",
+      "Serve straight away."
+    ],
+    "notes": "The marinated chickpeas make this — give them the full hour if you can. For a kid-friendly version, swap the salami for diced ham or leave it out.",
+    "mealName": "La Scala Chopped Salad",
+    "id": "r56d6f2f2",
+    "createdAt": "2026-05-01T22:34:32.173366Z"
+  },
+  {
+    "title": "Jennifer Aniston's Herby Salad",
+    "source": {
+      "type": "blog",
+      "url": "https://oliviaadriance.com/jennifer-aniston-salad/",
+      "label": "oliviaadriance.com · @that.salad.lady"
+    },
+    "imageUrl": "https://oliviaadriance.com/wp-content/uploads/2022/05/Final_2_Jennifer_Aniston_Salad.jpg",
+    "servings": 4,
+    "category": "Salads",
+    "tags": [
+      "salad",
+      "main",
+      "high-protein",
+      "lunch",
+      "meal-prep"
+    ],
+    "ingredients": [
+      {
+        "qty": "2",
+        "unit": "",
+        "name": "chicken breasts",
+        "notes": "large",
+        "emoji": "🐔"
+      },
+      {
+        "qty": "1 1/2",
+        "unit": "tsp",
+        "name": "Italian seasoning",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "3/4",
+        "unit": "tsp",
+        "name": "salt",
+        "notes": null,
+        "emoji": "🧂"
+      },
+      {
+        "qty": "1/2",
+        "unit": "tsp",
+        "name": "black pepper",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1 1/2",
+        "unit": "tbsp",
+        "name": "olive or rapeseed oil",
+        "notes": "for frying",
+        "emoji": "🫒"
+      },
+      {
+        "qty": "60",
+        "unit": "g",
+        "name": "quinoa",
+        "notes": "uncooked",
+        "emoji": ""
+      },
+      {
+        "qty": "200",
+        "unit": "ml",
+        "name": "chicken stock",
+        "notes": "divided",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "tin chickpeas, drained and rinsed",
+        "notes": "400g tin",
+        "emoji": ""
+      },
+      {
+        "qty": "170",
+        "unit": "g",
+        "name": "cucumber, quartered and chopped",
+        "notes": null,
+        "emoji": "🥒"
+      },
+      {
+        "qty": "1",
+        "unit": "handful",
+        "name": "flat-leaf parsley, roughly chopped",
+        "notes": "about 25g",
+        "emoji": "🌿"
+      },
+      {
+        "qty": "1/2",
+        "unit": "handful",
+        "name": "mint leaves, roughly chopped",
+        "notes": "about 10g",
+        "emoji": ""
+      },
+      {
+        "qty": "40",
+        "unit": "g",
+        "name": "red onion, finely chopped",
+        "notes": null,
+        "emoji": "🧅"
+      },
+      {
+        "qty": "60",
+        "unit": "g",
+        "name": "roasted salted pistachios, roughly chopped",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "40",
+        "unit": "g",
+        "name": "roasted salted pumpkin seeds",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "60",
+        "unit": "ml",
+        "name": "olive oil",
+        "notes": "to dress",
+        "emoji": "🫒"
+      },
+      {
+        "qty": "1-2",
+        "unit": "",
+        "name": "lemons, juiced",
+        "notes": null,
+        "emoji": "🍋"
+      }
+    ],
+    "steps": [
+      "Rub the chicken with the frying oil, Italian seasoning, salt and pepper.",
+      "Heat a skillet over medium-high heat and cook the chicken for 4 minutes a side without moving it.",
+      "Drop the heat to medium-low, pour in 60ml of stock to deglaze, scraping any stuck bits.",
+      "Cover and cook another 5 minutes, then rest off the heat for 5 minutes before slicing into bite-sized pieces.",
+      "While the chicken cooks, simmer the quinoa in the remaining 140ml stock with a pinch of salt for 15 minutes, lid on, until liquid has absorbed. Rest 5 minutes, then fluff.",
+      "In a big bowl combine the cucumber, chickpeas, parsley, mint, red onion, pistachios, pumpkin seeds, sliced chicken and quinoa.",
+      "Dress with the olive oil and lemon juice, season to taste and serve."
+    ],
+    "notes": "Holds well in the fridge for a couple of days — great for packed lunches. Pull back on the red onion or chop it finer for fussier eaters.",
+    "mealName": "Aniston Herby Salad",
+    "id": "rb07fdf6a",
+    "createdAt": "2026-05-01T22:34:32.173366Z"
+  },
+  {
+    "title": "Avocado Egg Salad (No Mayo)",
+    "source": {
+      "type": "blog",
+      "url": "https://oliviaadriance.com/avocado-egg-salad-no-mayo/",
+      "label": "oliviaadriance.com · @that.salad.lady"
+    },
+    "imageUrl": "https://oliviaadriance.com/wp-content/uploads/2022/08/Final_6_Avocado_Egg_Salad.jpg",
+    "servings": 4,
+    "category": "Salads",
+    "tags": [
+      "salad",
+      "vegetarian",
+      "quick",
+      "lunch",
+      "sandwich-filler"
+    ],
+    "ingredients": [
+      {
+        "qty": "2",
+        "unit": "",
+        "name": "ripe avocados, diced",
+        "notes": "large",
+        "emoji": "🥑"
+      },
+      {
+        "qty": "3",
+        "unit": "",
+        "name": "hard-boiled eggs, diced",
+        "notes": null,
+        "emoji": "🥚"
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "red onion, finely chopped",
+        "notes": null,
+        "emoji": "🧅"
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "fresh dill, chopped",
+        "notes": null,
+        "emoji": "🌿"
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "dill pickle (gherkin), diced",
+        "notes": null,
+        "emoji": "🥒"
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "pickle brine from the jar",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "tbsp",
+        "name": "Dijon mustard",
+        "notes": "spicy or regular",
+        "emoji": ""
+      },
+      {
+        "qty": "1/2",
+        "unit": "tsp",
+        "name": "salt",
+        "notes": null,
+        "emoji": "🧂"
+      },
+      {
+        "qty": "1",
+        "unit": "pinch",
+        "name": "black pepper",
+        "notes": null,
+        "emoji": ""
+      }
+    ],
+    "steps": [
+      "Bring a pan of water to the boil, gently lower in the eggs, turn off the heat and cover the pan for 14 minutes.",
+      "Drain and plunge the eggs into iced water for 5 minutes, then peel and dice.",
+      "In a bowl, mash half the diced avocado with the pickle brine, mustard, salt and pepper.",
+      "Fold in the remaining avocado, eggs, red onion, dill and chopped pickle.",
+      "Taste, adjust the seasoning, and pile onto toast, into lettuce cups or over greens."
+    ],
+    "notes": "The avocado replaces mayo here so the salad is best eaten the day it's made. Squeeze of lemon stops it browning if you need to hold it an hour.",
+    "mealName": "Avocado Egg Salad",
+    "id": "r3bfd008b",
+    "createdAt": "2026-05-01T22:34:32.173366Z"
+  },
+  {
+    "title": "Broccoli Crunch Salad with Almond Butter Dressing",
+    "source": {
+      "type": "blog",
+      "url": "https://oliviaadriance.com/broccoli-crunch-salad/",
+      "label": "oliviaadriance.com · @that.salad.lady"
+    },
+    "imageUrl": "https://oliviaadriance.com/wp-content/uploads/2024/05/Final_2_Broccoli_Crunch_Salad.jpg",
+    "servings": 4,
+    "category": "Salads",
+    "tags": [
+      "salad",
+      "vegetarian",
+      "side",
+      "crunchy",
+      "make-ahead"
+    ],
+    "ingredients": [
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "head broccoli, chopped small",
+        "notes": "around 350g",
+        "emoji": "🥦"
+      },
+      {
+        "qty": "120",
+        "unit": "g",
+        "name": "shelled edamame",
+        "notes": "frozen and defrosted is fine",
+        "emoji": ""
+      },
+      {
+        "qty": "60",
+        "unit": "g",
+        "name": "red cabbage, finely shaved",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "",
+        "name": "spring onions, thinly sliced",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "3",
+        "unit": "",
+        "name": "Medjool dates, chopped small",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "60",
+        "unit": "g",
+        "name": "roasted cashews, roughly chopped",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "3",
+        "unit": "tbsp",
+        "name": "smooth almond butter",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1 1/2",
+        "unit": "tbsp",
+        "name": "rapeseed or olive oil",
+        "notes": null,
+        "emoji": "🫒"
+      },
+      {
+        "qty": "1 1/2",
+        "unit": "tbsp",
+        "name": "rice vinegar",
+        "notes": "unseasoned",
+        "emoji": ""
+      },
+      {
+        "qty": "1 1/2",
+        "unit": "tbsp",
+        "name": "low-salt soy sauce or tamari",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "tsp",
+        "name": "honey",
+        "notes": null,
+        "emoji": "🍯"
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "fresh ginger, grated",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "pinch",
+        "name": "black pepper",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1-2",
+        "unit": "tbsp",
+        "name": "water, to thin the dressing",
+        "notes": null,
+        "emoji": ""
+      }
+    ],
+    "steps": [
+      "Whisk the almond butter, oil, rice vinegar, soy sauce, honey, ginger and pepper in a small bowl, loosening with a splash of water until pourable.",
+      "Tip the broccoli, edamame, red cabbage, spring onions, dates and cashews into a big serving bowl.",
+      "Pour over the dressing and toss until everything is coated.",
+      "Eat straight away or chill — it keeps in the fridge for up to 3 days."
+    ],
+    "notes": "The dates are non-negotiable — they take this from healthy-but-meh to addictive. Chop the broccoli small so kids can scoop it onto a fork.",
+    "mealName": "Broccoli Crunch Salad",
+    "id": "r49205bb6",
+    "createdAt": "2026-05-01T22:34:32.173366Z"
   }
 ]

@@ -40,7 +40,7 @@
   // Recipe categories are now free-form strings (each unique value = a "Cookbook").
   // Andy adds a new cookbook by writing `category: "Whatever"` on a recipe in recipes.json.
   // Recipes in these "main meal" cookbooks get a "+ meal idea" badge if not already in meals.csv.
-  const MAIN_COOKBOOKS = ['Italian', 'Japanese', 'Indian & curries', 'British classics', 'Tex-Mex', 'Eggs', 'Greek', 'Spanish', 'Mediterranean', 'No-cook nights', 'Other mains'];
+  const MAIN_COOKBOOKS = ['Italian', 'Japanese', 'Chinese', 'Thai', 'Asian', 'Indian & curries', 'British classics', 'Tex-Mex', 'Eggs', 'Greek', 'Spanish', 'Mediterranean', 'Salads', 'No-cook nights', 'Other mains'];
   let recipesView = 'cookbooks'; // 'cookbooks' | 'cookbook' | 'detail'
   let activeCookbook = null;
   let activeRecipeId = null;
@@ -1478,7 +1478,7 @@ Schema:
   "source": {"type": "instagram|web|screenshot|manual", "url": "string|null", "label": "string|null"},
   "imageUrl": "absolute URL of the dish's hero photo from the source, or null if none is available",
   "servings": 4,
-  "category": "Cookbook name — one of: Italian, Japanese, Indian & curries, British classics, Tex-Mex, Eggs, Greek, Spanish, Mediterranean, No-cook nights, Other mains, Sides, Toddler, Bakes, Treats. Or invent a new name if none fit (e.g. Korean, Thai).",
+  "category": "Cookbook name — one of: Italian, Japanese, Chinese, Thai, Asian, Indian & curries, British classics, Tex-Mex, Eggs, Greek, Spanish, Mediterranean, Salads, No-cook nights, Other mains, Sides, Toddler, Bakes, Treats. Or invent a new name if none fit (e.g. Korean, Vietnamese).",
   "tags": ["string"],
   "ingredients": [{"qty": "string", "unit": "string", "name": "string", "notes": "string|null", "emoji": "single emoji or empty"}],
   "steps": ["string"],
@@ -2697,10 +2697,10 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     // existing localStorage meals, and import any new bundled meals not present locally.
     // Each step is gated on its own flag so it runs once per user.
     // Versioned: bump when meals.csv categories change so existing users re-sync.
-    const categoryBackfillVersion = '2';
+    const categoryBackfillVersion = '3';
     const needsCategoryBackfill = state.meals.length > 0 && localStorage.getItem('mealPlanner_categoryBackfilled') !== categoryBackfillVersion;
     const needsImageBackfill = state.meals.length > 0 && !localStorage.getItem('mealPlanner_imageUrlBackfilled') && state.meals.some(m => !m.image_url);
-    const newMealsBackfillVersion = '2';
+    const newMealsBackfillVersion = '3';
     const needsNewMealsBackfill = state.meals.length > 0 && localStorage.getItem('mealPlanner_newMealsBackfilled') !== newMealsBackfillVersion;
     const categoryBackfillPromise = (needsCategoryBackfill || needsImageBackfill || needsNewMealsBackfill)
       ? fetch(BUNDLED_MEALS_CSV, { cache: 'no-store' })
