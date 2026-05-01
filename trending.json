@@ -24,6 +24,21 @@
       "name": "That Salad Lady",
       "url": "https://www.instagram.com/that.salad.lady/",
       "tagline": "Vibrant, substantial salads (Olivia Adriance)"
+    },
+    {
+      "name": "Anna Jones",
+      "url": "https://www.instagram.com/we_are_food/",
+      "tagline": "Plant-forward UK family cooking"
+    },
+    {
+      "name": "Dishoom",
+      "url": "https://www.instagram.com/dishoom/",
+      "tagline": "Indian classics, done properly"
+    },
+    {
+      "name": "Daen's Kitchen",
+      "url": "https://www.instagram.com/daenskitchen/",
+      "tagline": "Family-friendly, kid + adult crossover"
     }
   ],
   "trending": [
@@ -61,6 +76,27 @@
       "url": "https://www.instagram.com/that.salad.lady/",
       "image": "https://oliviaadriance.com/wp-content/uploads/2024/05/Final_2_Broccoli_Crunch_Salad.jpg",
       "note": "Olivia Adriance's chopped, herby and crunchy salads — main-meal ready, not garnish."
+    },
+    {
+      "title": "Anna Jones — plant-forward family cooking",
+      "source": "Instagram · @we_are_food",
+      "url": "https://www.instagram.com/we_are_food/",
+      "image": "https://images.unsplash.com/photo-1540420773420-3366772f4999?fm=jpg&q=70&w=600&auto=format&fit=crop",
+      "note": "UK veggie cookbook author — fills the plant-led gap without being preachy."
+    },
+    {
+      "title": "Dishoom — Bombay-style classics",
+      "source": "Instagram · @dishoom",
+      "url": "https://www.instagram.com/dishoom/",
+      "image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?fm=jpg&q=70&w=600&auto=format&fit=crop",
+      "note": "From the cookbook + Insta — proper Indian classics that rival the curries cookbook."
+    },
+    {
+      "title": "Daen's Kitchen — kid + adult crossover meals",
+      "source": "Instagram · @daenskitchen",
+      "url": "https://www.instagram.com/daenskitchen/",
+      "image": "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?fm=jpg&q=70&w=600&auto=format&fit=crop",
+      "note": "Aussie creator — same plate works for the 10mo, 3yo and adults."
     }
   ]
 }

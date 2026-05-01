@@ -2406,18 +2406,22 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     tile.className = 'meal-cuisine-tile';
     tile.dataset.cuisine = cuisine.name;
     const cells = [];
-    const thumbs = cuisine.thumbs;
+    // Prefer meals that have an image so all 4 cells render as photos
+    // (avoids the lopsided look of a photo + emoji + photo + emoji mix).
+    // If no meals in this cuisine have an image, fall back to cycling emoji
+    // — all 4 cells will then be the same type, still symmetric.
+    const allMeals = cuisine.meals || cuisine.thumbs || [];
+    const withImage = allMeals
+      .map(m => ({ meal: m, imgUrl: getRecipeImageForMeal(m.meal_name) }))
+      .filter(x => x.imgUrl);
     for (let i = 0; i < 4; i++) {
-      // Cycle through thumbs so 1-3 meal categories still fill the 2x2 grid symmetrically.
-      const m = thumbs.length > 0 ? thumbs[i % thumbs.length] : null;
-      if (m) {
-        const imgUrl = getRecipeImageForMeal(m.meal_name);
-        if (imgUrl) {
-          cells.push(`<div class="meal-cuisine-collage-cell"><img src="${escapeHtml(imgUrl)}" alt="" loading="lazy"></div>`);
-        } else {
-          const e = getMealEmoji(m) || '🍽';
-          cells.push(`<div class="meal-cuisine-collage-cell"><span>${escapeHtml(e)}</span></div>`);
-        }
+      if (withImage.length > 0) {
+        const { imgUrl } = withImage[i % withImage.length];
+        cells.push(`<div class="meal-cuisine-collage-cell"><img src="${escapeHtml(imgUrl)}" alt="" loading="lazy"></div>`);
+      } else if (allMeals.length > 0) {
+        const m = allMeals[i % allMeals.length];
+        const e = getMealEmoji(m) || '🍽';
+        cells.push(`<div class="meal-cuisine-collage-cell"><span>${escapeHtml(e)}</span></div>`);
       } else {
         cells.push('<div class="meal-cuisine-collage-cell empty"></div>');
       }
