@@ -642,6 +642,18 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
 }
 
+/* Weekday slots are tighter — single dinner slot, shorter labels.
+   Sat/Sun keep the larger size because their lunch+dinner labels often wrap. */
+.planner-day:not([data-day="Saturday"]):not([data-day="Sunday"]) .planner-slot {
+  min-height: 44px;
+  padding: 0.22rem;
+}
+
+.planner-day:not([data-day="Saturday"]):not([data-day="Sunday"]) .planner-slot .planned-meal {
+  padding: 0.28rem 0.5rem;
+  font-size: 0.74rem;
+}
+
 .planner-slot.drag-over {
   border-color: var(--primary);
   border-style: solid;
@@ -2412,6 +2424,18 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
     border-style: dashed;
     border-width: 1px;
     padding: 0.2rem 0.25rem;
+  }
+
+  /* Mobile: weekday rows are tighter (single dinner slot, full-width card,
+     short label). Sat/Sun keep the larger size for their wrapped 2-card layout. */
+  .planner-day:not([data-day="Saturday"]):not([data-day="Sunday"]) .planner-slot {
+    min-height: 1.85rem;
+    padding: 0.15rem 0.25rem;
+  }
+
+  .planner-day:not([data-day="Saturday"]):not([data-day="Sunday"]) .planner-slot .planned-meal {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.35rem;
   }
 
   .planner-slot .slot-label {
