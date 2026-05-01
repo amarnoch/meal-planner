@@ -2694,10 +2694,13 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       : Promise.resolve();
 
     // One-time backfill: merge `category` and `image_url` from the bundled CSV onto
-    // existing localStorage meals (existing users predate these columns).
+    // existing localStorage meals, and import any new bundled meals not present locally.
+    // Each step is gated on its own flag so it runs once per user.
     const needsCategoryBackfill = state.meals.length > 0 && !localStorage.getItem('mealPlanner_categoryBackfilled') && state.meals.some(m => !m.category);
     const needsImageBackfill = state.meals.length > 0 && !localStorage.getItem('mealPlanner_imageUrlBackfilled') && state.meals.some(m => !m.image_url);
-    const categoryBackfillPromise = (needsCategoryBackfill || needsImageBackfill)
+    const newMealsBackfillVersion = '2';
+    const needsNewMealsBackfill = state.meals.length > 0 && localStorage.getItem('mealPlanner_newMealsBackfilled') !== newMealsBackfillVersion;
+    const categoryBackfillPromise = (needsCategoryBackfill || needsImageBackfill || needsNewMealsBackfill)
       ? fetch(BUNDLED_MEALS_CSV, { cache: 'no-store' })
         .then(r => r.ok ? r.text() : null)
         .then(text => {
@@ -2723,6 +2726,14 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
           if (changed) saveMeals();
           if (needsCategoryBackfill) localStorage.setItem('mealPlanner_categoryBackfilled', '1');
           if (needsImageBackfill) localStorage.setItem('mealPlanner_imageUrlBackfilled', '1');
+          if (needsNewMealsBackfill) {
+            const before = state.meals.length;
+            importMealsFromCsv(text);
+            if (state.meals.length !== before) {
+              // importMealsFromCsv already saved
+            }
+            localStorage.setItem('mealPlanner_newMealsBackfilled', newMealsBackfillVersion);
+          }
         })
         .catch(() => {})
       : Promise.resolve();

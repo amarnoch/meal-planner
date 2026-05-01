@@ -10,14 +10,55 @@
     "imageUrl": "https://images.unsplash.com/photo-1718307495601-5231e6290d8a?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 12,
     "category": "Toddler",
-    "tags": ["toddler snack", "healthy snack", "1 year old", "baking"],
+    "tags": [
+      "toddler snack",
+      "healthy snack",
+      "1 year old",
+      "baking"
+    ],
     "ingredients": [
-      { "qty": "50", "unit": "g", "name": "butter", "notes": "plus extra for greasing", "emoji": "🧈" },
-      { "qty": "2", "unit": "", "name": "eggs", "notes": null, "emoji": "🥚" },
-      { "qty": "100", "unit": "ml", "name": "milk", "notes": null, "emoji": "🥛" },
-      { "qty": "1", "unit": "block", "name": "frozen spinach", "notes": "defrosted and chopped", "emoji": "🥬" },
-      { "qty": "60", "unit": "g", "name": "cheese", "notes": "grated", "emoji": "🧀" },
-      { "qty": "150", "unit": "g", "name": "plain flour", "notes": "sieved", "emoji": "🌾" }
+      {
+        "qty": "50",
+        "unit": "g",
+        "name": "butter",
+        "notes": "plus extra for greasing",
+        "emoji": "🧈"
+      },
+      {
+        "qty": "2",
+        "unit": "",
+        "name": "eggs",
+        "notes": null,
+        "emoji": "🥚"
+      },
+      {
+        "qty": "100",
+        "unit": "ml",
+        "name": "milk",
+        "notes": null,
+        "emoji": "🥛"
+      },
+      {
+        "qty": "1",
+        "unit": "block",
+        "name": "frozen spinach",
+        "notes": "defrosted and chopped",
+        "emoji": "🥬"
+      },
+      {
+        "qty": "60",
+        "unit": "g",
+        "name": "cheese",
+        "notes": "grated",
+        "emoji": "🧀"
+      },
+      {
+        "qty": "150",
+        "unit": "g",
+        "name": "plain flour",
+        "notes": "sieved",
+        "emoji": "🌾"
+      }
     ],
     "steps": [
       "Preheat the oven to 180C.",
@@ -46,21 +87,108 @@
     "imageUrl": "https://www.jocooks.com/wp-content/uploads/2019/10/coconut-chicken-curry-1-10.jpg",
     "servings": 4,
     "category": "Indian & curries",
-    "tags": ["dinner", "one pot", "30 minutes", "chicken", "indian", "curry", "family friendly", "freezer friendly"],
+    "tags": [
+      "dinner",
+      "one pot",
+      "30 minutes",
+      "chicken",
+      "indian",
+      "curry",
+      "family friendly",
+      "freezer friendly"
+    ],
     "ingredients": [
-      { "qty": "1.5", "unit": "tbsp", "name": "olive oil", "notes": null, "emoji": "🫒" },
-      { "qty": "600", "unit": "g", "name": "chicken breasts", "notes": "skinless and boneless, cut into bite-size pieces", "emoji": "🍗" },
-      { "qty": "1/2", "unit": "tsp", "name": "salt", "notes": "or to taste", "emoji": "🧂" },
-      { "qty": "1/2", "unit": "tsp", "name": "pepper", "notes": "or to taste", "emoji": "" },
-      { "qty": "1", "unit": "", "name": "onion", "notes": "chopped", "emoji": "🧅" },
-      { "qty": "2", "unit": "clove", "name": "garlic", "notes": "minced", "emoji": "🧄" },
-      { "qty": "1.5", "unit": "tbsp", "name": "curry powder", "notes": null, "emoji": "🌶" },
-      { "qty": "170", "unit": "ml", "name": "chicken stock", "notes": "low sodium", "emoji": "" },
-      { "qty": "1", "unit": "can", "name": "coconut milk", "notes": "400ml can", "emoji": "🥥" },
-      { "qty": "1", "unit": "can", "name": "chopped tomatoes", "notes": "400g can", "emoji": "🍅" },
-      { "qty": "1.5", "unit": "tbsp", "name": "tomato puree", "notes": null, "emoji": "" },
-      { "qty": "1", "unit": "tbsp", "name": "sugar", "notes": null, "emoji": "" },
-      { "qty": "1", "unit": "tbsp", "name": "parsley", "notes": "chopped", "emoji": "🌿" }
+      {
+        "qty": "1.5",
+        "unit": "tbsp",
+        "name": "olive oil",
+        "notes": null,
+        "emoji": "🫒"
+      },
+      {
+        "qty": "600",
+        "unit": "g",
+        "name": "chicken breasts",
+        "notes": "skinless and boneless, cut into bite-size pieces",
+        "emoji": "🍗"
+      },
+      {
+        "qty": "1/2",
+        "unit": "tsp",
+        "name": "salt",
+        "notes": "or to taste",
+        "emoji": "🧂"
+      },
+      {
+        "qty": "1/2",
+        "unit": "tsp",
+        "name": "pepper",
+        "notes": "or to taste",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "onion",
+        "notes": "chopped",
+        "emoji": "🧅"
+      },
+      {
+        "qty": "2",
+        "unit": "clove",
+        "name": "garlic",
+        "notes": "minced",
+        "emoji": "🧄"
+      },
+      {
+        "qty": "1.5",
+        "unit": "tbsp",
+        "name": "curry powder",
+        "notes": null,
+        "emoji": "🌶"
+      },
+      {
+        "qty": "170",
+        "unit": "ml",
+        "name": "chicken stock",
+        "notes": "low sodium",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "can",
+        "name": "coconut milk",
+        "notes": "400ml can",
+        "emoji": "🥥"
+      },
+      {
+        "qty": "1",
+        "unit": "can",
+        "name": "chopped tomatoes",
+        "notes": "400g can",
+        "emoji": "🍅"
+      },
+      {
+        "qty": "1.5",
+        "unit": "tbsp",
+        "name": "tomato puree",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "sugar",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "parsley",
+        "notes": "chopped",
+        "emoji": "🌿"
+      }
     ],
     "steps": [
       "Heat the olive oil in a large pan or shallow casserole, add the chicken and season with salt and pepper.",
@@ -72,7 +200,7 @@
     ],
     "notes": "Scaled to serve 4 (UK family). Store in an airtight container in the fridge for up to 3 days, or freeze once fully cooled. Curry powder blends vary in heat — start with 1 tbsp if unsure. Mild curry powder works best for a family-friendly version.",
     "createdAt": "2026-04-26T20:45:00Z",
-    "mealName": null
+    "mealName": "Coconut Chicken Curry"
   },
   {
     "id": "rec_classic_omurice",
@@ -85,15 +213,64 @@
     "imageUrl": "https://www.sirogohan.com/_files/recipe/images/omuraisu/omuraisu9142.JPG",
     "servings": 4,
     "category": "Japanese",
-    "tags": ["dinner", "japanese", "comfort food", "family friendly", "kid friendly", "eggs"],
+    "tags": [
+      "dinner",
+      "japanese",
+      "comfort food",
+      "family friendly",
+      "kid friendly",
+      "eggs"
+    ],
     "ingredients": [
-      { "qty": "1", "unit": "batch", "name": "Chicken Rice", "notes": "see the Chicken Rice recipe in this cookbook — make it first, divide into 4 portions, keep warm", "emoji": "🍚" },
-      { "qty": "8", "unit": "", "name": "eggs", "notes": "2 per portion, cook one portion at a time", "emoji": "🥚" },
-      { "qty": "", "unit": "", "name": "salt for eggs", "notes": "2 pinches per 2-egg portion", "emoji": "🧂" },
-      { "qty": "", "unit": "", "name": "butter for cooking eggs", "notes": "small knob per portion", "emoji": "🧈" },
-      { "qty": "8", "unit": "tbsp", "name": "tomato ketchup", "notes": "for the ketchup-butter sauce", "emoji": "🍅" },
-      { "qty": "3", "unit": "tbsp", "name": "water", "notes": "for the sauce", "emoji": "" },
-      { "qty": "20", "unit": "g", "name": "butter", "notes": "for the sauce", "emoji": "🧈" }
+      {
+        "qty": "1",
+        "unit": "batch",
+        "name": "Chicken Rice",
+        "notes": "see the Chicken Rice recipe in this cookbook — make it first, divide into 4 portions, keep warm",
+        "emoji": "🍚"
+      },
+      {
+        "qty": "8",
+        "unit": "",
+        "name": "eggs",
+        "notes": "2 per portion, cook one portion at a time",
+        "emoji": "🥚"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "salt for eggs",
+        "notes": "2 pinches per 2-egg portion",
+        "emoji": "🧂"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "butter for cooking eggs",
+        "notes": "small knob per portion",
+        "emoji": "🧈"
+      },
+      {
+        "qty": "8",
+        "unit": "tbsp",
+        "name": "tomato ketchup",
+        "notes": "for the ketchup-butter sauce",
+        "emoji": "🍅"
+      },
+      {
+        "qty": "3",
+        "unit": "tbsp",
+        "name": "water",
+        "notes": "for the sauce",
+        "emoji": ""
+      },
+      {
+        "qty": "20",
+        "unit": "g",
+        "name": "butter",
+        "notes": "for the sauce",
+        "emoji": "🧈"
+      }
     ],
     "steps": [
       "Make a batch of Chicken Rice (see the Chicken Rice recipe). Keep warm and divide into 4 portions.",
@@ -106,7 +283,7 @@
     ],
     "notes": "Built on top of the Chicken Rice recipe — make that first, then this becomes a quick assembly. The ketchup-butter sauce is the signature finishing touch.",
     "createdAt": "2026-04-26T20:55:00Z",
-    "mealName": null
+    "mealName": "Omurice"
   },
   {
     "id": "rec_caramelised_onion_butter_beans",
@@ -119,18 +296,83 @@
     "imageUrl": "https://images.unsplash.com/photo-1637668895982-893b7df2a59a?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
     "category": "Other mains",
-    "tags": ["vegetarian", "dinner", "quick", "comfort food"],
+    "tags": [
+      "vegetarian",
+      "dinner",
+      "quick",
+      "comfort food"
+    ],
     "ingredients": [
-      { "qty": "3", "unit": "", "name": "onions, finely sliced", "notes": null, "emoji": "🧅" },
-      { "qty": "2", "unit": "clove", "name": "garlic, finely chopped", "notes": null, "emoji": "🧄" },
-      { "qty": "60", "unit": "g", "name": "tomato purée", "notes": "doubled per Laura's note", "emoji": "🍅" },
-      { "qty": "1.5", "unit": "tsp", "name": "smoked paprika", "notes": null, "emoji": "" },
-      { "qty": "50", "unit": "ml", "name": "white wine", "notes": "optional", "emoji": "🍷" },
-      { "qty": "200", "unit": "ml", "name": "double cream", "notes": "doubled per Laura's note", "emoji": "🥛" },
-      { "qty": "2", "unit": "can", "name": "butter beans (400g each)", "notes": "doubled per Laura's note", "emoji": "🫘" },
-      { "qty": "1", "unit": "handful", "name": "lentils", "notes": "added per Laura's note", "emoji": "" },
-      { "qty": "1/2", "unit": "", "name": "lemon, juiced", "notes": null, "emoji": "🍋" },
-      { "qty": "1", "unit": "handful", "name": "parsley and basil, chopped", "notes": "optional topping", "emoji": "🌿" }
+      {
+        "qty": "3",
+        "unit": "",
+        "name": "onions, finely sliced",
+        "notes": null,
+        "emoji": "🧅"
+      },
+      {
+        "qty": "2",
+        "unit": "clove",
+        "name": "garlic, finely chopped",
+        "notes": null,
+        "emoji": "🧄"
+      },
+      {
+        "qty": "60",
+        "unit": "g",
+        "name": "tomato purée",
+        "notes": "doubled per Laura's note",
+        "emoji": "🍅"
+      },
+      {
+        "qty": "1.5",
+        "unit": "tsp",
+        "name": "smoked paprika",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "50",
+        "unit": "ml",
+        "name": "white wine",
+        "notes": "optional",
+        "emoji": "🍷"
+      },
+      {
+        "qty": "200",
+        "unit": "ml",
+        "name": "double cream",
+        "notes": "doubled per Laura's note",
+        "emoji": "🥛"
+      },
+      {
+        "qty": "2",
+        "unit": "can",
+        "name": "butter beans (400g each)",
+        "notes": "doubled per Laura's note",
+        "emoji": "🫘"
+      },
+      {
+        "qty": "1",
+        "unit": "handful",
+        "name": "lentils",
+        "notes": "added per Laura's note",
+        "emoji": ""
+      },
+      {
+        "qty": "1/2",
+        "unit": "",
+        "name": "lemon, juiced",
+        "notes": null,
+        "emoji": "🍋"
+      },
+      {
+        "qty": "1",
+        "unit": "handful",
+        "name": "parsley and basil, chopped",
+        "notes": "optional topping",
+        "emoji": "🌿"
+      }
     ],
     "steps": [
       "In a medium frying pan over medium heat, add a couple of tbsp of oil then the onions. Fry until softened and caramelised, stirring often.",
@@ -143,7 +385,7 @@
     ],
     "notes": "Laura's tweaks applied: 2 cans of butter beans, lentils added, tomato purée and cream doubled. Lentils added with the beans — if using dried lentils rather than pre-cooked, add extra liquid and simmer longer until tender.",
     "createdAt": "2026-04-26T21:05:00Z",
-    "mealName": null
+    "mealName": "Butter Beans"
   },
   {
     "id": "rec_japanese_curry",
@@ -156,20 +398,100 @@
     "imageUrl": "https://images.unsplash.com/photo-1679279726946-a158b8bcaa23?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
     "category": "Japanese",
-    "tags": ["dinner", "japanese", "curry", "family friendly", "freezer friendly", "comfort food", "one pot"],
+    "tags": [
+      "dinner",
+      "japanese",
+      "curry",
+      "family friendly",
+      "freezer friendly",
+      "comfort food",
+      "one pot"
+    ],
     "ingredients": [
-      { "qty": "1", "unit": "", "name": "onion", "notes": "diced", "emoji": "🧅" },
-      { "qty": "", "unit": "", "name": "meat (beef, chicken, pork or prawns)", "notes": "brown first; skip for a vegetarian version", "emoji": "🍖" },
-      { "qty": "", "unit": "", "name": "water", "notes": "enough to cover", "emoji": "" },
-      { "qty": "", "unit": "", "name": "carrots", "notes": "chopped into bite-size pieces", "emoji": "🥕" },
-      { "qty": "", "unit": "", "name": "potatoes", "notes": "chopped into bite-size pieces", "emoji": "🥔" },
-      { "qty": "1", "unit": "handful", "name": "fresh tomatoes (or 1/4 tin chopped tomatoes)", "notes": null, "emoji": "🍅" },
-      { "qty": "1", "unit": "tsp", "name": "sugar", "notes": "optional, balances the acidity", "emoji": "" },
-      { "qty": "", "unit": "", "name": "salt and pepper", "notes": "to season", "emoji": "🧂" },
-      { "qty": "1", "unit": "tbsp", "name": "garam masala", "notes": "plus optional extra 1 tsp at the end", "emoji": "" },
-      { "qty": "", "unit": "", "name": "Japanese curry cubes", "notes": "e.g. S&B Golden Curry — choose mild for kid-friendly", "emoji": "🍛" },
-      { "qty": "", "unit": "", "name": "milk or extra water", "notes": "to loosen if the sauce is too thick", "emoji": "🥛" },
-      { "qty": "", "unit": "", "name": "rice or udon noodles", "notes": "to serve", "emoji": "🍚" }
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "onion",
+        "notes": "diced",
+        "emoji": "🧅"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "meat (beef, chicken, pork or prawns)",
+        "notes": "brown first; skip for a vegetarian version",
+        "emoji": "🍖"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "water",
+        "notes": "enough to cover",
+        "emoji": ""
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "carrots",
+        "notes": "chopped into bite-size pieces",
+        "emoji": "🥕"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "potatoes",
+        "notes": "chopped into bite-size pieces",
+        "emoji": "🥔"
+      },
+      {
+        "qty": "1",
+        "unit": "handful",
+        "name": "fresh tomatoes (or 1/4 tin chopped tomatoes)",
+        "notes": null,
+        "emoji": "🍅"
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "sugar",
+        "notes": "optional, balances the acidity",
+        "emoji": ""
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "salt and pepper",
+        "notes": "to season",
+        "emoji": "🧂"
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "garam masala",
+        "notes": "plus optional extra 1 tsp at the end",
+        "emoji": ""
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "Japanese curry cubes",
+        "notes": "e.g. S&B Golden Curry — choose mild for kid-friendly",
+        "emoji": "🍛"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "milk or extra water",
+        "notes": "to loosen if the sauce is too thick",
+        "emoji": "🥛"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "rice or udon noodles",
+        "notes": "to serve",
+        "emoji": "🍚"
+      }
     ],
     "steps": [
       "Dice the onion. In a large pan or pot, brown your chosen meat (beef, chicken, pork or prawns) with the onion. Skip the meat for a vegetarian version.",
@@ -198,19 +520,92 @@
     "imageUrl": "https://images.unsplash.com/photo-1591224876006-be862c0f1d7a?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
     "category": "Japanese",
-    "tags": ["japanese", "soup", "vegetarian", "light", "comfort food", "make ahead"],
+    "tags": [
+      "japanese",
+      "soup",
+      "vegetarian",
+      "light",
+      "comfort food",
+      "make ahead"
+    ],
     "ingredients": [
-      { "qty": "", "unit": "", "name": "water", "notes": "for the broth", "emoji": "💧" },
-      { "qty": "1", "unit": "", "name": "dashi tea bag", "notes": "remove once boiled", "emoji": "🍵" },
-      { "qty": "1", "unit": "tsp", "name": "dashi powder", "notes": "to taste", "emoji": "" },
-      { "qty": "1", "unit": "", "name": "white onion", "notes": "sliced", "emoji": "🧅" },
-      { "qty": "1", "unit": "", "name": "potato", "notes": "diced", "emoji": "🥔" },
-      { "qty": "1", "unit": "", "name": "carrot", "notes": "diced", "emoji": "🥕" },
-      { "qty": "1", "unit": "handful", "name": "mangetout", "notes": null, "emoji": "🌿" },
-      { "qty": "", "unit": "", "name": "tofu", "notes": "cubed", "emoji": "" },
-      { "qty": "", "unit": "", "name": "wakame seaweed", "notes": "dried, rehydrates in the soup", "emoji": "🌊" },
-      { "qty": "1", "unit": "tbsp", "name": "dark miso paste", "notes": "to taste — add residue at the bottom for flavour", "emoji": "" },
-      { "qty": "1", "unit": "tbsp", "name": "light miso paste", "notes": "to taste", "emoji": "" }
+      {
+        "qty": "",
+        "unit": "",
+        "name": "water",
+        "notes": "for the broth",
+        "emoji": "💧"
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "dashi tea bag",
+        "notes": "remove once boiled",
+        "emoji": "🍵"
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "dashi powder",
+        "notes": "to taste",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "white onion",
+        "notes": "sliced",
+        "emoji": "🧅"
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "potato",
+        "notes": "diced",
+        "emoji": "🥔"
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "carrot",
+        "notes": "diced",
+        "emoji": "🥕"
+      },
+      {
+        "qty": "1",
+        "unit": "handful",
+        "name": "mangetout",
+        "notes": null,
+        "emoji": "🌿"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "tofu",
+        "notes": "cubed",
+        "emoji": ""
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "wakame seaweed",
+        "notes": "dried, rehydrates in the soup",
+        "emoji": "🌊"
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "dark miso paste",
+        "notes": "to taste — add residue at the bottom for flavour",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "light miso paste",
+        "notes": "to taste",
+        "emoji": ""
+      }
     ],
     "steps": [
       "Bring water to the boil in a saucepan.",
@@ -226,7 +621,7 @@
     ],
     "notes": "Family recipe. Keeps well in the fridge for up to 3 days; reheat gently rather than boiling.",
     "createdAt": "2026-04-26T22:05:00Z",
-    "mealName": null
+    "mealName": "Miso Soup"
   },
   {
     "id": "rec_yorkshire_puddings",
@@ -239,12 +634,42 @@
     "imageUrl": "https://images.unsplash.com/photo-1765568741171-71bbaf721747?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 6,
     "category": "Sides",
-    "tags": ["british", "baking", "side", "sunday roast", "classic"],
+    "tags": [
+      "british",
+      "baking",
+      "side",
+      "sunday roast",
+      "classic"
+    ],
     "ingredients": [
-      { "qty": "70", "unit": "g", "name": "plain flour", "notes": null, "emoji": "🌾" },
-      { "qty": "2", "unit": "", "name": "eggs", "notes": null, "emoji": "🥚" },
-      { "qty": "100", "unit": "ml", "name": "milk", "notes": null, "emoji": "🥛" },
-      { "qty": "", "unit": "", "name": "vegetable oil", "notes": "a little, for the muffin tin", "emoji": "" }
+      {
+        "qty": "70",
+        "unit": "g",
+        "name": "plain flour",
+        "notes": null,
+        "emoji": "🌾"
+      },
+      {
+        "qty": "2",
+        "unit": "",
+        "name": "eggs",
+        "notes": null,
+        "emoji": "🥚"
+      },
+      {
+        "qty": "100",
+        "unit": "ml",
+        "name": "milk",
+        "notes": null,
+        "emoji": "🥛"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "vegetable oil",
+        "notes": "a little, for the muffin tin",
+        "emoji": ""
+      }
     ],
     "steps": [
       "Whisk the flour, eggs and milk together into a smooth batter.",
@@ -269,11 +694,36 @@
     "imageUrl": "https://images.unsplash.com/photo-1565087170449-fa23854a6100?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
     "category": "Bakes",
-    "tags": ["breakfast", "sweet", "savoury", "family friendly", "kid friendly", "quick"],
+    "tags": [
+      "breakfast",
+      "sweet",
+      "savoury",
+      "family friendly",
+      "kid friendly",
+      "quick"
+    ],
     "ingredients": [
-      { "qty": "100", "unit": "g", "name": "plain flour", "notes": null, "emoji": "🌾" },
-      { "qty": "2", "unit": "", "name": "eggs", "notes": null, "emoji": "🥚" },
-      { "qty": "300", "unit": "ml", "name": "milk", "notes": null, "emoji": "🥛" }
+      {
+        "qty": "100",
+        "unit": "g",
+        "name": "plain flour",
+        "notes": null,
+        "emoji": "🌾"
+      },
+      {
+        "qty": "2",
+        "unit": "",
+        "name": "eggs",
+        "notes": null,
+        "emoji": "🥚"
+      },
+      {
+        "qty": "300",
+        "unit": "ml",
+        "name": "milk",
+        "notes": null,
+        "emoji": "🥛"
+      }
     ],
     "steps": [
       "Whisk flour, eggs and milk together into a smooth, thin batter.",
@@ -296,17 +746,76 @@
     "imageUrl": "https://images.unsplash.com/photo-1633983055303-2e33e153b7dc?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
     "category": "Tex-Mex",
-    "tags": ["dinner", "freezer friendly", "beef", "one pot"],
+    "tags": [
+      "dinner",
+      "freezer friendly",
+      "beef",
+      "one pot"
+    ],
     "ingredients": [
-      { "qty": "1", "unit": "", "name": "onion", "notes": "diced", "emoji": "🧅" },
-      { "qty": "1", "unit": "", "name": "pepper", "notes": "diced", "emoji": "🫑" },
-      { "qty": "1", "unit": "tbsp", "name": "chilli spice mix", "notes": "chilli powder, cumin, paprika to taste", "emoji": "🌶" },
-      { "qty": "500", "unit": "g", "name": "beef mince", "notes": null, "emoji": "🥩" },
-      { "qty": "200", "unit": "ml", "name": "beef stock", "notes": null, "emoji": "" },
-      { "qty": "1", "unit": "can", "name": "chopped tomatoes", "notes": "400g can", "emoji": "🍅" },
-      { "qty": "2", "unit": "tbsp", "name": "tomato puree", "notes": null, "emoji": "" },
-      { "qty": "1", "unit": "can", "name": "kidney beans", "notes": "drained", "emoji": "🫘" },
-      { "qty": "", "unit": "", "name": "salt and pepper", "notes": "to season", "emoji": "🧂" }
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "onion",
+        "notes": "diced",
+        "emoji": "🧅"
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "pepper",
+        "notes": "diced",
+        "emoji": "🫑"
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "chilli spice mix",
+        "notes": "chilli powder, cumin, paprika to taste",
+        "emoji": "🌶"
+      },
+      {
+        "qty": "500",
+        "unit": "g",
+        "name": "beef mince",
+        "notes": null,
+        "emoji": "🥩"
+      },
+      {
+        "qty": "200",
+        "unit": "ml",
+        "name": "beef stock",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "can",
+        "name": "chopped tomatoes",
+        "notes": "400g can",
+        "emoji": "🍅"
+      },
+      {
+        "qty": "2",
+        "unit": "tbsp",
+        "name": "tomato puree",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "can",
+        "name": "kidney beans",
+        "notes": "drained",
+        "emoji": "🫘"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "salt and pepper",
+        "notes": "to season",
+        "emoji": "🧂"
+      }
     ],
     "steps": [
       "Fry the onion for 5 minutes until softening.",
@@ -331,17 +840,78 @@
     "imageUrl": "https://www.sirogohan.com/_files/recipe/images/omuraisu/tikirice7669.JPG",
     "servings": 4,
     "category": "Japanese",
-    "tags": ["dinner", "rice", "yoshoku", "kid friendly", "freezer friendly", "1 year old"],
+    "tags": [
+      "dinner",
+      "rice",
+      "yoshoku",
+      "kid friendly",
+      "freezer friendly",
+      "1 year old"
+    ],
     "ingredients": [
-      { "qty": "600", "unit": "g", "name": "cooked rice (warm)", "notes": null, "emoji": "🍚" },
-      { "qty": "200", "unit": "g", "name": "chicken thigh", "notes": "diced into roughly 1cm cubes", "emoji": "🍗" },
-      { "qty": "1/2", "unit": "", "name": "onion", "notes": "diced 5–7mm", "emoji": "🧅" },
-      { "qty": "1/2", "unit": "", "name": "carrot", "notes": "diced 4–5mm", "emoji": "🥕" },
-      { "qty": "3", "unit": "tbsp", "name": "tomato ketchup", "notes": "use 3.5 tbsp if you skip the tomato puree", "emoji": "🍅" },
-      { "qty": "1", "unit": "tbsp", "name": "tomato puree", "notes": "3× concentrated; halve if using tomato paste; optional but adds depth", "emoji": "" },
-      { "qty": "15", "unit": "g", "name": "salted butter", "notes": "unsalted is fine — adjust salt at the end", "emoji": "🧈" },
-      { "qty": "", "unit": "", "name": "salt", "notes": "to taste, added at the finish", "emoji": "🧂" },
-      { "qty": "", "unit": "", "name": "black pepper", "notes": "to taste", "emoji": "" }
+      {
+        "qty": "600",
+        "unit": "g",
+        "name": "cooked rice (warm)",
+        "notes": null,
+        "emoji": "🍚"
+      },
+      {
+        "qty": "200",
+        "unit": "g",
+        "name": "chicken thigh",
+        "notes": "diced into roughly 1cm cubes",
+        "emoji": "🍗"
+      },
+      {
+        "qty": "1/2",
+        "unit": "",
+        "name": "onion",
+        "notes": "diced 5–7mm",
+        "emoji": "🧅"
+      },
+      {
+        "qty": "1/2",
+        "unit": "",
+        "name": "carrot",
+        "notes": "diced 4–5mm",
+        "emoji": "🥕"
+      },
+      {
+        "qty": "3",
+        "unit": "tbsp",
+        "name": "tomato ketchup",
+        "notes": "use 3.5 tbsp if you skip the tomato puree",
+        "emoji": "🍅"
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "tomato puree",
+        "notes": "3× concentrated; halve if using tomato paste; optional but adds depth",
+        "emoji": ""
+      },
+      {
+        "qty": "15",
+        "unit": "g",
+        "name": "salted butter",
+        "notes": "unsalted is fine — adjust salt at the end",
+        "emoji": "🧈"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "salt",
+        "notes": "to taste, added at the finish",
+        "emoji": "🧂"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "black pepper",
+        "notes": "to taste",
+        "emoji": ""
+      }
     ],
     "steps": [
       "Dice the chicken thigh into ~1cm cubes, the carrot into 4–5mm pieces, and the onion into 5–7mm pieces.",
@@ -353,7 +923,7 @@
     ],
     "notes": "Japanese yōshoku classic — also the base for our Omurice recipe (wrap a portion in a folded omelette and top with ketchup-butter sauce). Keeps ~3 days in the fridge or ~1 month frozen.",
     "createdAt": "2026-04-26T23:30:00Z",
-    "mealName": null
+    "mealName": "Chicken Rice"
   },
   {
     "id": "rec_yoghurt_flatbreads",
@@ -366,13 +936,51 @@
     "imageUrl": "https://plus.unsplash.com/premium_photo-1675382377369-c8f4cd69cfee?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
     "category": "Sides",
-    "tags": ["quick", "vegetarian", "side", "no yeast", "1 year old", "kid friendly", "toddler"],
+    "tags": [
+      "quick",
+      "vegetarian",
+      "side",
+      "no yeast",
+      "1 year old",
+      "kid friendly",
+      "toddler"
+    ],
     "ingredients": [
-      { "qty": "250", "unit": "g", "name": "self-raising flour", "notes": "plus extra for dusting", "emoji": "🌾" },
-      { "qty": "1", "unit": "tsp", "name": "baking powder", "notes": null, "emoji": "" },
-      { "qty": "1/2", "unit": "tsp", "name": "salt", "notes": null, "emoji": "🧂" },
-      { "qty": "250", "unit": "g", "name": "natural yoghurt", "notes": "full-fat works best", "emoji": "🥛" },
-      { "qty": "1", "unit": "tbsp", "name": "olive oil", "notes": "for the pan", "emoji": "🫒" }
+      {
+        "qty": "250",
+        "unit": "g",
+        "name": "self-raising flour",
+        "notes": "plus extra for dusting",
+        "emoji": "🌾"
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "baking powder",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1/2",
+        "unit": "tsp",
+        "name": "salt",
+        "notes": null,
+        "emoji": "🧂"
+      },
+      {
+        "qty": "250",
+        "unit": "g",
+        "name": "natural yoghurt",
+        "notes": "full-fat works best",
+        "emoji": "🥛"
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "olive oil",
+        "notes": "for the pan",
+        "emoji": "🫒"
+      }
     ],
     "steps": [
       "Mix the flour, baking powder and salt in a bowl, then stir in the yoghurt with a wooden spoon until it forms a rough dough.",
@@ -396,21 +1004,107 @@
     "imageUrl": "https://images.unsplash.com/photo-1590412200988-a436970781fa?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
     "category": "Other mains",
-    "tags": ["dinner", "vegetarian", "quick", "one pot", "eggs", "family friendly", "kid friendly"],
+    "tags": [
+      "dinner",
+      "vegetarian",
+      "quick",
+      "one pot",
+      "eggs",
+      "family friendly",
+      "kid friendly"
+    ],
     "ingredients": [
-      { "qty": "2", "unit": "tbsp", "name": "olive oil", "notes": null, "emoji": "🫒" },
-      { "qty": "1", "unit": "", "name": "onion", "notes": "diced", "emoji": "🧅" },
-      { "qty": "1", "unit": "", "name": "red pepper", "notes": "diced", "emoji": "🫑" },
-      { "qty": "3", "unit": "clove", "name": "garlic", "notes": "minced", "emoji": "🧄" },
-      { "qty": "1", "unit": "tsp", "name": "smoked paprika", "notes": null, "emoji": "" },
-      { "qty": "1", "unit": "tsp", "name": "cumin", "notes": null, "emoji": "" },
-      { "qty": "1/2", "unit": "tsp", "name": "chilli flakes", "notes": "optional, or to taste", "emoji": "🌶" },
-      { "qty": "2", "unit": "can", "name": "chopped tomatoes", "notes": "400g cans", "emoji": "🍅" },
-      { "qty": "1", "unit": "tsp", "name": "sugar", "notes": "balances acidity", "emoji": "" },
-      { "qty": "", "unit": "", "name": "salt and pepper", "notes": "to taste", "emoji": "🧂" },
-      { "qty": "4", "unit": "", "name": "eggs", "notes": null, "emoji": "🥚" },
-      { "qty": "100", "unit": "g", "name": "feta cheese", "notes": "crumbled, optional", "emoji": "🧀" },
-      { "qty": "1", "unit": "handful", "name": "parsley or coriander", "notes": "chopped, to serve", "emoji": "🌿" }
+      {
+        "qty": "2",
+        "unit": "tbsp",
+        "name": "olive oil",
+        "notes": null,
+        "emoji": "🫒"
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "onion",
+        "notes": "diced",
+        "emoji": "🧅"
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "red pepper",
+        "notes": "diced",
+        "emoji": "🫑"
+      },
+      {
+        "qty": "3",
+        "unit": "clove",
+        "name": "garlic",
+        "notes": "minced",
+        "emoji": "🧄"
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "smoked paprika",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "cumin",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1/2",
+        "unit": "tsp",
+        "name": "chilli flakes",
+        "notes": "optional, or to taste",
+        "emoji": "🌶"
+      },
+      {
+        "qty": "2",
+        "unit": "can",
+        "name": "chopped tomatoes",
+        "notes": "400g cans",
+        "emoji": "🍅"
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "sugar",
+        "notes": "balances acidity",
+        "emoji": ""
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "salt and pepper",
+        "notes": "to taste",
+        "emoji": "🧂"
+      },
+      {
+        "qty": "4",
+        "unit": "",
+        "name": "eggs",
+        "notes": null,
+        "emoji": "🥚"
+      },
+      {
+        "qty": "100",
+        "unit": "g",
+        "name": "feta cheese",
+        "notes": "crumbled, optional",
+        "emoji": "🧀"
+      },
+      {
+        "qty": "1",
+        "unit": "handful",
+        "name": "parsley or coriander",
+        "notes": "chopped, to serve",
+        "emoji": "🌿"
+      }
     ],
     "steps": [
       "Heat the olive oil in a wide, lidded frying pan over medium heat. Add the onion and pepper and cook for 8–10 minutes until softened.",
@@ -435,22 +1129,115 @@
     "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
     "category": "Indian & curries",
-    "tags": ["dinner", "vegetarian", "vegan", "one pot", "freezer friendly", "family friendly", "1 year old", "toddler"],
+    "tags": [
+      "dinner",
+      "vegetarian",
+      "vegan",
+      "one pot",
+      "freezer friendly",
+      "family friendly",
+      "1 year old",
+      "toddler"
+    ],
     "ingredients": [
-      { "qty": "2", "unit": "tbsp", "name": "vegetable oil", "notes": null, "emoji": "" },
-      { "qty": "1", "unit": "", "name": "onion", "notes": "diced", "emoji": "🧅" },
-      { "qty": "3", "unit": "clove", "name": "garlic", "notes": "minced", "emoji": "🧄" },
-      { "qty": "1", "unit": "thumb", "name": "fresh ginger", "notes": "grated, or 1 tsp ground ginger", "emoji": "" },
-      { "qty": "1", "unit": "tsp", "name": "cumin seeds", "notes": "or ground cumin", "emoji": "" },
-      { "qty": "1", "unit": "tsp", "name": "turmeric", "notes": null, "emoji": "" },
-      { "qty": "1", "unit": "tsp", "name": "garam masala", "notes": "plus extra to finish", "emoji": "" },
-      { "qty": "1/2", "unit": "tsp", "name": "chilli powder", "notes": "optional — skip for toddlers", "emoji": "🌶" },
-      { "qty": "300", "unit": "g", "name": "red lentils", "notes": "rinsed", "emoji": "" },
-      { "qty": "1", "unit": "can", "name": "chopped tomatoes", "notes": "400g can", "emoji": "🍅" },
-      { "qty": "400", "unit": "ml", "name": "coconut milk", "notes": "1 can", "emoji": "🥥" },
-      { "qty": "400", "unit": "ml", "name": "water or vegetable stock", "notes": null, "emoji": "" },
-      { "qty": "", "unit": "", "name": "salt", "notes": "to taste", "emoji": "🧂" },
-      { "qty": "2", "unit": "large handful", "name": "spinach", "notes": "optional, stirred in at the end", "emoji": "🥬" }
+      {
+        "qty": "2",
+        "unit": "tbsp",
+        "name": "vegetable oil",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "onion",
+        "notes": "diced",
+        "emoji": "🧅"
+      },
+      {
+        "qty": "3",
+        "unit": "clove",
+        "name": "garlic",
+        "notes": "minced",
+        "emoji": "🧄"
+      },
+      {
+        "qty": "1",
+        "unit": "thumb",
+        "name": "fresh ginger",
+        "notes": "grated, or 1 tsp ground ginger",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "cumin seeds",
+        "notes": "or ground cumin",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "turmeric",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "garam masala",
+        "notes": "plus extra to finish",
+        "emoji": ""
+      },
+      {
+        "qty": "1/2",
+        "unit": "tsp",
+        "name": "chilli powder",
+        "notes": "optional — skip for toddlers",
+        "emoji": "🌶"
+      },
+      {
+        "qty": "300",
+        "unit": "g",
+        "name": "red lentils",
+        "notes": "rinsed",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "can",
+        "name": "chopped tomatoes",
+        "notes": "400g can",
+        "emoji": "🍅"
+      },
+      {
+        "qty": "400",
+        "unit": "ml",
+        "name": "coconut milk",
+        "notes": "1 can",
+        "emoji": "🥥"
+      },
+      {
+        "qty": "400",
+        "unit": "ml",
+        "name": "water or vegetable stock",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "salt",
+        "notes": "to taste",
+        "emoji": "🧂"
+      },
+      {
+        "qty": "2",
+        "unit": "large handful",
+        "name": "spinach",
+        "notes": "optional, stirred in at the end",
+        "emoji": "🥬"
+      }
     ],
     "steps": [
       "Heat the oil in a large pan over medium heat. Add the onion and cook for 8 minutes until softened and lightly golden.",
@@ -476,23 +1263,120 @@
     "imageUrl": "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 5,
     "category": "Italian",
-    "tags": ["dinner", "italian", "pasta", "freezer friendly", "family friendly", "comfort food"],
+    "tags": [
+      "dinner",
+      "italian",
+      "pasta",
+      "freezer friendly",
+      "family friendly",
+      "comfort food"
+    ],
     "ingredients": [
-      { "qty": "1.5", "unit": "tbsp", "name": "olive oil", "notes": null, "emoji": "🫒" },
-      { "qty": "1", "unit": "", "name": "onion", "notes": "finely chopped", "emoji": "🧅" },
-      { "qty": "2", "unit": "clove", "name": "garlic", "notes": "minced", "emoji": "🧄" },
-      { "qty": "500", "unit": "g", "name": "beef mince", "notes": "or half beef, half pork", "emoji": "🥩" },
-      { "qty": "125", "unit": "ml", "name": "red wine", "notes": "dry; or beef stock", "emoji": "🍷" },
-      { "qty": "2", "unit": "", "name": "beef stock cubes", "notes": "crumbled", "emoji": "" },
-      { "qty": "800", "unit": "g", "name": "crushed tomatoes", "notes": "1 large tin or passata", "emoji": "🍅" },
-      { "qty": "2", "unit": "tbsp", "name": "tomato paste", "notes": null, "emoji": "" },
-      { "qty": "2", "unit": "tsp", "name": "Worcestershire sauce", "notes": null, "emoji": "" },
-      { "qty": "2", "unit": "", "name": "bay leaves", "notes": "dried", "emoji": "" },
-      { "qty": "2", "unit": "sprig", "name": "fresh thyme", "notes": "or ½ tsp dried", "emoji": "🌿" },
-      { "qty": "3/4", "unit": "tsp", "name": "salt", "notes": null, "emoji": "🧂" },
-      { "qty": "1/2", "unit": "tsp", "name": "black pepper", "notes": null, "emoji": "" },
-      { "qty": "400", "unit": "g", "name": "spaghetti", "notes": "to serve", "emoji": "🍝" },
-      { "qty": "", "unit": "", "name": "parmesan", "notes": "to serve", "emoji": "🧀" }
+      {
+        "qty": "1.5",
+        "unit": "tbsp",
+        "name": "olive oil",
+        "notes": null,
+        "emoji": "🫒"
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "onion",
+        "notes": "finely chopped",
+        "emoji": "🧅"
+      },
+      {
+        "qty": "2",
+        "unit": "clove",
+        "name": "garlic",
+        "notes": "minced",
+        "emoji": "🧄"
+      },
+      {
+        "qty": "500",
+        "unit": "g",
+        "name": "beef mince",
+        "notes": "or half beef, half pork",
+        "emoji": "🥩"
+      },
+      {
+        "qty": "125",
+        "unit": "ml",
+        "name": "red wine",
+        "notes": "dry; or beef stock",
+        "emoji": "🍷"
+      },
+      {
+        "qty": "2",
+        "unit": "",
+        "name": "beef stock cubes",
+        "notes": "crumbled",
+        "emoji": ""
+      },
+      {
+        "qty": "800",
+        "unit": "g",
+        "name": "crushed tomatoes",
+        "notes": "1 large tin or passata",
+        "emoji": "🍅"
+      },
+      {
+        "qty": "2",
+        "unit": "tbsp",
+        "name": "tomato paste",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "tsp",
+        "name": "Worcestershire sauce",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "",
+        "name": "bay leaves",
+        "notes": "dried",
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "sprig",
+        "name": "fresh thyme",
+        "notes": "or ½ tsp dried",
+        "emoji": "🌿"
+      },
+      {
+        "qty": "3/4",
+        "unit": "tsp",
+        "name": "salt",
+        "notes": null,
+        "emoji": "🧂"
+      },
+      {
+        "qty": "1/2",
+        "unit": "tsp",
+        "name": "black pepper",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "400",
+        "unit": "g",
+        "name": "spaghetti",
+        "notes": "to serve",
+        "emoji": "🍝"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "parmesan",
+        "notes": "to serve",
+        "emoji": "🧀"
+      }
     ],
     "steps": [
       "Heat oil in a large pot over medium-high. Add onion and garlic; cook 3 minutes until golden.",
@@ -518,26 +1402,141 @@
     "imageUrl": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
     "category": "Indian & curries",
-    "tags": ["dinner", "indian", "curry", "chicken", "family friendly", "freezer friendly"],
+    "tags": [
+      "dinner",
+      "indian",
+      "curry",
+      "chicken",
+      "family friendly",
+      "freezer friendly"
+    ],
     "ingredients": [
-      { "qty": "600", "unit": "g", "name": "chicken thigh", "notes": "boneless, skinless, cut into 3cm cubes", "emoji": "🍗" },
-      { "qty": "125", "unit": "g", "name": "plain yoghurt", "notes": "full fat", "emoji": "🥛" },
-      { "qty": "6", "unit": "clove", "name": "garlic", "notes": "minced (3 for marinade, 3 for sauce)", "emoji": "🧄" },
-      { "qty": "2", "unit": "tbsp", "name": "fresh ginger", "notes": "grated (1 tbsp for marinade, 1 tbsp for sauce)", "emoji": "" },
-      { "qty": "1", "unit": "tsp", "name": "garam masala", "notes": "for marinade", "emoji": "" },
-      { "qty": "1", "unit": "tsp", "name": "cumin", "notes": "for marinade", "emoji": "" },
-      { "qty": "1", "unit": "tsp", "name": "ground coriander", "notes": "for marinade", "emoji": "" },
-      { "qty": "1", "unit": "tsp", "name": "paprika", "notes": "for marinade", "emoji": "" },
-      { "qty": "2", "unit": "tsp", "name": "lemon juice", "notes": "for marinade", "emoji": "🍋" },
-      { "qty": "1", "unit": "", "name": "onion", "notes": "finely chopped", "emoji": "🧅" },
-      { "qty": "1", "unit": "tbsp", "name": "paprika", "notes": "for sauce (not smoked)", "emoji": "" },
-      { "qty": "1", "unit": "tbsp", "name": "garam masala", "notes": "for sauce", "emoji": "" },
-      { "qty": "2", "unit": "tsp", "name": "turmeric", "notes": "for sauce", "emoji": "" },
-      { "qty": "400", "unit": "ml", "name": "tomato passata", "notes": null, "emoji": "🍅" },
-      { "qty": "400", "unit": "ml", "name": "water", "notes": null, "emoji": "" },
-      { "qty": "100", "unit": "ml", "name": "double cream", "notes": null, "emoji": "🥛" },
-      { "qty": "1", "unit": "tsp", "name": "sugar", "notes": null, "emoji": "" },
-      { "qty": "50", "unit": "g", "name": "butter", "notes": "for finishing the sauce", "emoji": "🧈" }
+      {
+        "qty": "600",
+        "unit": "g",
+        "name": "chicken thigh",
+        "notes": "boneless, skinless, cut into 3cm cubes",
+        "emoji": "🍗"
+      },
+      {
+        "qty": "125",
+        "unit": "g",
+        "name": "plain yoghurt",
+        "notes": "full fat",
+        "emoji": "🥛"
+      },
+      {
+        "qty": "6",
+        "unit": "clove",
+        "name": "garlic",
+        "notes": "minced (3 for marinade, 3 for sauce)",
+        "emoji": "🧄"
+      },
+      {
+        "qty": "2",
+        "unit": "tbsp",
+        "name": "fresh ginger",
+        "notes": "grated (1 tbsp for marinade, 1 tbsp for sauce)",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "garam masala",
+        "notes": "for marinade",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "cumin",
+        "notes": "for marinade",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "ground coriander",
+        "notes": "for marinade",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "paprika",
+        "notes": "for marinade",
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "tsp",
+        "name": "lemon juice",
+        "notes": "for marinade",
+        "emoji": "🍋"
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "onion",
+        "notes": "finely chopped",
+        "emoji": "🧅"
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "paprika",
+        "notes": "for sauce (not smoked)",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "garam masala",
+        "notes": "for sauce",
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "tsp",
+        "name": "turmeric",
+        "notes": "for sauce",
+        "emoji": ""
+      },
+      {
+        "qty": "400",
+        "unit": "ml",
+        "name": "tomato passata",
+        "notes": null,
+        "emoji": "🍅"
+      },
+      {
+        "qty": "400",
+        "unit": "ml",
+        "name": "water",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "100",
+        "unit": "ml",
+        "name": "double cream",
+        "notes": null,
+        "emoji": "🥛"
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "sugar",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "50",
+        "unit": "g",
+        "name": "butter",
+        "notes": "for finishing the sauce",
+        "emoji": "🧈"
+      }
     ],
     "steps": [
       "Mix marinade: yoghurt, 3 garlic cloves, 1 tbsp ginger, garam masala, cumin, coriander, paprika, lemon juice and salt. Add chicken, coat well, and marinate for at least 3 hours (overnight is best).",
@@ -564,20 +1563,98 @@
     "imageUrl": "https://images.unsplash.com/photo-1476124369491-e7addf5db371?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
     "category": "Italian",
-    "tags": ["dinner", "italian", "vegetarian", "comfort food", "weekend"],
+    "tags": [
+      "dinner",
+      "italian",
+      "vegetarian",
+      "comfort food",
+      "weekend"
+    ],
     "ingredients": [
-      { "qty": "750", "unit": "g", "name": "mushrooms", "notes": "mix of sliced and quartered", "emoji": "🍄" },
-      { "qty": "3", "unit": "tbsp", "name": "butter", "notes": "for the mushrooms", "emoji": "🧈" },
-      { "qty": "2", "unit": "tbsp", "name": "olive oil", "notes": "for the mushrooms", "emoji": "🫒" },
-      { "qty": "3", "unit": "clove", "name": "garlic", "notes": "minced (2 for mushrooms, 1 for risotto)", "emoji": "🧄" },
-      { "qty": "2", "unit": "", "name": "shallots", "notes": "finely chopped (or ½ onion)", "emoji": "🧅" },
-      { "qty": "60", "unit": "ml", "name": "dry white wine", "notes": null, "emoji": "🍷" },
-      { "qty": "300", "unit": "g", "name": "arborio rice", "notes": null, "emoji": "🍚" },
-      { "qty": "1.25", "unit": "litre", "name": "chicken or veg stock", "notes": "warm, low sodium", "emoji": "" },
-      { "qty": "125", "unit": "ml", "name": "double cream", "notes": "optional but recommended", "emoji": "🥛" },
-      { "qty": "2", "unit": "tbsp", "name": "butter", "notes": "for finishing the risotto", "emoji": "🧈" },
-      { "qty": "50", "unit": "g", "name": "parmesan", "notes": "finely grated", "emoji": "🧀" },
-      { "qty": "", "unit": "", "name": "salt and pepper", "notes": "to taste", "emoji": "🧂" }
+      {
+        "qty": "750",
+        "unit": "g",
+        "name": "mushrooms",
+        "notes": "mix of sliced and quartered",
+        "emoji": "🍄"
+      },
+      {
+        "qty": "3",
+        "unit": "tbsp",
+        "name": "butter",
+        "notes": "for the mushrooms",
+        "emoji": "🧈"
+      },
+      {
+        "qty": "2",
+        "unit": "tbsp",
+        "name": "olive oil",
+        "notes": "for the mushrooms",
+        "emoji": "🫒"
+      },
+      {
+        "qty": "3",
+        "unit": "clove",
+        "name": "garlic",
+        "notes": "minced (2 for mushrooms, 1 for risotto)",
+        "emoji": "🧄"
+      },
+      {
+        "qty": "2",
+        "unit": "",
+        "name": "shallots",
+        "notes": "finely chopped (or ½ onion)",
+        "emoji": "🧅"
+      },
+      {
+        "qty": "60",
+        "unit": "ml",
+        "name": "dry white wine",
+        "notes": null,
+        "emoji": "🍷"
+      },
+      {
+        "qty": "300",
+        "unit": "g",
+        "name": "arborio rice",
+        "notes": null,
+        "emoji": "🍚"
+      },
+      {
+        "qty": "1.25",
+        "unit": "litre",
+        "name": "chicken or veg stock",
+        "notes": "warm, low sodium",
+        "emoji": ""
+      },
+      {
+        "qty": "125",
+        "unit": "ml",
+        "name": "double cream",
+        "notes": "optional but recommended",
+        "emoji": "🥛"
+      },
+      {
+        "qty": "2",
+        "unit": "tbsp",
+        "name": "butter",
+        "notes": "for finishing the risotto",
+        "emoji": "🧈"
+      },
+      {
+        "qty": "50",
+        "unit": "g",
+        "name": "parmesan",
+        "notes": "finely grated",
+        "emoji": "🧀"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "salt and pepper",
+        "notes": "to taste",
+        "emoji": "🧂"
+      }
     ],
     "steps": [
       "Sauté mushrooms in batches: heat oil and half the butter in a large pot over high heat. Cook half the mushrooms until golden (about 4 min). Add half the garlic, season, cook 1 more minute. Remove to a bowl. Repeat with the rest.",
@@ -603,22 +1680,113 @@
     "imageUrl": "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
     "category": "Asian",
-    "tags": ["dinner", "thai", "curry", "one pot", "30 minutes", "family friendly"],
+    "tags": [
+      "dinner",
+      "thai",
+      "curry",
+      "one pot",
+      "30 minutes",
+      "family friendly"
+    ],
     "ingredients": [
-      { "qty": "2", "unit": "tbsp", "name": "vegetable oil", "notes": null, "emoji": "" },
-      { "qty": "4", "unit": "tbsp", "name": "Thai green curry paste", "notes": "Maesri recommended; use 3 tbsp for milder", "emoji": "" },
-      { "qty": "2", "unit": "clove", "name": "garlic", "notes": "minced", "emoji": "🧄" },
-      { "qty": "2", "unit": "tsp", "name": "fresh ginger", "notes": "finely grated", "emoji": "" },
-      { "qty": "1", "unit": "tbsp", "name": "lemongrass paste", "notes": "or 1 stalk, finely chopped", "emoji": "" },
-      { "qty": "250", "unit": "ml", "name": "chicken or vegetable stock", "notes": "low sodium", "emoji": "" },
-      { "qty": "400", "unit": "ml", "name": "coconut milk", "notes": "full fat, 1 can", "emoji": "🥥" },
-      { "qty": "1", "unit": "tsp", "name": "fish sauce", "notes": "to taste", "emoji": "" },
-      { "qty": "1", "unit": "tsp", "name": "sugar", "notes": "to taste", "emoji": "" },
-      { "qty": "6", "unit": "", "name": "kaffir lime leaves", "notes": "torn — dried is fine", "emoji": "" },
-      { "qty": "350", "unit": "g", "name": "chicken thigh", "notes": "skinless, boneless, sliced — or prawns", "emoji": "🍗" },
-      { "qty": "150", "unit": "g", "name": "sugar snap peas or courgette", "notes": "or any quick-cook veg", "emoji": "🥬" },
-      { "qty": "1", "unit": "handful", "name": "Thai basil or coriander", "notes": "to serve", "emoji": "🌿" },
-      { "qty": "1/2", "unit": "", "name": "lime", "notes": "juiced", "emoji": "🍋" }
+      {
+        "qty": "2",
+        "unit": "tbsp",
+        "name": "vegetable oil",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "4",
+        "unit": "tbsp",
+        "name": "Thai green curry paste",
+        "notes": "Maesri recommended; use 3 tbsp for milder",
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "clove",
+        "name": "garlic",
+        "notes": "minced",
+        "emoji": "🧄"
+      },
+      {
+        "qty": "2",
+        "unit": "tsp",
+        "name": "fresh ginger",
+        "notes": "finely grated",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "lemongrass paste",
+        "notes": "or 1 stalk, finely chopped",
+        "emoji": ""
+      },
+      {
+        "qty": "250",
+        "unit": "ml",
+        "name": "chicken or vegetable stock",
+        "notes": "low sodium",
+        "emoji": ""
+      },
+      {
+        "qty": "400",
+        "unit": "ml",
+        "name": "coconut milk",
+        "notes": "full fat, 1 can",
+        "emoji": "🥥"
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "fish sauce",
+        "notes": "to taste",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "sugar",
+        "notes": "to taste",
+        "emoji": ""
+      },
+      {
+        "qty": "6",
+        "unit": "",
+        "name": "kaffir lime leaves",
+        "notes": "torn — dried is fine",
+        "emoji": ""
+      },
+      {
+        "qty": "350",
+        "unit": "g",
+        "name": "chicken thigh",
+        "notes": "skinless, boneless, sliced — or prawns",
+        "emoji": "🍗"
+      },
+      {
+        "qty": "150",
+        "unit": "g",
+        "name": "sugar snap peas or courgette",
+        "notes": "or any quick-cook veg",
+        "emoji": "🥬"
+      },
+      {
+        "qty": "1",
+        "unit": "handful",
+        "name": "Thai basil or coriander",
+        "notes": "to serve",
+        "emoji": "🌿"
+      },
+      {
+        "qty": "1/2",
+        "unit": "",
+        "name": "lime",
+        "notes": "juiced",
+        "emoji": "🍋"
+      }
     ],
     "steps": [
       "Heat oil in a wide pan over medium-high. Add curry paste, garlic, ginger and lemongrass. Fry 2–3 minutes until fragrant and mostly dried out.",
@@ -644,20 +1812,99 @@
     "imageUrl": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
     "category": "Tex-Mex",
-    "tags": ["dinner", "tex-mex", "chicken", "quick", "family friendly", "kid friendly"],
+    "tags": [
+      "dinner",
+      "tex-mex",
+      "chicken",
+      "quick",
+      "family friendly",
+      "kid friendly"
+    ],
     "ingredients": [
-      { "qty": "700", "unit": "g", "name": "chicken thigh", "notes": "skinless, boneless — or 2 large chicken breasts, halved horizontally", "emoji": "🍗" },
-      { "qty": "60", "unit": "ml", "name": "lime juice", "notes": "about 2 limes", "emoji": "🍋" },
-      { "qty": "60", "unit": "ml", "name": "orange juice", "notes": null, "emoji": "" },
-      { "qty": "2", "unit": "tbsp", "name": "olive oil", "notes": "for the marinade", "emoji": "🫒" },
-      { "qty": "2", "unit": "clove", "name": "garlic", "notes": "minced", "emoji": "🧄" },
-      { "qty": "1", "unit": "tsp", "name": "cumin", "notes": null, "emoji": "" },
-      { "qty": "3", "unit": "", "name": "peppers", "notes": "mixed colours, deseeded and sliced", "emoji": "🫑" },
-      { "qty": "1", "unit": "large", "name": "onion", "notes": "halved and thickly sliced", "emoji": "🧅" },
-      { "qty": "8", "unit": "", "name": "small flour tortillas", "notes": "to serve", "emoji": "" },
-      { "qty": "1", "unit": "", "name": "avocado", "notes": "sliced, to serve", "emoji": "🥑" },
-      { "qty": "", "unit": "", "name": "soured cream", "notes": "to serve", "emoji": "" },
-      { "qty": "", "unit": "", "name": "lime wedges", "notes": "to serve", "emoji": "🍋" }
+      {
+        "qty": "700",
+        "unit": "g",
+        "name": "chicken thigh",
+        "notes": "skinless, boneless — or 2 large chicken breasts, halved horizontally",
+        "emoji": "🍗"
+      },
+      {
+        "qty": "60",
+        "unit": "ml",
+        "name": "lime juice",
+        "notes": "about 2 limes",
+        "emoji": "🍋"
+      },
+      {
+        "qty": "60",
+        "unit": "ml",
+        "name": "orange juice",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "tbsp",
+        "name": "olive oil",
+        "notes": "for the marinade",
+        "emoji": "🫒"
+      },
+      {
+        "qty": "2",
+        "unit": "clove",
+        "name": "garlic",
+        "notes": "minced",
+        "emoji": "🧄"
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "cumin",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "3",
+        "unit": "",
+        "name": "peppers",
+        "notes": "mixed colours, deseeded and sliced",
+        "emoji": "🫑"
+      },
+      {
+        "qty": "1",
+        "unit": "large",
+        "name": "onion",
+        "notes": "halved and thickly sliced",
+        "emoji": "🧅"
+      },
+      {
+        "qty": "8",
+        "unit": "",
+        "name": "small flour tortillas",
+        "notes": "to serve",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "avocado",
+        "notes": "sliced, to serve",
+        "emoji": "🥑"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "soured cream",
+        "notes": "to serve",
+        "emoji": ""
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "lime wedges",
+        "notes": "to serve",
+        "emoji": "🍋"
+      }
     ],
     "steps": [
       "Mix lime juice, orange juice, olive oil, garlic, cumin, salt and pepper in a bowl. Add chicken, coat well. Marinate for at least 1 hour (up to 24 hours, or freeze and defrost overnight).",
@@ -680,21 +1927,106 @@
     "imageUrl": "https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
     "category": "Japanese",
-    "tags": ["dinner", "japanese", "noodles", "quick", "family friendly", "kid friendly"],
+    "tags": [
+      "dinner",
+      "japanese",
+      "noodles",
+      "quick",
+      "family friendly",
+      "kid friendly"
+    ],
     "ingredients": [
-      { "qty": "300", "unit": "g", "name": "yakisoba noodles", "notes": "pre-steamed chukamen noodles — 2 packs typically", "emoji": "🍜" },
-      { "qty": "250", "unit": "g", "name": "protein (pork belly, chicken or beef)", "notes": "thinly sliced", "emoji": "🍖" },
-      { "qty": "1", "unit": "small", "name": "onion", "notes": "thinly sliced", "emoji": "🧅" },
-      { "qty": "1/2", "unit": "small", "name": "carrot", "notes": "julienned or thinly sliced", "emoji": "🥕" },
-      { "qty": "1/4", "unit": "", "name": "green pepper", "notes": "thinly sliced", "emoji": "🫑" },
-      { "qty": "2", "unit": "cup", "name": "cabbage", "notes": "roughly chopped into 5cm squares", "emoji": "🥬" },
-      { "qty": "1", "unit": "cup", "name": "bean sprouts", "notes": null, "emoji": "" },
-      { "qty": "1", "unit": "tbsp", "name": "vegetable oil", "notes": null, "emoji": "" },
-      { "qty": "6", "unit": "tbsp", "name": "Tonkatsu sauce", "notes": "for the yakisoba sauce", "emoji": "" },
-      { "qty": "4", "unit": "tbsp", "name": "Worcestershire sauce", "notes": "for the yakisoba sauce", "emoji": "" },
-      { "qty": "1", "unit": "tbsp", "name": "soy sauce", "notes": "for the yakisoba sauce", "emoji": "" },
-      { "qty": "1", "unit": "tbsp", "name": "mirin", "notes": "for the yakisoba sauce", "emoji": "" },
-      { "qty": "", "unit": "", "name": "aonori and pickled ginger", "notes": "to garnish, optional", "emoji": "" }
+      {
+        "qty": "300",
+        "unit": "g",
+        "name": "yakisoba noodles",
+        "notes": "pre-steamed chukamen noodles — 2 packs typically",
+        "emoji": "🍜"
+      },
+      {
+        "qty": "250",
+        "unit": "g",
+        "name": "protein (pork belly, chicken or beef)",
+        "notes": "thinly sliced",
+        "emoji": "🍖"
+      },
+      {
+        "qty": "1",
+        "unit": "small",
+        "name": "onion",
+        "notes": "thinly sliced",
+        "emoji": "🧅"
+      },
+      {
+        "qty": "1/2",
+        "unit": "small",
+        "name": "carrot",
+        "notes": "julienned or thinly sliced",
+        "emoji": "🥕"
+      },
+      {
+        "qty": "1/4",
+        "unit": "",
+        "name": "green pepper",
+        "notes": "thinly sliced",
+        "emoji": "🫑"
+      },
+      {
+        "qty": "2",
+        "unit": "cup",
+        "name": "cabbage",
+        "notes": "roughly chopped into 5cm squares",
+        "emoji": "🥬"
+      },
+      {
+        "qty": "1",
+        "unit": "cup",
+        "name": "bean sprouts",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "vegetable oil",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "6",
+        "unit": "tbsp",
+        "name": "Tonkatsu sauce",
+        "notes": "for the yakisoba sauce",
+        "emoji": ""
+      },
+      {
+        "qty": "4",
+        "unit": "tbsp",
+        "name": "Worcestershire sauce",
+        "notes": "for the yakisoba sauce",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "soy sauce",
+        "notes": "for the yakisoba sauce",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "mirin",
+        "notes": "for the yakisoba sauce",
+        "emoji": ""
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "aonori and pickled ginger",
+        "notes": "to garnish, optional",
+        "emoji": ""
+      }
     ],
     "steps": [
       "Mix all sauce ingredients together in a small bowl and set aside.",
