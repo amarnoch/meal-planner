@@ -3,28 +3,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap');
 
 :root {
-  /* Avo & Peach palette: sage green primary, peach accent, warm peach background */
-  --bg: #f7e2c4;
-  --surface: #fdf6ec;
-  --surface-raised: #f3d8b6;
-  --border: #d9b88a;
-  --border-light: #d8b88a;
-  --text: #1f1c1a;
-  --text-muted: #5a4f3f;
-  --primary: #5d9966;
-  --primary-hover: #4a8054;
-  --primary-light: rgba(93, 153, 102, 0.12);
-  --primary-lighter: rgba(93, 153, 102, 0.06);
-  --accent: #e88f5e;
-  --accent-2: #d6a847;
-  --secondary: #7a736c;
-  --success: #2f7d4f;
+  /* Blueberry & Slate palette: deep indigo primary, warm coral accent, cool grey background */
+  --bg: #eef0f4;
+  --surface: #f8f9fb;
+  --surface-raised: #e4e7ed;
+  --border: #c5c9d4;
+  --border-light: #d6d9e2;
+  --text: #1a1d26;
+  --text-muted: #5c6070;
+  --primary: #4f5fd5;
+  --primary-hover: #3d4dba;
+  --primary-light: rgba(79, 95, 213, 0.12);
+  --primary-lighter: rgba(79, 95, 213, 0.06);
+  --accent: #e26d5a;
+  --accent-2: #d4a03a;
+  --secondary: #6e7180;
+  --success: #2d8659;
   --danger: #c84545;
   --radius: 16px;
   --radius-sm: 10px;
-  --shadow: 0 1px 3px rgba(31, 28, 26, 0.06), 0 1px 2px rgba(31, 28, 26, 0.04);
-  --shadow-md: 0 6px 18px rgba(31, 28, 26, 0.10), 0 2px 6px rgba(31, 28, 26, 0.05);
-  --shadow-lg: 0 18px 48px rgba(31, 28, 26, 0.14), 0 6px 14px rgba(31, 28, 26, 0.08);
+  --shadow: 0 1px 3px rgba(26, 29, 38, 0.06), 0 1px 2px rgba(26, 29, 38, 0.04);
+  --shadow-md: 0 6px 18px rgba(26, 29, 38, 0.10), 0 2px 6px rgba(26, 29, 38, 0.05);
+  --shadow-lg: 0 18px 48px rgba(26, 29, 38, 0.14), 0 6px 14px rgba(26, 29, 38, 0.08);
   --sidebar-width: 260px;
   --shopping-width: 260px;
   --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -419,7 +419,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 
 .delete-meal-btn:hover {
   color: var(--danger);
-  background: rgba(209, 91, 91, 0.08);
+  background: rgba(200, 69, 69, 0.08);
 }
 
 .meal-card .meal-name {
@@ -523,19 +523,19 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 }
 
 .week-summary-meat {
-  background: rgba(180, 100, 80, 0.2);
+  background: rgba(160, 90, 80, 0.2);
   color: var(--text);
 }
 
 .week-summary-meatfree {
-  background: rgba(232, 143, 94, 0.20);
+  background: rgba(226, 109, 90, 0.20);
   color: var(--accent);
   font-weight: 600;
 }
 
 .week-summary-salmon {
-  background: rgba(100, 140, 180, 0.25);
-  color: #2a5070;
+  background: rgba(90, 120, 190, 0.25);
+  color: #2a4080;
 }
 
 .week-summary-carb {
@@ -632,7 +632,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 .planner-day[data-day="Sunday"] .planner-day-header {
   background: var(--primary-lighter);
   color: var(--primary);
-  border-color: rgba(93, 153, 102, 0.15);
+  border-color: rgba(79, 95, 213, 0.15);
 }
 
 .planner-slot {
@@ -660,7 +660,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   border-color: var(--primary);
   border-style: solid;
   background: var(--primary-light);
-  box-shadow: inset 0 0 0 1px rgba(93, 153, 102, 0.15);
+  box-shadow: inset 0 0 0 1px rgba(79, 95, 213, 0.15);
 }
 
 .planner-slot .slot-label {
@@ -684,7 +684,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   text-align: left;
   width: 100%;
   transition: opacity var(--transition), transform var(--transition), box-shadow var(--transition);
-  box-shadow: 0 3px 10px rgba(93, 153, 102, 0.30);
+  box-shadow: 0 3px 10px rgba(79, 95, 213, 0.30);
   line-height: 1.35;
   display: flex;
   flex-wrap: wrap;
@@ -699,7 +699,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 }
 
 .planner-slot .planned-meal:hover {
-  box-shadow: 0 4px 12px rgba(93, 153, 102, 0.35);
+  box-shadow: 0 4px 12px rgba(79, 95, 213, 0.35);
   transform: translateY(-1px);
 }
 
@@ -869,13 +869,13 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   background: linear-gradient(135deg, var(--primary), var(--primary-hover));
   color: white;
   border-color: var(--primary);
-  box-shadow: 0 3px 8px rgba(93, 153, 102, 0.25);
+  box-shadow: 0 3px 8px rgba(79, 95, 213, 0.25);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--primary-hover), #386a3d);
+  background: linear-gradient(135deg, var(--primary-hover), #2f3d9e);
   border-color: var(--primary-hover);
-  box-shadow: 0 5px 14px rgba(93, 153, 102, 0.35);
+  box-shadow: 0 5px 14px rgba(79, 95, 213, 0.35);
   transform: translateY(-1px);
 }
 
@@ -1252,11 +1252,11 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 
 .planned-action-clear {
   color: var(--danger);
-  border-color: rgba(209, 91, 91, 0.35);
+  border-color: rgba(200, 69, 69, 0.35);
 }
 
 .planned-action-clear:hover {
-  background: rgba(209, 91, 91, 0.08);
+  background: rgba(200, 69, 69, 0.08);
   border-color: var(--danger);
 }
 
@@ -1411,8 +1411,8 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 }
 
 .recipe-card-needs-meal {
-  background: rgba(232, 143, 94, 0.18);
-  border-color: rgba(232, 143, 94, 0.4);
+  background: rgba(226, 109, 90, 0.18);
+  border-color: rgba(226, 109, 90, 0.4);
   color: var(--accent);
   font-weight: 600;
 }
@@ -1465,7 +1465,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 .discover-panel > .discover-heading::-webkit-details-marker { display: none; }
 
 .discover-panel > .discover-heading:hover {
-  background: rgba(232, 143, 94, 0.08);
+  background: rgba(226, 109, 90, 0.08);
 }
 
 .discover-panel > .discover-heading::after {
@@ -1602,7 +1602,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 
 .discover-source-pill:hover {
   border-color: var(--accent);
-  background: rgba(232, 143, 94, 0.08);
+  background: rgba(226, 109, 90, 0.08);
 }
 
 .discover-source-pill strong { font-weight: 700; }
@@ -2401,7 +2401,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   .planner-day[data-day="Saturday"] .planner-day-header,
   .planner-day[data-day="Sunday"] .planner-day-header {
     color: var(--primary);
-    border-right-color: rgba(93, 153, 102, 0.4);
+    border-right-color: rgba(79, 95, 213, 0.4);
     font-weight: 800;
   }
 

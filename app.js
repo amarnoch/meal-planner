@@ -1154,19 +1154,12 @@
     card.dataset.recipeId = recipe.id;
     const meta = [getRecipeCategoryLabel(recipe.category)];
     if (recipe.servings) meta.push(`${recipe.servings} serving${recipe.servings === 1 ? '' : 's'}`);
-    let badge = '';
-    if (recipe.mealName) {
-      badge = '<span class="recipe-card-status">In meals</span>';
-    } else if (MAIN_COOKBOOKS.includes(recipe.category)) {
-      badge = '<span class="recipe-card-status recipe-card-needs-meal">+ meal idea</span>';
-    }
     const thumb = recipeThumbHtml(recipe, 'recipe-card-thumb-emoji');
     card.innerHTML = `
       <div class="recipe-card-thumb">${thumb}</div>
       <div class="recipe-card-body">
         <div class="recipe-card-title-row">
           <h3>${escapeHtml(recipe.title)}</h3>
-          ${badge}
         </div>
         <p class="recipe-card-meta">${meta.map(escapeHtml).join(' · ')}</p>
       </div>
@@ -1433,7 +1426,6 @@
           <h2>${escapeHtml(recipe.title)}</h2>
           <div class="recipe-detail-meta-row">${metaChips.join('')}${sourceChip}</div>
         </div>
-        <button type="button" class="btn ${isMeal ? 'btn-primary' : 'btn-secondary'}" id="copy-recipe-to-meal-btn">${isMeal ? 'Copy to meal list' : 'Also make this a meal'}</button>
       </div>
       ${tags ? `<div class="recipe-tags">${tags}</div>` : ''}
       <section class="recipe-detail-section">

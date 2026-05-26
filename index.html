@@ -36,17 +36,7 @@
       <h2>Meal Library <span id="meal-library-count" class="meal-library-count"></span></h2>
       <p class="meal-library-mobile-hint">Tap a meal to add it to the week (choose options, then pick a day).</p>
       <input type="search" id="meal-search" class="meal-search" placeholder="Search meals" autocomplete="off">
-      <button type="button" class="btn btn-primary" id="add-meal-btn">Add Meal</button>
       <div id="meal-library" class="meal-library" role="list"></div>
-      <details class="sidebar-admin">
-        <summary>Manage meals</summary>
-        <div class="sidebar-footer">
-          <button type="button" class="btn btn-secondary" id="import-meals-btn">Import Meals CSV</button>
-          <input type="file" id="import-meals-input" accept=".csv" hidden>
-          <button type="button" class="btn btn-secondary" id="export-meals-btn">Export Meals CSV</button>
-          <button type="button" class="btn btn-secondary" id="export-plan-btn">Export Plan CSV</button>
-        </div>
-      </details>
     </aside>
 
     <!-- Center: Weekly Planner -->
@@ -72,16 +62,6 @@
       </div>
       <div id="recipes-list" class="recipes-list" role="list"></div>
       <div id="recipe-detail" class="recipe-detail" hidden></div>
-      <details class="recipes-admin">
-        <summary>Manage recipes</summary>
-        <p class="recipes-admin-hint">To add new recipes: <strong>Extract recipe</strong> → Claude/ChatGPT → paste JSON into <code>recipes.json</code> in git.</p>
-        <div class="recipes-admin-actions">
-          <button type="button" class="btn btn-primary btn-sm" id="add-recipe-btn">Extract recipe</button>
-          <button type="button" class="btn btn-secondary btn-sm" id="import-recipes-btn">Import backup file</button>
-          <input type="file" id="import-recipes-input" accept=".json" hidden>
-          <button type="button" class="btn btn-secondary btn-sm" id="export-recipes-btn">Export backup</button>
-        </div>
-      </details>
     </section>
 
     <!-- Right panel: Shopping List -->
@@ -191,65 +171,6 @@
     </div>
   </div>
 
-  <!-- Extract recipe helper (batch workflow: JSON goes into recipes.json in git) -->
-  <div id="recipe-modal-overlay" class="modal-overlay" aria-hidden="true">
-    <div class="modal recipe-modal">
-      <button type="button" class="modal-close-btn" data-close-target="recipe-modal-overlay" aria-label="Close">×</button>
-      <h2>Extract recipe</h2>
-      <p class="form-hint">Three steps: describe the source, copy a prompt into Claude or ChatGPT, then validate JSON before you paste it into <code>recipes.json</code> in the repo.</p>
-
-      <ol class="recipe-wizard-steps" aria-label="Steps">
-        <li class="recipe-wizard-indicator active" data-step="1">Source</li>
-        <li class="recipe-wizard-indicator" data-step="2">Extract</li>
-        <li class="recipe-wizard-indicator" data-step="3">Validate</li>
-      </ol>
-
-      <div id="recipe-step-1" class="recipe-wizard-panel">
-        <label for="recipe-source-type">Source type</label>
-        <select id="recipe-source-type">
-          <option value="manual">Manual / notes</option>
-          <option value="instagram">Instagram link</option>
-          <option value="web">Web page link</option>
-          <option value="screenshot">Screenshot</option>
-        </select>
-
-        <label for="recipe-source-url">Source URL (optional)</label>
-        <input type="url" id="recipe-source-url" placeholder="https://...">
-
-        <label for="recipe-source-notes">Source notes (optional)</label>
-        <textarea id="recipe-source-notes" rows="3" placeholder="Paste rough recipe notes, or describe the screenshot you will attach in the chat."></textarea>
-      </div>
-
-      <div id="recipe-step-2" class="recipe-wizard-panel" hidden>
-        <p class="form-hint">Copy the prompt, then paste it (and your link or screenshot) in Claude or ChatGPT. When the model returns JSON, go to the next step to check it.</p>
-        <div class="recipe-prompt-actions recipe-prompt-actions-wrap">
-          <button type="button" class="btn btn-primary btn-sm" id="copy-recipe-prompt-open-claude-btn">Copy &amp; open Claude</button>
-          <button type="button" class="btn btn-secondary btn-sm" id="copy-recipe-prompt-open-chatgpt-btn">Copy &amp; open ChatGPT</button>
-          <span id="recipe-prompt-copied" class="share-copied-toast" hidden>Copied!</span>
-        </div>
-      </div>
-
-      <div id="recipe-step-3" class="recipe-wizard-panel" hidden>
-        <label for="recipe-json-input">Paste recipe JSON to validate</label>
-        <textarea id="recipe-json-input" rows="10" placeholder='{"title":"…"} or [ {...}, {...} ] — markdown fences are OK'></textarea>
-        <p id="recipe-json-error" class="form-error" hidden></p>
-        <p id="recipe-json-ok" class="form-success" hidden></p>
-      </div>
-
-      <div class="modal-actions recipe-modal-actions-split">
-        <div class="recipe-modal-actions-left">
-          <button type="button" class="btn btn-secondary" id="recipe-wizard-back" hidden>Back</button>
-          <button type="button" class="btn btn-secondary" id="recipe-modal-cancel">Cancel</button>
-        </div>
-        <div class="recipe-modal-actions-right">
-          <button type="button" class="btn btn-secondary btn-sm" id="paste-recipe-json-btn" hidden>Paste from clipboard</button>
-          <button type="button" class="btn btn-primary" id="recipe-wizard-next">Next</button>
-          <button type="button" class="btn btn-secondary" id="recipe-wizard-done-btn" hidden>Done</button>
-          <button type="button" class="btn btn-primary" id="validate-recipe-json-btn" hidden>Validate JSON</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <script src="app.js"></script>
 </body>

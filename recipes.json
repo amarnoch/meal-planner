@@ -685,11 +685,11 @@
   },
   {
     "id": "rec_pancakes_crepes",
-    "title": "Pancakes / Crepes",
+    "title": "Easy Pancakes (Crepes)",
     "source": {
-      "type": "manual",
-      "url": null,
-      "label": "Family recipe"
+      "type": "web",
+      "url": "https://www.bbcgoodfood.com/recipes/easy-pancakes",
+      "label": "BBC Good Food"
     },
     "imageUrl": "https://images.unsplash.com/photo-1565087170449-fa23854a6100?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
@@ -713,7 +713,7 @@
       {
         "qty": "2",
         "unit": "",
-        "name": "eggs",
+        "name": "large eggs",
         "notes": null,
         "emoji": "🥚"
       },
@@ -723,16 +723,116 @@
         "name": "milk",
         "notes": null,
         "emoji": "🥛"
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "sunflower or vegetable oil",
+        "notes": "plus a little extra for frying",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "pinch",
+        "name": "salt",
+        "notes": null,
+        "emoji": "🧂"
       }
     ],
     "steps": [
-      "Whisk flour, eggs and milk together into a smooth, thin batter.",
-      "Heat a medium pan to medium-hot, lightly greased.",
-      "Ladle the batter into the pan, swirling to coat the base in a thin layer.",
-      "Fry for 30–60 seconds per side until lightly golden."
+      "Put the flour, eggs, milk, oil and a pinch of salt into a bowl or large jug and whisk to a smooth batter.",
+      "Set aside for 30 minutes to rest if you have time, or start cooking straight away.",
+      "Set a medium frying pan over a medium heat and wipe with a little oiled kitchen paper.",
+      "Pour in just enough batter to coat the base of the pan in a thin layer, swirling as you pour.",
+      "Cook for about 1 minute on each side until golden.",
+      "Keep warm in a low oven while you cook the rest."
     ],
-    "notes": "Family recipe — thin French-style crepes. Sweet (lemon and sugar, Nutella) or savoury (cheese and ham). Makes 6–8 crepes.",
+    "notes": "Thin French-style crepes. Sweet (lemon and sugar, Nutella) or savoury (cheese and ham). Makes 6–8 crepes.",
     "createdAt": "2026-04-26T22:15:00Z",
+    "mealName": null
+  },
+  {
+    "id": "rec_fluffy_american_pancakes",
+    "title": "Fluffy American Pancakes",
+    "source": {
+      "type": "web",
+      "url": "https://www.bbc.co.uk/food/recipes/fluffyamericanpancak_74828",
+      "label": "BBC Food"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 4,
+    "category": "Bakes",
+    "tags": [
+      "breakfast",
+      "sweet",
+      "family friendly",
+      "kid friendly",
+      "quick",
+      "weekend"
+    ],
+    "ingredients": [
+      {
+        "qty": "135",
+        "unit": "g",
+        "name": "plain flour",
+        "notes": null,
+        "emoji": "🌾"
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "baking powder",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1/2",
+        "unit": "tsp",
+        "name": "salt",
+        "notes": null,
+        "emoji": "🧂"
+      },
+      {
+        "qty": "2",
+        "unit": "tbsp",
+        "name": "caster sugar",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "130",
+        "unit": "ml",
+        "name": "milk",
+        "notes": null,
+        "emoji": "🥛"
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "large egg",
+        "notes": "lightly beaten",
+        "emoji": "🥚"
+      },
+      {
+        "qty": "2",
+        "unit": "tbsp",
+        "name": "melted butter",
+        "notes": "cooled slightly, plus extra for cooking",
+        "emoji": "🧈"
+      }
+    ],
+    "steps": [
+      "Sift the flour, baking powder, salt and caster sugar into a large bowl.",
+      "In a separate bowl or jug, lightly whisk together the milk and egg, then whisk in the melted butter.",
+      "Pour the milk mixture into the flour mixture and beat with a fork until you have a smooth batter. Let it stand for a few minutes.",
+      "For banana pancakes: mash 1 ripe banana and fold into the batter. For blueberry pancakes: fold in a handful of blueberries.",
+      "Heat a non-stick frying pan over a medium heat and add a knob of butter. When melted, add a ladle of batter.",
+      "Wait until the top of the pancake begins to bubble, then flip and cook until both sides are golden brown and the pancake has risen to about 1cm thick.",
+      "Repeat until all the batter is used up. Keep warm in a low oven.",
+      "Serve with maple syrup and extra butter."
+    ],
+    "notes": "For banana pancakes, mash 1 ripe banana into the batter. For blueberry pancakes, fold in a handful of fresh or frozen blueberries. Both work great for toddlers.",
+    "createdAt": "2026-05-26T09:30:00Z",
     "mealName": null
   },
   {
@@ -934,7 +1034,7 @@
       "label": "BBC Good Food (community)"
     },
     "imageUrl": "https://plus.unsplash.com/premium_photo-1675382377369-c8f4cd69cfee?fm=jpg&q=70&w=600&auto=format&fit=crop",
-    "servings": 4,
+    "servings": 1,
     "category": "Sides",
     "tags": [
       "quick",
@@ -947,49 +1047,34 @@
     ],
     "ingredients": [
       {
-        "qty": "250",
+        "qty": "70",
         "unit": "g",
         "name": "self-raising flour",
         "notes": "plus extra for dusting",
         "emoji": "🌾"
       },
       {
-        "qty": "1",
-        "unit": "tsp",
-        "name": "baking powder",
-        "notes": null,
-        "emoji": ""
-      },
-      {
-        "qty": "1/2",
-        "unit": "tsp",
-        "name": "salt",
-        "notes": null,
-        "emoji": "🧂"
-      },
-      {
-        "qty": "250",
+        "qty": "70",
         "unit": "g",
         "name": "natural yoghurt",
-        "notes": "full-fat works best",
+        "notes": null,
         "emoji": "🥛"
       },
       {
         "qty": "1",
         "unit": "tbsp",
-        "name": "olive oil",
+        "name": "oil",
         "notes": "for the pan",
         "emoji": "🫒"
       }
     ],
     "steps": [
-      "Mix the flour, baking powder and salt in a bowl, then stir in the yoghurt with a wooden spoon until it forms a rough dough.",
+      "Mix the flour and yoghurt in a bowl until it forms a rough dough.",
       "Tip onto a lightly floured surface and knead briefly until smooth, adding a little more flour if sticky.",
-      "Divide into 4 equal balls and roll each out to roughly the size of a saucer, about 3–4mm thick.",
-      "Heat a dry frying pan (or lightly oiled) over a medium-high heat. Cook each flatbread for 1–2 minutes per side until puffed and charred in spots.",
-      "Stack and wrap in a clean tea towel to keep warm and soft while you cook the rest."
+      "Roll out to roughly 3–4mm thick.",
+      "Heat the oil in a frying pan over a medium-high heat. Cook for 1–2 minutes per side until puffed and charred in spots."
     ],
-    "notes": "Toddler-friendly side. Quantities make 4 dinner-plate rounds — divide into 6 medium or 8 small if you'd rather. Optional: brush with melted garlic butter and chopped coriander after cooking. [ASSUMPTION] Quantities follow the standard BBC Good Food / UK 2-ingredient yoghurt flatbread formula (equal weights flour + yoghurt) — the source page wasn't directly fetchable; verify before relying on it.",
+    "notes": "Single-portion recipe — scale up by multiplying. Optional: brush with melted garlic butter and chopped coriander after cooking.",
     "createdAt": "2026-04-27T08:00:00Z",
     "mealName": null
   },
@@ -2501,5 +2586,227 @@
     "mealName": "Broccoli Crunch Salad",
     "id": "r49205bb6",
     "createdAt": "2026-05-01T22:34:32.173366Z"
+  },
+  {
+    "id": "rec_dishoom_black_dal",
+    "title": "Dishoom Black Dal (Instant Pot)",
+    "source": {
+      "type": "web",
+      "url": "https://iamafoodblog.com/dishooms-black-dal-and-garlic-naan/",
+      "label": "I Am a Food Blog — Dishoom's Black Dal"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 6,
+    "category": "Indian & curries",
+    "tags": [
+      "dinner",
+      "vegetarian",
+      "instant pot",
+      "indian",
+      "comfort food",
+      "freezer friendly",
+      "make ahead"
+    ],
+    "ingredients": [
+      {
+        "qty": "1",
+        "unit": "cup",
+        "name": "black lentils",
+        "notes": "black beluga lentils, rinsed",
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "",
+        "name": "whole cloves",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "star anise",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "ground coriander",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "ground cumin",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1/2",
+        "unit": "tsp",
+        "name": "cayenne pepper",
+        "notes": null,
+        "emoji": "🌶"
+      },
+      {
+        "qty": "1/2",
+        "unit": "tsp",
+        "name": "fennel seeds",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1/2",
+        "unit": "tsp",
+        "name": "garam masala",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1/4",
+        "unit": "tsp",
+        "name": "ground cardamom",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "3",
+        "unit": "tbsp",
+        "name": "butter",
+        "notes": null,
+        "emoji": "🧈"
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "neutral oil",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "small",
+        "name": "onion",
+        "notes": "finely diced",
+        "emoji": "🧅"
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "fresh ginger",
+        "notes": "minced",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "garlic",
+        "notes": "minced",
+        "emoji": "🧄"
+      },
+      {
+        "qty": "155",
+        "unit": "g",
+        "name": "tomato paste",
+        "notes": "about 5.5 oz",
+        "emoji": "🍅"
+      },
+      {
+        "qty": "2",
+        "unit": "cups",
+        "name": "water",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "tbsp",
+        "name": "double cream",
+        "notes": "to finish",
+        "emoji": "🥛"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "salt",
+        "notes": "to taste",
+        "emoji": "🧂"
+      }
+    ],
+    "steps": [
+      "Toast the whole spices (cloves, star anise, fennel seeds) in a dry pan over low heat until fragrant. Crush or grind them, then mix with the ground spices (coriander, cumin, cayenne, garam masala, cardamom).",
+      "Set the Instant Pot to sauté on high. Add the butter and oil. Cook the diced onion, ginger and garlic for a few minutes until softened.",
+      "Stir in the ground spice mix, then add the rinsed black lentils, tomato paste and 2 cups of water. Stir to combine.",
+      "Seal the lid and cook on high pressure for 15 minutes.",
+      "Quick release the pressure. Open the lid and stir in the cream and an extra knob of butter.",
+      "Season with salt to taste and serve."
+    ],
+    "notes": "Dishoom-inspired Instant Pot version — lighter and creamier than the 24-hour oven method, with tomato as a more prominent note. Serve with rice and naan. Freezes well.",
+    "createdAt": "2026-05-26T09:00:00Z",
+    "mealName": "Dishoom Black Dal"
+  },
+  {
+    "id": "rec_sweet_potato_finger_biscuits",
+    "title": "Sweet Potato Finger Biscuits",
+    "source": {
+      "type": "screenshot",
+      "url": null,
+      "label": "What Mummy Makes"
+    },
+    "imageUrl": "https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?fm=jpg&q=70&w=600&auto=format&fit=crop",
+    "servings": 20,
+    "category": "Toddler",
+    "tags": [
+      "toddler snack",
+      "baking",
+      "healthy snack",
+      "1 year old",
+      "kid friendly",
+      "freezer friendly"
+    ],
+    "ingredients": [
+      {
+        "qty": "1",
+        "unit": "small",
+        "name": "sweet potato",
+        "notes": "peeled and diced into 1\" cubes",
+        "emoji": "🍠"
+      },
+      {
+        "qty": "60",
+        "unit": "g",
+        "name": "mild cheddar cheese",
+        "notes": "grated",
+        "emoji": "🧀"
+      },
+      {
+        "qty": "125",
+        "unit": "g",
+        "name": "plain flour",
+        "notes": null,
+        "emoji": "🌾"
+      },
+      {
+        "qty": "62",
+        "unit": "ml",
+        "name": "unsalted butter",
+        "notes": "melted",
+        "emoji": "🧈"
+      }
+    ],
+    "steps": [
+      "Preheat the oven to 180°C and line a large baking tray.",
+      "Steam the sweet potato for 8–10 minutes until soft.",
+      "Add the sweet potato to a large mixing bowl and mash well.",
+      "Add the cheese, flour and melted butter and combine to form a thick dough — you may need to go in with your hands.",
+      "Roll out the dough to a 5mm thickness and slice into fingers (roughly 5cm × 3cm × 0.5cm).",
+      "Place the fingers onto the prepared baking tray and bake for 18–20 minutes.",
+      "Serve once cooled."
+    ],
+    "notes": "Freezer-friendly toddler snack. To freeze: let cool fully, place on a baking tray flat in the freezer for up to an hour, then transfer to an airtight container or freezer bags (this stops them sticking together).",
+    "createdAt": "2026-05-26T09:05:00Z",
+    "mealName": null
   }
 ]
