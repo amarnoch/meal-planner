@@ -2808,5 +2808,409 @@
     "notes": "Freezer-friendly toddler snack. To freeze: let cool fully, place on a baking tray flat in the freezer for up to an hour, then transfer to an airtight container or freezer bags (this stops them sticking together).",
     "createdAt": "2026-05-26T09:05:00Z",
     "mealName": null
+  },
+  {
+    "id": "rec_spanish_meatball_butter_bean_stew",
+    "title": "Spanish Meatball & Butter Bean Stew",
+    "source": {
+      "type": "web",
+      "url": "https://www.bbcgoodfood.com/recipes/spanish-meatball-butter-bean-stew",
+      "label": "BBC Good Food"
+    },
+    "imageUrl": null,
+    "servings": 3,
+    "category": "Spanish",
+    "tags": [
+      "dinner",
+      "one pan",
+      "pork",
+      "spanish",
+      "family friendly",
+      "freezer friendly"
+    ],
+    "ingredients": [
+      {
+        "qty": "350",
+        "unit": "g",
+        "name": "lean pork mince",
+        "notes": null,
+        "emoji": "🐷"
+      },
+      {
+        "qty": "2",
+        "unit": "tsp",
+        "name": "olive oil",
+        "notes": null,
+        "emoji": "🫒"
+      },
+      {
+        "qty": "1",
+        "unit": "large",
+        "name": "red onion",
+        "notes": "chopped",
+        "emoji": "🧅"
+      },
+      {
+        "qty": "2",
+        "unit": "",
+        "name": "peppers",
+        "notes": "sliced, any colour",
+        "emoji": "🫑"
+      },
+      {
+        "qty": "3",
+        "unit": "cloves",
+        "name": "garlic",
+        "notes": "crushed",
+        "emoji": "🧄"
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "sweet smoked paprika",
+        "notes": null,
+        "emoji": "🌶️"
+      },
+      {
+        "qty": "2 x 400",
+        "unit": "g",
+        "name": "cans chopped tomatoes",
+        "notes": null,
+        "emoji": "🥫"
+      },
+      {
+        "qty": "400",
+        "unit": "g",
+        "name": "can butter beans",
+        "notes": "drained",
+        "emoji": "🫘"
+      },
+      {
+        "qty": "2",
+        "unit": "tsp",
+        "name": "golden caster sugar",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "parsley",
+        "notes": "small bunch, chopped",
+        "emoji": "🌿"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "crusty bread",
+        "notes": "to serve, optional",
+        "emoji": "🍞"
+      }
+    ],
+    "steps": [
+      "Season the pork and shape into small meatballs. Heat the oil in a large pan, add the meatballs and cook for 5 mins until golden brown all over.",
+      "Push the meatballs to one side of the pan and add the onion and peppers. Cook for a further 5 mins, stirring occasionally, until softened, then stir in the garlic and paprika. Stir everything for 1 min, then add the tomatoes. Cover with a lid and simmer for 10 mins.",
+      "Uncover, stir in the beans, sugar and some seasoning, then simmer for a further 10 mins uncovered.",
+      "Just before serving, stir in the parsley. Serve with crusty bread for dunking, if desired."
+    ],
+    "notes": "Recipe serves 3 — scale up the mince, beans and a second tin of tomatoes for 4-6. Freezes well.",
+    "createdAt": "2026-06-04T00:00:00Z",
+    "mealName": "Spanish Meatball & Butter Bean Stew"
+  },
+  {
+    "id": "rec_roast_sea_bass_traybake",
+    "title": "Roast Sea Bass & Vegetable Traybake",
+    "source": {
+      "type": "web",
+      "url": "https://www.bbcgoodfood.com/recipes/roast-sea-bass-vegetable-traybake",
+      "label": "BBC Good Food"
+    },
+    "imageUrl": null,
+    "servings": 2,
+    "category": "Mediterranean",
+    "tags": [
+      "dinner",
+      "traybake",
+      "fish",
+      "healthy",
+      "low effort",
+      "mediterranean"
+    ],
+    "ingredients": [
+      {
+        "qty": "300",
+        "unit": "g",
+        "name": "red-skinned potatoes",
+        "notes": "thinly sliced into rounds",
+        "emoji": "🥔"
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "red pepper",
+        "notes": "cut into strips",
+        "emoji": "🫑"
+      },
+      {
+        "qty": "2",
+        "unit": "tbsp",
+        "name": "extra virgin olive oil",
+        "notes": null,
+        "emoji": "🫒"
+      },
+      {
+        "qty": "1",
+        "unit": "sprig",
+        "name": "rosemary",
+        "notes": "leaves removed and very finely chopped",
+        "emoji": "🌿"
+      },
+      {
+        "qty": "2",
+        "unit": "fillets",
+        "name": "sea bass",
+        "notes": null,
+        "emoji": "🐟"
+      },
+      {
+        "qty": "25",
+        "unit": "g",
+        "name": "pitted black olives",
+        "notes": "halved",
+        "emoji": "🫒"
+      },
+      {
+        "qty": "1/2",
+        "unit": "",
+        "name": "lemon",
+        "notes": "sliced thinly into rounds",
+        "emoji": "🍋"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "basil leaves",
+        "notes": "handful",
+        "emoji": "🌿"
+      }
+    ],
+    "steps": [
+      "Heat oven to 180C/160C fan/gas 4. Arrange the potato and pepper slices on a large non-stick baking tray. Drizzle over 1 tbsp oil and scatter with the rosemary, a pinch of salt and a good grinding of pepper.",
+      "Toss everything together well and roast for 25 mins, turning over halfway through, until the potatoes are golden and crisp at the edges.",
+      "Arrange the fish fillets on top and scatter over the olives. Place a couple of lemon slices on top of the fish and drizzle with the remaining oil.",
+      "Roast for a further 7-8 mins until the fish is cooked through. Serve scattered with basil leaves."
+    ],
+    "notes": "Everything cooks on one tray. Sea bass can be swapped for any firm white fish fillet.",
+    "createdAt": "2026-06-04T00:00:00Z",
+    "mealName": "Roast Sea Bass Traybake"
+  },
+  {
+    "id": "rec_simple_fish_stew",
+    "title": "Simple Fish Stew",
+    "source": {
+      "type": "web",
+      "url": "https://www.bbcgoodfood.com/recipes/simple-fish-stew",
+      "label": "BBC Good Food"
+    },
+    "imageUrl": null,
+    "servings": 2,
+    "category": "Mediterranean",
+    "tags": [
+      "dinner",
+      "one pot",
+      "fish",
+      "healthy",
+      "low calorie",
+      "mediterranean"
+    ],
+    "ingredients": [
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "olive oil",
+        "notes": null,
+        "emoji": "🫒"
+      },
+      {
+        "qty": "1",
+        "unit": "tsp",
+        "name": "fennel seeds",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "",
+        "name": "carrots",
+        "notes": "diced",
+        "emoji": "🥕"
+      },
+      {
+        "qty": "2",
+        "unit": "sticks",
+        "name": "celery",
+        "notes": "diced",
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "cloves",
+        "name": "garlic",
+        "notes": "finely chopped",
+        "emoji": "🧄"
+      },
+      {
+        "qty": "2",
+        "unit": "",
+        "name": "leeks",
+        "notes": "thinly sliced",
+        "emoji": ""
+      },
+      {
+        "qty": "400",
+        "unit": "g",
+        "name": "can chopped tomatoes",
+        "notes": null,
+        "emoji": "🥫"
+      },
+      {
+        "qty": "500",
+        "unit": "ml",
+        "name": "hot fish stock",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "fillets",
+        "name": "skinless pollock (about 200g)",
+        "notes": "thawed if frozen, cut into chunks",
+        "emoji": "🐟"
+      },
+      {
+        "qty": "85",
+        "unit": "g",
+        "name": "raw shelled king prawns",
+        "notes": null,
+        "emoji": "🦐"
+      }
+    ],
+    "steps": [
+      "Heat the oil in a large pan, add the fennel seeds, carrots, celery and garlic, and cook for 5 mins until starting to soften.",
+      "Tip in the leeks, tomatoes and stock, season and bring to the boil, then cover and simmer for 15-20 mins until the vegetables are tender and the sauce has thickened and reduced slightly.",
+      "Add the fish, scatter over the prawns and cook for 2 mins more until lightly cooked. Ladle into bowls and serve."
+    ],
+    "notes": "Any firm white fish works in place of pollock. Good with crusty bread to mop up the broth.",
+    "createdAt": "2026-06-04T00:00:00Z",
+    "mealName": "Simple Fish Stew"
+  },
+  {
+    "id": "rec_tuna_pasta",
+    "title": "Tuna Pasta",
+    "source": {
+      "type": "manual",
+      "url": null,
+      "label": null
+    },
+    "imageUrl": null,
+    "servings": 4,
+    "category": "Italian",
+    "tags": [
+      "dinner",
+      "pasta",
+      "tuna",
+      "store cupboard",
+      "family friendly",
+      "quick"
+    ],
+    "ingredients": [
+      {
+        "qty": "400",
+        "unit": "g",
+        "name": "pasta",
+        "notes": null,
+        "emoji": "🍝"
+      },
+      {
+        "qty": "1",
+        "unit": "tbsp",
+        "name": "olive oil",
+        "notes": null,
+        "emoji": "🫒"
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "onion",
+        "notes": "finely chopped",
+        "emoji": "🧅"
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "carrot",
+        "notes": "finely diced",
+        "emoji": "🥕"
+      },
+      {
+        "qty": "1",
+        "unit": "stick",
+        "name": "celery",
+        "notes": "finely diced",
+        "emoji": ""
+      },
+      {
+        "qty": "1",
+        "unit": "",
+        "name": "pepper",
+        "notes": "diced",
+        "emoji": "🫑"
+      },
+      {
+        "qty": "400",
+        "unit": "g",
+        "name": "can chopped tomatoes",
+        "notes": null,
+        "emoji": "🥫"
+      },
+      {
+        "qty": "2",
+        "unit": "tbsp",
+        "name": "mascarpone",
+        "notes": null,
+        "emoji": ""
+      },
+      {
+        "qty": "2",
+        "unit": "cans",
+        "name": "tuna",
+        "notes": "drained",
+        "emoji": "🐟"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "sweetcorn",
+        "notes": "tin or frozen, drained",
+        "emoji": "🌽"
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "cheese",
+        "notes": "grated, to serve, optional",
+        "emoji": "🧀"
+      }
+    ],
+    "steps": [
+      "Cook the pasta in salted boiling water until al dente. Drain, reserving a splash of the cooking water.",
+      "Meanwhile, heat the oil in a large pan and soften the onion, carrot, celery and pepper for 8-10 mins until tender.",
+      "Add the chopped tomatoes and simmer for 10 mins until thickened. Stir in the mascarpone until creamy.",
+      "Flake in the tuna and stir through the sweetcorn, heating until warmed through. Season to taste.",
+      "Toss the drained pasta through the sauce, loosening with a little pasta water if needed. Serve with grated cheese if you like."
+    ],
+    "notes": "Store-cupboard friendly. The mascarpone makes it creamy without a separate white sauce.",
+    "createdAt": "2026-06-04T00:00:00Z",
+    "mealName": "Tuna Pasta"
   }
 ]
