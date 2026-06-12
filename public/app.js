@@ -2775,24 +2775,26 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     tile.className = 'meal-cuisine-tile';
     tile.dataset.cuisine = cuisine.name;
     const cells = [];
-    // Prefer meals that have an image so all 4 cells render as photos
-    // (avoids the lopsided look of a photo + emoji + photo + emoji mix).
-    // If no meals in this cuisine have an image, fall back to cycling emoji
-    // — all 4 cells will then be the same type, still symmetric.
+    // Each photo/emoji is used at most once — no repeated images in a tile.
+    // Photos first, then emoji cells from the remaining meals, then blanks.
     const allMeals = cuisine.meals || cuisine.thumbs || [];
     const withImage = allMeals
       .map(m => ({ meal: m, imgUrl: getRecipeImageForMeal(m.meal_name) }))
       .filter(x => x.imgUrl);
+    const uniqueImages = [...new Set(withImage.map(x => x.imgUrl))].slice(0, 4);
+    const photoMeals = new Set(withImage.map(x => x.meal.meal_name));
+    const emojiMeals = allMeals.filter(m => !photoMeals.has(m.meal_name));
     for (let i = 0; i < 4; i++) {
-      if (withImage.length > 0) {
-        const { imgUrl } = withImage[i % withImage.length];
-        cells.push(`<div class="meal-cuisine-collage-cell"><img src="${escapeHtml(imgUrl)}" alt="" loading="lazy"></div>`);
-      } else if (allMeals.length > 0) {
-        const m = allMeals[i % allMeals.length];
-        const e = getMealEmoji(m) || '🍽';
-        cells.push(`<div class="meal-cuisine-collage-cell"><span>${escapeHtml(e)}</span></div>`);
+      if (i < uniqueImages.length) {
+        cells.push(`<div class="meal-cuisine-collage-cell"><img src="${escapeHtml(uniqueImages[i])}" alt="" loading="lazy"></div>`);
       } else {
-        cells.push('<div class="meal-cuisine-collage-cell empty"></div>');
+        const m = emojiMeals[i - uniqueImages.length];
+        if (m) {
+          const e = getMealEmoji(m) || '🍽';
+          cells.push(`<div class="meal-cuisine-collage-cell"><span>${escapeHtml(e)}</span></div>`);
+        } else {
+          cells.push('<div class="meal-cuisine-collage-cell empty"></div>');
+        }
       }
     }
     tile.innerHTML = `
