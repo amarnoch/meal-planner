@@ -1,10 +1,10 @@
 /**
- * Meal Planner - vanilla JS app
- * State, planner, shopping list, recipes, CSV
+ * Meal Planner - vanilla JS app (ES module)
+ * State, planner, shopping list, recipes, CSV, sync, settings
  */
 
-(function () {
-  'use strict';
+import { createSync, syncEnabled, getFamilyKey, setFamilyKey, mergeArraysBy, mergeMaps } from './js/sync.js';
+import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidateSubscription, registerServiceWorker, sendTestNotification } from './js/push.js';
 
   const STORAGE_MEALS = 'mealPlanner_meals';
   const STORAGE_PLAN = 'mealPlanner_plan';
@@ -21,20 +21,91 @@
   /** Curated discover sources + trending recipe ideas for the Recipes tab landing. */
   const BUNDLED_TRENDING_JSON = 'trending.json';
 
-  const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-  const DAY_ABBREV = {
-    Monday: 'Mon',
-    Tuesday: 'Tue',
-    Wednesday: 'Wed',
-    Thursday: 'Thu',
-    Friday: 'Fri',
-    Saturday: 'Sat',
-    Sunday: 'Sun'
+  // --- Settings (synced; replaces the old hardcoded rules) ---
+  const STORAGE_SETTINGS = 'mealPlanner_settings';
+  const SETTINGS_DEFAULTS = {
+    horizonDays: 7,            // 7 | 10 | 14
+    quickDays: ['Tuesday', 'Thursday'],
+    salmonPerWeek: 1,
+    meatFreeDaysPerWeek: 2,
+    longMealsWeekendOnly: true,
+    avoidCarbRepeat: true,
+    weekendLunch: true,
+    notifyTime: '08:00'
   };
+  let settings = { ...SETTINGS_DEFAULTS };
 
-  function dayAbbrev(day) {
-    return DAY_ABBREV[day] || day;
+  function loadSettings() {
+    try {
+      const raw = localStorage.getItem(STORAGE_SETTINGS);
+      if (raw) settings = { ...SETTINGS_DEFAULTS, ...JSON.parse(raw) };
+    } catch (_) { settings = { ...SETTINGS_DEFAULTS }; }
+  }
+
+  function saveSettings() {
+    localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
+    markDirty('settings');
+  }
+
+  // --- Plan dates: slots are keyed by real dates ("2026-06-15|Dinner") so the
+  // plan can run 7/10/14 days and "today" is unambiguous across devices. ---
+  function toDateKey(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  /** Monday of the current week. */
+  function startOfPlan() {
+    const now = new Date();
+    const dow = (now.getDay() + 6) % 7; // 0 = Monday
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - dow);
+    return monday;
+  }
+
+  /** Ordered date keys covering the planning horizon. */
+  function planDays() {
+    const start = startOfPlan();
+    const out = [];
+    for (let i = 0; i < (settings.horizonDays || 7); i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      out.push(toDateKey(d));
+    }
+    return out;
+  }
+
+  function dateFromKey(dayKey) {
+    return new Date(`${dayKey}T12:00:00`);
+  }
+
+  function weekdayOf(dayKey) {
+    return WEEKDAYS[(dateFromKey(dayKey).getDay() + 6) % 7];
+  }
+
+  function isWeekendDay(dayKey) {
+    const w = weekdayOf(dayKey);
+    return w === 'Saturday' || w === 'Sunday';
+  }
+
+  function isTodayKey(dayKey) {
+    return dayKey === toDateKey(new Date());
+  }
+
+  /** "Monday 15 Jun" */
+  function dayLabel(dayKey) {
+    const d = dateFromKey(dayKey);
+    return `${weekdayOf(dayKey)} ${d.getDate()} ${d.toLocaleDateString('en-GB', { month: 'short' })}`;
+  }
+
+  /** "Mon 15" */
+  function dayAbbrev(dayKey) {
+    const d = dateFromKey(dayKey);
+    return `${weekdayOf(dayKey).slice(0, 3)} ${d.getDate()}`;
   }
 
   // Recipe categories are now free-form strings (each unique value = a "Cookbook").
@@ -60,10 +131,24 @@
     potato: ['potato', 'potatoes', 'chips', 'fries', 'wedges', 'mash', 'jacket']
   };
 
-  // Slots: weekdays = dinner only; Sat/Sun = lunch + dinner
-  function getSlotsForDay(day) {
-    const isWeekend = day === 'Saturday' || day === 'Sunday';
-    return isWeekend ? ['Lunch', 'Dinner'] : ['Dinner'];
+  // Slots: weekdays = dinner only; Sat/Sun = lunch + dinner (configurable)
+  function getSlotsForDay(dayKey) {
+    return (isWeekendDay(dayKey) && settings.weekendLunch) ? ['Lunch', 'Dinner'] : ['Dinner'];
+  }
+
+  /** Reserved plan value for a leftovers slot. The "variant" stores what it's leftovers of. */
+  const LEFTOVERS = '__leftovers__';
+
+  function isLeftoversName(name) {
+    return name === LEFTOVERS;
+  }
+
+  /** Human label for any planned slot value (handles leftovers). */
+  function plannedDisplayName(mealName, variantName, sideName) {
+    if (isLeftoversName(mealName)) return variantName ? `Leftovers · ${variantName}` : 'Leftovers';
+    let label = variantName ? `${mealName} (${variantName})` : mealName;
+    if (sideName && sideName !== SIDE_NONE) label += ' with ' + sideName;
+    return label;
   }
 
   function containsKeyword(text, keywords) {
@@ -185,8 +270,10 @@
       alert('Add some meals to your library first.');
       return;
     }
+    const days = planDays();
+    const weeks = days.length / 7;
     const slots = [];
-    for (const day of DAYS) {
+    for (const day of days) {
       for (const mealType of getSlotsForDay(day)) {
         slots.push({ day, mealType });
       }
@@ -194,7 +281,11 @@
     const salmonMeals = state.meals.filter(isSalmonMeal);
     const meatFreeCandidates = state.meals.filter(mealCanBeMeatFree);
     const quickMeals = state.meals.filter(isQuickMeal);
-    const salmonSlotIndex = salmonMeals.length > 0 ? Math.floor(Math.random() * slots.length) : -1;
+    const salmonTarget = salmonMeals.length > 0 ? Math.round((settings.salmonPerWeek || 0) * weeks) : 0;
+    const salmonSlotIndices = new Set();
+    while (salmonSlotIndices.size < Math.min(salmonTarget, slots.length)) {
+      salmonSlotIndices.add(Math.floor(Math.random() * slots.length));
+    }
 
     for (const key of Object.keys(state.plan)) {
       delete state.plan[key];
@@ -211,8 +302,9 @@
     let prevCarbTypes = new Set();
     let prevMealCarbTypes = new Set();
     const meatFreeDayIndices = new Set();
-    while (meatFreeDayIndices.size < 2 && meatFreeCandidates.length >= 1) {
-      meatFreeDayIndices.add(Math.floor(Math.random() * 7));
+    const meatFreeTarget = Math.round((settings.meatFreeDaysPerWeek || 0) * weeks);
+    while (meatFreeDayIndices.size < Math.min(meatFreeTarget, days.length) && meatFreeCandidates.length >= 1) {
+      meatFreeDayIndices.add(Math.floor(Math.random() * days.length));
     }
     const shuffledMeals = shuffleArray(state.meals);
     const nonSalmonMeals = shuffledMeals.filter(m => !isSalmonMeal(m));
@@ -220,8 +312,8 @@
 
     const allowedForDay = (m, d) => {
       if (!isLongMeal(m)) return true;
-      if (d !== 'Saturday' && d !== 'Sunday') return false;
-      const prevDay = DAYS[DAYS.indexOf(d) - 1];
+      if (settings.longMealsWeekendOnly && !isWeekendDay(d)) return false;
+      const prevDay = days[days.indexOf(d) - 1];
       return !longMealDays.has(prevDay);
     };
     const notUsedThisWeek = (m) => !usedMealNames.has(m.meal_name);
@@ -244,16 +336,16 @@
 
     for (let i = 0; i < slots.length; i++) {
       const { day, mealType } = slots[i];
-      const dayIndex = DAYS.indexOf(day);
+      const dayIndex = days.indexOf(day);
       const needMeatFreeDay = meatFreeDayIndices.has(dayIndex);
-      const isSalmonSlot = i === salmonSlotIndex;
-      const preferQuick = (day === 'Tuesday' || day === 'Thursday') && !isSalmonSlot;
+      const isSalmonSlot = salmonSlotIndices.has(i);
+      const preferQuick = (settings.quickDays || []).includes(weekdayOf(day)) && !isSalmonSlot;
 
       let meal = null;
       let variantName = undefined;
       let sideName = undefined;
 
-      const noCarbOverlap = (m) => hasNoCarbOverlap(m, prevMealCarbTypes);
+      const noCarbOverlap = (m) => !settings.avoidCarbRepeat || hasNoCarbOverlap(m, prevMealCarbTypes);
 
       if (isSalmonSlot && salmonMeals.length > 0) {
         meal = pickFromPool(salmonMeals, day, true, salmonMeals);
@@ -294,7 +386,8 @@
       alert('Add some meals to your library first.');
       return;
     }
-    if (!DAYS.includes(day)) return;
+    const days = planDays();
+    if (!days.includes(day)) return;
 
     clearDay(day);
 
@@ -308,14 +401,14 @@
       const name = getPlannedMeal(d, mt);
       return name && isSalmonMeal(state.meals.find(m => m.meal_name === name));
     });
-    const prevDay = DAYS[DAYS.indexOf(day) - 1];
-    const nextDay = DAYS[DAYS.indexOf(day) + 1];
+    const prevDay = days[days.indexOf(day) - 1];
+    const nextDay = days[days.indexOf(day) + 1];
     const adjacentHasLongMeal = (prevDay && dayHasLongMeal(prevDay)) || (nextDay && dayHasLongMeal(nextDay));
     const adjacentHasSalmon = adjDayHasSalmon(prevDay) || adjDayHasSalmon(nextDay);
     const allowedForDay = (m, d) => {
       if (isSalmonMeal(m) && adjacentHasSalmon) return false;
       if (!isLongMeal(m)) return true;
-      if (d !== 'Saturday' && d !== 'Sunday') return false;
+      if (settings.longMealsWeekendOnly && !isWeekendDay(d)) return false;
       return !adjacentHasLongMeal;
     };
     const usedToday = new Set();
@@ -331,8 +424,8 @@
     })();
 
     for (const mealType of daySlots) {
-      const preferQuick = (day === 'Tuesday' || day === 'Thursday') && daySlots.length === 1;
-      const noCarbOverlap = (m) => hasNoCarbOverlap(m, prevMealCarbTypes);
+      const preferQuick = (settings.quickDays || []).includes(weekdayOf(day)) && daySlots.length === 1;
+      const noCarbOverlap = (m) => !settings.avoidCarbRepeat || hasNoCarbOverlap(m, prevMealCarbTypes);
 
       let pool = shuffledMeals.filter(m => allowedForDay(m, day) && !usedToday.has(m.meal_name) && !isTakeawayMeal(m) && noCarbOverlap(m));
       if (pool.length === 0) pool = shuffledMeals.filter(m => allowedForDay(m, day) && !usedToday.has(m.meal_name) && !isTakeawayMeal(m));
@@ -406,6 +499,47 @@
     discover: null
   };
 
+  // Sync engine is created in init(); saves before that just stay local.
+  let syncRef = null;
+  function markDirty(name) {
+    if (syncRef) syncRef.markDirty(name);
+  }
+
+  /** v1 plans were keyed "Monday|Dinner"; remap onto this week's dates. */
+  function migrateWeekdayPlanKeys() {
+    const weekdayToDate = {};
+    for (const dayKey of planDays().slice(0, 7)) weekdayToDate[weekdayOf(dayKey)] = dayKey;
+    let changed = false;
+    for (const mapName of ['plan', 'planVariants', 'planSides']) {
+      const map = state[mapName];
+      for (const key of Object.keys(map)) {
+        const [day, mealType] = key.split('|');
+        if (WEEKDAYS.includes(day) && weekdayToDate[day]) {
+          map[`${weekdayToDate[day]}|${mealType}`] = map[key];
+          delete map[key];
+          changed = true;
+        }
+      }
+    }
+    if (changed) {
+      savePlan();
+      savePlanVariants();
+      savePlanSides();
+    }
+  }
+
+  /** Drop plan entries older than the visible horizon so the doc never grows unbounded. */
+  function prunePastPlanEntries() {
+    const valid = new Set(planDays());
+    for (const mapName of ['plan', 'planVariants', 'planSides']) {
+      const map = state[mapName];
+      for (const key of Object.keys(map)) {
+        const day = key.split('|')[0];
+        if (/^\d{4}-\d{2}-\d{2}$/.test(day) && !valid.has(day) && day < planDays()[0]) delete map[key];
+      }
+    }
+  }
+
   function loadState() {
     try {
       const mealsJson = localStorage.getItem(STORAGE_MEALS);
@@ -425,30 +559,39 @@
     }
     if (!Array.isArray(state.recipes)) state.recipes = [];
     loadShoppingRemoved();
+    loadSettings();
+    migrateWeekdayPlanKeys();
+    prunePastPlanEntries();
   }
 
   function saveMeals() {
     localStorage.setItem(STORAGE_MEALS, JSON.stringify(state.meals));
+    markDirty('meals');
   }
 
   function savePlan() {
     localStorage.setItem(STORAGE_PLAN, JSON.stringify(state.plan));
+    markDirty('plan');
   }
 
   function savePlanVariants() {
     localStorage.setItem(STORAGE_PLAN_VARIANTS, JSON.stringify(state.planVariants));
+    markDirty('plan');
   }
 
   function savePlanSides() {
     localStorage.setItem(STORAGE_PLAN_SIDES, JSON.stringify(state.planSides));
+    markDirty('plan');
   }
 
   function saveShoppingChecked() {
     localStorage.setItem(STORAGE_SHOPPING_CHECKED, JSON.stringify(state.shoppingChecked));
+    markDirty('plan');
   }
 
   function saveRecipes() {
     localStorage.setItem(STORAGE_RECIPES, JSON.stringify(state.recipes));
+    markDirty('recipes');
   }
 
   function getPlanKey(day, mealType) {
@@ -597,7 +740,7 @@
   function planToCsv() {
     const header = 'day,meal_type,meal_name,variant_name,side_name';
     const rows = [];
-    for (const day of DAYS) {
+    for (const day of planDays()) {
       for (const mealType of getSlotsForDay(day)) {
         const name = getPlannedMeal(day, mealType);
         const variant = getPlannedVariant(day, mealType);
@@ -720,6 +863,7 @@
 
   function saveShoppingRemoved() {
     localStorage.setItem(STORAGE_SHOPPING_REMOVED, JSON.stringify([...shoppingRemoved]));
+    markDirty('plan');
   }
 
   // Morrisons aisle order (more-specific rules first; first match wins)
@@ -762,7 +906,7 @@
   function getShoppingGroups() {
     const acc = new Map();
 
-    for (const day of DAYS) {
+    for (const day of planDays()) {
       for (const mealType of getSlotsForDay(day)) {
         const mealName = getPlannedMeal(day, mealType);
         const meal = mealName ? getMealByName(mealName) : null;
@@ -1418,7 +1562,10 @@
     const isMeal = recipe.category === 'meal';
     const heroContent = recipeThumbHtml(recipe, 'recipe-detail-hero-emoji');
     detail.innerHTML = `
-      <button type="button" class="btn btn-secondary btn-sm" id="back-to-recipes-btn">← All cookbooks</button>
+      <div class="recipe-detail-topbar">
+        <button type="button" class="btn btn-secondary btn-sm" id="back-to-recipes-btn">← Back</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="edit-recipe-btn">✎ Edit</button>
+      </div>
       <div class="recipe-detail-hero">${heroContent}</div>
       <div class="recipe-detail-header">
         <div>
@@ -1472,6 +1619,191 @@
     refreshUI();
     renderRecipes();
     alert(`"${recipe.title}" is now in your meal list.`);
+  }
+
+  // --- Add/Edit Recipe form (in-app; syncs to the shared library) ---
+  const INGREDIENT_UNITS = ['g', 'kg', 'ml', 'l', 'tbsp', 'tsp', 'can', 'cans', 'tin', 'tins', 'clove', 'cloves', 'handful', 'slice', 'slices', 'pack', 'bunch', 'sprig', 'sprigs', 'pinch'];
+
+  /** "400 ml coconut milk (full-fat)" → {qty, unit, name, notes}. Forgiving: plain text becomes just a name. */
+  function parseIngredientLine(line) {
+    const trimmed = String(line || '').trim();
+    if (!trimmed) return null;
+    let rest = trimmed;
+    let notes = null;
+    const noteMatch = rest.match(/\(([^)]*)\)\s*$/);
+    if (noteMatch) {
+      notes = noteMatch[1].trim() || null;
+      rest = rest.slice(0, noteMatch.index).trim();
+    }
+    let qty = '';
+    let unit = '';
+    const qtyMatch = rest.match(/^([\d]+(?:[./-][\d]+)?|½|¼|¾)\s*/);
+    if (qtyMatch) {
+      qty = qtyMatch[1];
+      rest = rest.slice(qtyMatch[0].length);
+      const unitMatch = rest.match(/^([a-zA-Z]+)\s+/);
+      if (unitMatch && INGREDIENT_UNITS.includes(unitMatch[1].toLowerCase())) {
+        unit = unitMatch[1].toLowerCase();
+        rest = rest.slice(unitMatch[0].length);
+      }
+    }
+    const name = rest.trim();
+    if (!name) return null;
+    return { qty, unit, name, notes, emoji: '' };
+  }
+
+  function ingredientToLine(ing) {
+    const qtyUnit = [ing.qty, ing.unit].map(s => String(s || '').trim()).filter(Boolean).join(' ');
+    const notes = ing.notes ? ` (${ing.notes})` : '';
+    return `${qtyUnit ? qtyUnit + ' ' : ''}${ing.name}${notes}`;
+  }
+
+  let editingRecipeId = null;
+
+  function openRecipeFormModal(recipeId) {
+    const overlay = document.getElementById('recipe-form-overlay');
+    if (!overlay) return;
+    editingRecipeId = recipeId || null;
+    const recipe = recipeId ? getRecipeById(recipeId) : null;
+    document.getElementById('recipe-form-modal-title').textContent = recipe ? 'Edit recipe' : 'Add recipe';
+    document.getElementById('rf-title').value = recipe ? recipe.title : '';
+    document.getElementById('rf-category').value = recipe ? (recipe.category || '') : '';
+    document.getElementById('rf-servings').value = recipe ? (recipe.servings || 4) : 4;
+    document.getElementById('rf-image').value = recipe ? (recipe.imageUrl || '') : '';
+    document.getElementById('rf-source').value = recipe ? (recipe.source?.url || '') : '';
+    document.getElementById('rf-tags').value = recipe ? (recipe.tags || []).join(', ') : '';
+    document.getElementById('rf-ingredients').value = recipe ? (recipe.ingredients || []).map(ingredientToLine).join('\n') : '';
+    document.getElementById('rf-steps').value = recipe ? (recipe.steps || []).join('\n') : '';
+    document.getElementById('rf-add-to-meals').checked = !recipe;
+    const err = document.getElementById('recipe-form-error');
+    if (err) err.hidden = true;
+    // Datalist of existing cookbooks for the category field
+    const datalist = document.getElementById('rf-category-options');
+    if (datalist) {
+      const cats = [...new Set(state.recipes.map(r => r.category).filter(Boolean))].sort();
+      datalist.innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">`).join('');
+    }
+    openOverlayById(overlay.id);
+  }
+
+  function handleRecipeFormSubmit(e) {
+    e.preventDefault();
+    const err = document.getElementById('recipe-form-error');
+    const showError = (msg) => { if (err) { err.textContent = msg; err.hidden = false; } };
+    const title = document.getElementById('rf-title').value.trim();
+    const ingredients = document.getElementById('rf-ingredients').value.split('\n').map(parseIngredientLine).filter(Boolean);
+    const steps = document.getElementById('rf-steps').value.split('\n').map(s => s.trim()).filter(Boolean);
+    if (!title) return showError('Give the recipe a title.');
+    if (ingredients.length === 0) return showError('Add at least one ingredient (one per line).');
+    if (steps.length === 0) return showError('Add at least one step (one per line).');
+    const sourceUrl = document.getElementById('rf-source').value.trim();
+    const existing = editingRecipeId ? getRecipeById(editingRecipeId) : null;
+    const recipe = {
+      id: existing ? existing.id : makeRecipeId(title),
+      title,
+      source: { type: sourceUrl ? 'web' : 'manual', url: sourceUrl || null, label: null },
+      imageUrl: document.getElementById('rf-image').value.trim() || null,
+      servings: Number.parseInt(document.getElementById('rf-servings').value, 10) || 4,
+      category: document.getElementById('rf-category').value.trim() || 'Other mains',
+      tags: document.getElementById('rf-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+      ingredients,
+      steps,
+      notes: existing ? (existing.notes || '') : '',
+      createdAt: existing ? existing.createdAt : new Date().toISOString(),
+      mealName: existing ? existing.mealName : null
+    };
+    upsertRecipes([recipe]);
+
+    // Optionally make it plannable straight away
+    if (document.getElementById('rf-add-to-meals').checked && !getMealByName(title)) {
+      const meal = { meal_name: title, ingredients: ingredients.map(ingredientToLine), category: recipe.category };
+      if (recipe.imageUrl) meal.image_url = recipe.imageUrl;
+      if (recipe.tags.some(t => /quick|30 min|15 min/i.test(t))) meal.quick = true;
+      state.meals.push(meal);
+      saveMeals();
+      recipe.mealName = title;
+      saveRecipes();
+    }
+
+    closeOverlay('recipe-form-overlay');
+    editingRecipeId = null;
+    renderMealLibrary();
+    renderRecipesList();
+    refreshUI();
+  }
+
+  // --- Settings ---
+  function openSettingsModal() {
+    const overlay = document.getElementById('settings-overlay');
+    if (!overlay) return;
+    document.getElementById('set-horizon').value = String(settings.horizonDays);
+    document.getElementById('set-weekend-lunch').checked = !!settings.weekendLunch;
+    document.querySelectorAll('#set-quick-days input[type="checkbox"]').forEach(cb => {
+      cb.checked = (settings.quickDays || []).includes(cb.value);
+    });
+    document.getElementById('set-salmon').value = String(settings.salmonPerWeek);
+    document.getElementById('set-meatfree').value = String(settings.meatFreeDaysPerWeek);
+    document.getElementById('set-long-weekend').checked = !!settings.longMealsWeekendOnly;
+    document.getElementById('set-carb-repeat').checked = !!settings.avoidCarbRepeat;
+    document.getElementById('set-notify-time').value = settings.notifyTime || '08:00';
+    document.getElementById('set-family-key').value = getFamilyKey();
+    updateSyncStatusLine();
+    updateRemindersUI();
+    openOverlayById(overlay.id);
+  }
+
+  function updateSyncStatusLine(text) {
+    const el = document.getElementById('sync-status-line');
+    if (!el) return;
+    if (text) { el.textContent = text; return; }
+    el.textContent = syncEnabled()
+      ? 'Sync is on — changes share between devices within ~30 seconds.'
+      : 'Enter your family key to share meals, recipes and the plan between devices.';
+  }
+
+  async function updateRemindersUI() {
+    const btn = document.getElementById('enable-reminders-btn');
+    const note = document.getElementById('reminders-note');
+    if (!btn || !note) return;
+    if (!canUsePush()) {
+      btn.disabled = true;
+      note.textContent = isStandalone()
+        ? 'Notifications need iOS 16.4+.'
+        : 'To get daily reminders on iPhone: Share → Add to Home Screen, then open the app from there.';
+      return;
+    }
+    const enabled = await remindersEnabled();
+    btn.disabled = enabled;
+    btn.textContent = enabled ? '✓ Reminders on' : 'Enable reminders on this phone';
+    note.textContent = enabled
+      ? `You'll get the day's plan at ${settings.notifyTime || '08:00'}.`
+      : 'Get a notification each morning with the day\'s meal and any prep.';
+  }
+
+  function handleSettingsSave(e) {
+    e.preventDefault();
+    settings.horizonDays = Number(document.getElementById('set-horizon').value) || 7;
+    settings.weekendLunch = document.getElementById('set-weekend-lunch').checked;
+    settings.quickDays = [...document.querySelectorAll('#set-quick-days input:checked')].map(cb => cb.value);
+    settings.salmonPerWeek = Number(document.getElementById('set-salmon').value) || 0;
+    settings.meatFreeDaysPerWeek = Number(document.getElementById('set-meatfree').value) || 0;
+    settings.longMealsWeekendOnly = document.getElementById('set-long-weekend').checked;
+    settings.avoidCarbRepeat = document.getElementById('set-carb-repeat').checked;
+    settings.notifyTime = document.getElementById('set-notify-time').value || '08:00';
+    saveSettings();
+
+    const keyInput = document.getElementById('set-family-key').value.trim();
+    const hadKey = syncEnabled();
+    setFamilyKey(keyInput);
+    if (keyInput && !hadKey && syncRef) {
+      updateSyncStatusLine('Connecting…');
+      syncRef.seedIfEmpty()
+        .then(() => { syncRef.start(); updateSyncStatusLine(); })
+        .catch(() => updateSyncStatusLine('Could not connect — check the key.'));
+    }
+
+    closeOverlay('settings-overlay');
+    refreshUI();
   }
 
   function buildRecipePrompt() {
@@ -1670,19 +2002,20 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     const grid = document.getElementById('planner-grid');
     if (!grid) return;
     grid.innerHTML = '';
-    for (const day of DAYS) {
+    for (const day of planDays()) {
       const slots = getSlotsForDay(day);
       const col = document.createElement('div');
-      col.className = 'planner-day';
+      col.className = 'planner-day' + (isTodayKey(day) ? ' planner-day-today' : '');
       col.dataset.day = day;
 
+      const label = dayLabel(day);
       const headerEl = document.createElement('div');
       headerEl.className = 'planner-day-header';
       headerEl.innerHTML = `
-        <span class="planner-day-name" title="${escapeHtml(day)}"><span class="planner-day-name-long">${escapeHtml(day)}</span><span class="planner-day-name-short">${escapeHtml(dayAbbrev(day))}</span></span>
+        <span class="planner-day-name" title="${escapeHtml(label)}"><span class="planner-day-name-long">${escapeHtml(label)}</span><span class="planner-day-name-short">${escapeHtml(dayAbbrev(day))}</span>${isTodayKey(day) ? '<span class="planner-today-pill">Today</span>' : ''}</span>
         <span class="planner-day-toolbar">
-          <button type="button" class="btn-icon random-day-btn" title="Random meals for ${escapeHtml(day)}" data-day="${escapeHtml(day)}" aria-label="Random meals for ${escapeHtml(day)}">&#127922;</button>
-          <button type="button" class="btn-icon clear-day-btn" title="Clear ${day}" data-day="${escapeHtml(day)}" aria-label="Clear ${escapeHtml(day)}">&times;</button>
+          <button type="button" class="btn-icon random-day-btn" title="Random meals for ${escapeHtml(label)}" data-day="${escapeHtml(day)}" aria-label="Random meals for ${escapeHtml(label)}">&#127922;</button>
+          <button type="button" class="btn-icon clear-day-btn" title="Clear ${escapeHtml(label)}" data-day="${escapeHtml(day)}" aria-label="Clear ${escapeHtml(label)}">&times;</button>
         </span>`;
 
       const slotsWrap = document.createElement('div');
@@ -1692,13 +2025,13 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         const mealName = getPlannedMeal(day, mealType);
         const variantName = getPlannedVariant(day, mealType);
         const sideName = getPlannedSide(day, mealType);
-        const meal = getMealByName(mealName);
-        const emoji = meal ? getMealEmoji(meal) : '';
-        let displayName = variantName ? `${mealName} (${variantName})` : mealName;
-        if (sideName && sideName !== SIDE_NONE) displayName += ' with ' + sideName;
+        const isLeftovers = isLeftoversName(mealName);
+        const meal = isLeftovers ? null : getMealByName(mealName);
+        const emoji = isLeftovers ? '🍲' : (meal ? getMealEmoji(meal) : '');
+        const displayName = mealName ? plannedDisplayName(mealName, variantName, sideName) : mealName;
         const slotId = `slot-${day}-${mealType}`;
         const slotDiv = document.createElement('div');
-        slotDiv.className = 'planner-slot' + (mealName ? '' : ' empty');
+        slotDiv.className = 'planner-slot' + (mealName ? '' : ' empty') + (isLeftovers ? ' leftovers' : '');
         slotDiv.dataset.day = day;
         slotDiv.dataset.mealType = mealType;
         slotDiv.id = slotId;
@@ -1753,12 +2086,13 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     const meatFreeByDay = new Set();
     const carbCounts = { rice: 0, pasta: 0, pizza: 0, potato: 0 };
     let salmonCount = 0;
-    for (const day of DAYS) {
+    for (const day of planDays()) {
       const slots = getSlotsForDay(day);
       let dayHasMeat = false;
       let dayHasAnyMeal = false;
       for (const mealType of slots) {
         const mealName = getPlannedMeal(day, mealType);
+        if (isLeftoversName(mealName)) { dayHasAnyMeal = true; continue; }
         const meal = getMealByName(mealName);
         if (!meal) continue;
         dayHasAnyMeal = true;
@@ -1962,10 +2296,24 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
 
     // Pick a meal first (entry from empty slot)
     if (s.step === 'pickMeal') {
-      heading.textContent = `Pick meal for ${s.targetDay} ${s.targetMealType}`;
+      heading.textContent = `Pick meal for ${dayLabel(s.targetDay)} ${s.targetMealType}`;
       hint.textContent = 'Tap a meal to add it to this slot.';
       subtitle.innerHTML = '';
       if (backBtn) backBtn.hidden = true;
+
+      // Leftovers: plannable without ingredients; optional note of what it's leftovers of.
+      const leftoversBtn = document.createElement('button');
+      leftoversBtn.type = 'button';
+      leftoversBtn.className = 'btn btn-secondary btn-block assign-meal-pick-btn assign-leftovers-btn';
+      leftoversBtn.innerHTML = '<span class="meal-emoji-display">🍲</span>Leftovers';
+      leftoversBtn.addEventListener('click', () => {
+        const note = prompt('Leftovers of what? (optional)') || '';
+        setPlannedMeal(s.targetDay, s.targetMealType, LEFTOVERS, note.trim() || undefined);
+        closeAssignMealModal();
+        refreshUI();
+      });
+      body.appendChild(leftoversBtn);
+
       const meals = state.meals.slice().sort((a, b) => a.meal_name.localeCompare(b.meal_name));
       if (meals.length === 0) {
         body.innerHTML = '<p class="assign-meal-hint">No meals yet — add one from the Meals tab.</p>';
@@ -2051,12 +2399,12 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       const canBack = (meal.variants && meal.variants.length > 0) || (meal.sides && meal.sides.length > 0);
       backBtn.hidden = !canBack;
     }
-    for (const day of DAYS) {
+    for (const day of planDays()) {
       for (const mealType of getSlotsForDay(day)) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn btn-secondary btn-block assign-slot-btn';
-        btn.textContent = `${day} · ${mealType}`;
+        btn.textContent = `${dayLabel(day)} · ${mealType}`;
         btn.addEventListener('click', () => {
           setPlannedMeal(day, mealType, mealName, s.variantName || undefined, s.sideName || undefined);
           closeAssignMealModal();
@@ -2193,8 +2541,9 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
 
   function openPlannedMealActions(day, mealType) {
     const mealName = getPlannedMeal(day, mealType);
-    const meal = mealName ? getMealByName(mealName) : null;
-    if (!meal) return;
+    const isLeftovers = isLeftoversName(mealName);
+    const meal = (mealName && !isLeftovers) ? getMealByName(mealName) : null;
+    if (!meal && !isLeftovers) return;
     const variantName = getPlannedVariant(day, mealType);
     const sideName = getPlannedSide(day, mealType);
 
@@ -2208,11 +2557,9 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     assignFlowState = null;
     if (backBtn) backBtn.hidden = true;
     body.innerHTML = '';
-    heading.textContent = `${day} · ${mealType}`;
-    const emoji = getMealEmoji(meal);
-    let label = mealName;
-    if (variantName) label += ` (${variantName})`;
-    if (sideName && sideName !== SIDE_NONE) label += ` with ${sideName}`;
+    heading.textContent = `${dayLabel(day)} · ${mealType}`;
+    const emoji = isLeftovers ? '🍲' : getMealEmoji(meal);
+    const label = plannedDisplayName(mealName, variantName, sideName);
     subtitle.innerHTML = (emoji ? `<span class="meal-emoji-display">${escapeHtml(emoji)}</span>` : '') + escapeHtml(label);
     hint.textContent = 'What would you like to do?';
 
@@ -2228,7 +2575,21 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     });
     body.appendChild(replaceBtn);
 
-    if (meal.variants && meal.variants.length > 0) {
+    if (!isLeftovers) {
+      // One tap to swap tonight's plan for leftovers — keeps what it replaced as the note.
+      const loBtn = document.createElement('button');
+      loBtn.type = 'button';
+      loBtn.className = 'btn btn-secondary btn-block';
+      loBtn.textContent = '🍲 Use leftovers instead';
+      loBtn.addEventListener('click', () => {
+        setPlannedMeal(day, mealType, LEFTOVERS, `instead of ${mealName}`);
+        close();
+        refreshUI();
+      });
+      body.appendChild(loBtn);
+    }
+
+    if (meal && meal.variants && meal.variants.length > 0) {
       const vBtn = document.createElement('button');
       vBtn.type = 'button';
       vBtn.className = 'btn btn-secondary btn-block';
@@ -2242,7 +2603,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       body.appendChild(vBtn);
     }
 
-    if (meal.sides && meal.sides.length > 0) {
+    if (meal && meal.sides && meal.sides.length > 0) {
       const sBtn = document.createElement('button');
       sBtn.type = 'button';
       sBtn.className = 'btn btn-secondary btn-block';
@@ -2695,14 +3056,89 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
   }
 
   // --- Init ---
+  function createSyncEngine() {
+    return createSync({
+      docs: {
+        meals: {
+          collect: () => ({ meals: state.meals }),
+          apply: (data) => {
+            if (!data || !Array.isArray(data.meals)) return;
+            state.meals = data.meals;
+            localStorage.setItem(STORAGE_MEALS, JSON.stringify(state.meals));
+          },
+          merge: (local, server) => ({ meals: mergeArraysBy(m => m.meal_name, (local || {}).meals, (server || {}).meals) })
+        },
+        recipes: {
+          collect: () => ({ recipes: state.recipes }),
+          apply: (data) => {
+            if (!data || !Array.isArray(data.recipes)) return;
+            state.recipes = data.recipes;
+            localStorage.setItem(STORAGE_RECIPES, JSON.stringify(state.recipes));
+          },
+          merge: (local, server) => ({ recipes: mergeArraysBy(r => String(r.id), (local || {}).recipes, (server || {}).recipes) })
+        },
+        plan: {
+          collect: () => ({
+            plan: state.plan,
+            planVariants: state.planVariants,
+            planSides: state.planSides,
+            shoppingChecked: state.shoppingChecked,
+            shoppingRemoved: [...shoppingRemoved]
+          }),
+          apply: (data) => {
+            if (!data) return;
+            state.plan = data.plan || {};
+            state.planVariants = data.planVariants || {};
+            state.planSides = data.planSides || {};
+            state.shoppingChecked = data.shoppingChecked || {};
+            shoppingRemoved = new Set(data.shoppingRemoved || []);
+            localStorage.setItem(STORAGE_PLAN, JSON.stringify(state.plan));
+            localStorage.setItem(STORAGE_PLAN_VARIANTS, JSON.stringify(state.planVariants));
+            localStorage.setItem(STORAGE_PLAN_SIDES, JSON.stringify(state.planSides));
+            localStorage.setItem(STORAGE_SHOPPING_CHECKED, JSON.stringify(state.shoppingChecked));
+            localStorage.setItem(STORAGE_SHOPPING_REMOVED, JSON.stringify([...shoppingRemoved]));
+          },
+          merge: (local, server) => ({
+            plan: mergeMaps((local || {}).plan, (server || {}).plan),
+            planVariants: mergeMaps((local || {}).planVariants, (server || {}).planVariants),
+            planSides: mergeMaps((local || {}).planSides, (server || {}).planSides),
+            shoppingChecked: mergeMaps((local || {}).shoppingChecked, (server || {}).shoppingChecked),
+            shoppingRemoved: [...new Set([...((local || {}).shoppingRemoved || []), ...((server || {}).shoppingRemoved || [])])]
+          })
+        },
+        settings: {
+          collect: () => settings,
+          apply: (data) => {
+            if (!data) return;
+            settings = { ...SETTINGS_DEFAULTS, ...data };
+            localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
+          },
+          merge: (local, server) => ({ ...(server || {}), ...(local || {}) })
+        }
+      },
+      onApplied: () => {
+        renderMealLibrary();
+        refreshUI();
+        renderRecipes();
+      },
+      onStatus: (s) => {
+        if (s === 'error') updateSyncStatusLine('Sync error — check the family key in Settings.');
+      }
+    });
+  }
+
   function init() {
     loadState();
+    syncRef = createSyncEngine();
 
     function finishInit() {
       renderMealLibrary();
       refreshUI();
       renderRecipesList();
       wireEventListeners();
+      syncRef.start();
+      registerServiceWorker();
+      revalidateSubscription();
     }
 
     const mealsPromise = state.meals.length === 0
@@ -2865,6 +3301,30 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
 
     document.getElementById('recipes-btn')?.addEventListener('click', () => showAppPanel('recipes'));
     document.getElementById('close-recipes-btn')?.addEventListener('click', () => showAppPanel('planner'));
+    document.getElementById('settings-btn')?.addEventListener('click', openSettingsModal);
+    document.getElementById('settings-form')?.addEventListener('submit', handleSettingsSave);
+    document.getElementById('settings-cancel')?.addEventListener('click', () => closeOverlay('settings-overlay'));
+    document.getElementById('enable-reminders-btn')?.addEventListener('click', async () => {
+      const note = document.getElementById('reminders-note');
+      try {
+        await enableReminders();
+        updateRemindersUI();
+      } catch (err) {
+        if (note) note.textContent = err.message;
+      }
+    });
+    document.getElementById('test-notification-btn')?.addEventListener('click', async () => {
+      const note = document.getElementById('reminders-note');
+      try {
+        const r = await sendTestNotification();
+        if (note) note.textContent = `Test sent to ${r.sent || 0} device(s).`;
+      } catch (err) {
+        if (note) note.textContent = err.message;
+      }
+    });
+    document.getElementById('add-recipe-form-btn')?.addEventListener('click', () => openRecipeFormModal());
+    document.getElementById('recipe-form')?.addEventListener('submit', handleRecipeFormSubmit);
+    document.getElementById('recipe-form-cancel')?.addEventListener('click', () => closeOverlay('recipe-form-overlay'));
     document.getElementById('add-recipe-btn')?.addEventListener('click', openRecipeModal);
     document.getElementById('recipe-modal-cancel')?.addEventListener('click', closeRecipeModal);
     document.getElementById('recipe-wizard-back')?.addEventListener('click', () => setRecipeWizardStep(recipeWizardStep - 1));
@@ -2889,21 +3349,23 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       if (e.target.closest('#back-to-recipes-btn')) {
         e.preventDefault();
         e.stopPropagation();
+        // Return to the cookbook the recipe was opened from (or the cookbook grid)
+        const cameFrom = activeCookbook;
         activeRecipeId = null;
-        activeCookbook = null;
-        recipesView = 'cookbooks';
-        // Defensive: force the visibility flip immediately so the navigation feels instant
+        recipesView = cameFrom ? 'cookbook' : 'cookbooks';
         const list = document.getElementById('recipes-list');
         const detail = document.getElementById('recipe-detail');
         if (detail) detail.hidden = true;
         if (list) list.hidden = false;
         renderRecipes();
-        // Scroll the recipes panel back to the top so the user lands on the cookbook grid
         const panel = document.querySelector('.recipes-panel');
         if (panel) panel.scrollTop = 0;
         return;
       }
-      if (e.target.closest('#copy-recipe-to-meal-btn')) copyRecipeToMeal(activeRecipeId);
+      if (e.target.closest('#edit-recipe-btn')) {
+        openRecipeFormModal(activeRecipeId);
+        return;
+      }
       const copyBtn = e.target.closest('#copy-ingredients-btn');
       if (copyBtn) copyRecipeIngredients(activeRecipeId, copyBtn);
     });
@@ -2921,7 +3383,16 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     initMobileTabs();
   }
 
+  let currentPanel = null;
+
   function showAppPanel(name) {
+    // Fix: tapping the Recipes tab while a recipe is open used to re-render the
+    // same detail view, so there was no way back to the list from the tab bar.
+    if (name === 'recipes' && currentPanel === 'recipes' && activeRecipeId) {
+      activeRecipeId = null;
+      recipesView = activeCookbook ? 'cookbook' : 'cookbooks';
+    }
+    currentPanel = name;
     const panels = {
       planner: document.querySelector('.planner'),
       sidebar: document.querySelector('.sidebar'),
@@ -2950,4 +3421,3 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
   } else {
     init();
   }
-})();

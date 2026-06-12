@@ -1,92 +1,56 @@
-# Meal Planner
+# The Marnoch Pantry (v2)
 
-A simple **weekly meal planner** in the browser: build a **meal library** with ingredients, drag meals onto the week, and get an **automatic shopping list**. Built with plain **HTML, CSS, and JavaScript** (no build step).
+A family **meal planner** PWA: shared meal/recipe library, a date-based plan (7 / 10 / 14 days), automatic Morrisons-ordered shopping list, **cross-device sync**, and **daily push notifications** — all free, hosted on Cloudflare.
 
-- **Weekdays:** dinner slots only  
-- **Weekends:** lunch + dinner  
-- **First visit:** if [`meals.csv`](meals.csv) is present next to the app (e.g. on GitHub Pages), that **default meal library** loads automatically and the setup wizard is skipped. Otherwise the wizard walks you through adding meals.  
-- **Data:** your plan and edits are stored in **localStorage** on that device only (not sent to a server)
+Plain **HTML, CSS, and JavaScript** (ES modules, no build step) + one **Cloudflare Worker** (`worker/`) for the API, sync storage (KV), and the notification cron.
 
-## Features
+## What's new in v2
 
-- Meal library with variants, sides, and comma-separated ingredients  
-- Weekly planner + shopping list (with checkboxes)  
-- **Shared recipe library** via committed [`recipes.json`](recipes.json) (loaded on every visit when the file is available — ideal for a household after GitHub Pages redeploys)  
-- **Share** / **Import** for the full plan (link, QR, or JSON file)  
-- **Import / export meals** as CSV; **export plan** as CSV  
+- **Sync between phones** — meals, recipes, plan, shopping ticks and settings share via a "family key" (Settings ⚙). No accounts.
+- **Add recipes in the app** — Recipes → **+ Add recipe**. Either partner can add/edit; it syncs everywhere. No more git commits to add a recipe.
+- **7 / 10 / 14-day plans** — Settings → Plan length. Slots are keyed by real dates; "Today" is highlighted.
+- **Leftovers** — pick "Leftovers" for any slot, or tap a planned meal → "🍲 Use leftovers instead". Excluded from the shopping list.
+- **Daily reminder** — push notification each morning with the day's meal(s) and defrost-type prep. Needs the app added to the iPhone Home Screen (iOS 16.4+), then Settings → Enable reminders.
+- **Configurable rules** — quick-meal days, salmon/week, meat-free days, weekend-only big meals, carb-repeat avoidance: all in Settings instead of hardcoded.
+- **New look** — clean white Mob-style refresh; bug fixed where the Recipes tab couldn't get you back from an open recipe.
 
-## Recipes (batch library + device backup)
+## Repo layout
 
-The **canonical recipe list** for everyone using the deployed app lives in **`recipes.json`** in this repo. After you push, GitHub Pages serves the new file and all visitors get the same library on refresh.
-
-- **Extract recipe** (in the app): step through **Source → Extract → Validate**. Build a prompt for Claude or ChatGPT, copy model output, and use **Validate JSON** to check it before you commit.  
-- **Copy prompt & open Claude** copies the prompt and opens a new chat; you can also use **Open Claude** / **Open ChatGPT** links.  
-- **Paste from clipboard** (validate step) helps on mobile when the model returns JSON.  
-- The parser accepts a bare object, an array, or JSON wrapped in fenced code blocks from chat tools (markdown-style fences are stripped).  
-- **Export backup** downloads a JSON snapshot of whatever is on **this device** (merged library + local drafts + your notes).  
-- **Import backup file** merges that snapshot into this browser only — it does **not** update the shared repo.  
-- Meal-type recipes can still be copied into the **Meal Library** from a recipe card.  
-- Per-recipe **comments** and “in meal list” state stay on the device when they differ from the file (same `id` = your local notes overlay the shared record).
-
-### Batch workflow (add a recipe for everyone)
-
-1. On phone or desktop, open the app → **Recipes** → **Extract recipe** and complete the steps.  
-2. In Claude or ChatGPT, paste the prompt plus your link or screenshot; copy the JSON it returns.  
-3. On a laptop (or GitHub’s web editor), append the object to the **`recipes.json`** array (or add a new object if it’s a single recipe).  
-4. Validate syntax, e.g. `python3 -m json.tool recipes.json > /tmp/out.json && mv /tmp/out.json recipes.json`  
-5. `git add recipes.json && git commit -m "Add recipe" && git push`  
-6. Wait for GitHub Pages to redeploy, then refresh the app — you and anyone else using the site see the new recipes.
-
-If **`recipes.json` fails to load** (offline, opening as `file://`, or file missing), the app keeps using the last **localStorage** copy from the previous successful load, including any **local-only drafts** (recipes with ids not in the file).
-
-## Default meals (`meals.csv`)
-
-Commit a **`meals.csv`** in the repo root (same folder as `index.html`). The app **fetches it only when the meal library is empty** (new visitor or cleared storage), then saves a copy into `localStorage`. Update the CSV in git and redeploy to change the defaults for new users; existing users keep their saved library until they clear site data or re-import.
-
-Use **Export meals CSV** in the app to regenerate the file after editing meals in the UI.
-
-**Note:** `fetch` needs a real URL. Opening `index.html` as `file://` often **cannot** load `meals.csv` or `recipes.json`; use a local server (below) or GitHub Pages.
+```
+public/    the app (deployed as static assets)
+worker/    Cloudflare Worker: /api/* + daily notification cron + web push
+scripts/   generate-vapid-keys.mjs (one-off)
+wrangler.toml
+```
 
 ## Run locally
 
-Open `index.html` in a browser, or serve the folder so all assets load reliably:
-
 ```bash
-cd /path/to/meal-planner
-python3 -m http.server 8080
-# visit http://localhost:8080
+npx wrangler dev          # app + API + local KV on http://localhost:8788
+# put FAMILY_KEY=somekey in .dev.vars (gitignored) for local sync testing
 ```
 
-## Deploy (GitHub Pages)
+## One-time Cloudflare setup
 
-If this repo is **`your-username/meal-planner`** and Pages is enabled on the **`main`** branch from the **root** (`/`), the app is usually available at:
+1. Create a free account at dash.cloudflare.com (no card needed).
+2. `npx wrangler login`
+3. `npx wrangler kv namespace create PANTRY` → paste the printed id into `wrangler.toml` (`id = "..."`).
+4. Secrets:
+   ```bash
+   npx wrangler secret put FAMILY_KEY          # invent a long random phrase
+   node scripts/generate-vapid-keys.mjs        # prints the two VAPID values
+   npx wrangler secret put VAPID_PUBLIC_KEY
+   npx wrangler secret put VAPID_PRIVATE_KEY
+   ```
+5. `npx wrangler deploy` → app live at `https://marnoch-pantry.<account>.workers.dev`
+6. On each phone: open the URL → Share → **Add to Home Screen** → open the app → Settings ⚙ → enter the family key → **Enable reminders**.
 
-**`https://your-username.github.io/meal-planner/`**
+Day-to-day deploys: `npx wrangler deploy` after changes (or connect the repo in the Cloudflare dashboard via Workers Builds for deploy-on-push).
 
-Enable it in the repo: **Settings → Pages → Build and deployment → Branch: `main` / folder: `/`**.
+## Rollback
 
-## Sharing your **public GitHub repo**
+The pre-v2 app is tagged **`v1`** (GitHub Pages version): `git checkout v1`.
 
-Once the repo is **public** on your personal account, anyone can use it with the normal GitHub URL:
+## Data & privacy
 
-| What to share | URL pattern |
-|---------------|-------------|
-| Repo (code, README, stars) | `https://github.com/<your-username>/meal-planner` |
-| Clone (HTTPS) | `https://github.com/<your-username>/meal-planner.git` |
-| Live app (if Pages is on) | `https://<your-username>.github.io/meal-planner/` |
-
-**Practical tips:**
-
-1. **Copy the URL** from the browser when you’re on the repo’s main page — that’s the link to share for “here’s the project.”  
-2. **README** (this file) is what people see first on GitHub; keep it updated.  
-3. **Description & website:** Repo **Settings → General** — set a short description and optionally **Website** to your GitHub Pages URL.  
-4. **Topics:** On the repo main page, click **⚙️** next to “About” and add tags like `meal-planner`, `javascript`, `static-site` so others can discover it.  
-5. **Stars / forks:** On a public repo, **Star** and **Fork** are visible to everyone; you don’t need to do anything extra for “sharing” beyond making the repo public (which you already did).
-
-## Privacy note
-
-Your **weekly plan** and **device-specific recipe notes / backups** live in the visitor’s browser. The **default meal list** and **shared recipes** are whatever you commit as `meals.csv` and `recipes.json` (public if the repo is public). Sharing a **Share** link or file sends that plan snapshot to whoever you give it to.
-
-## License
-
-Add a `LICENSE` file if you want to specify how others may use the code (e.g. MIT).
+Shared data (meals, recipes, plan, settings) lives in Cloudflare KV, readable/writable only with the family key. Each device keeps a localStorage copy and works offline; changes sync when back online. `public/recipes.json` and `public/meals.csv` remain as seed/backup data.

@@ -19,6 +19,7 @@
     <h1>The Marnoch Pantry</h1>
     <div class="header-actions">
       <button type="button" class="btn btn-secondary btn-sm" id="recipes-btn">Recipes</button>
+      <button type="button" class="btn btn-secondary btn-sm" id="settings-btn" aria-label="Settings" title="Settings">⚙︎</button>
     </div>
   </header>
 
@@ -59,6 +60,7 @@
       </header>
       <div class="recipes-controls">
         <input type="search" id="recipe-search" placeholder="Search recipes">
+        <button type="button" class="btn btn-primary btn-sm" id="add-recipe-form-btn">+ Add recipe</button>
       </div>
       <div id="recipes-list" class="recipes-list" role="list"></div>
       <div id="recipe-detail" class="recipe-detail" hidden></div>
@@ -172,6 +174,121 @@
   </div>
 
 
-  <script src="app.js"></script>
+  <!-- Add/Edit Recipe modal -->
+  <div id="recipe-form-overlay" class="modal-overlay" aria-hidden="true">
+    <div class="modal">
+      <button type="button" class="modal-close-btn" data-close-target="recipe-form-overlay" aria-label="Close">×</button>
+      <h2 id="recipe-form-modal-title">Add recipe</h2>
+      <form id="recipe-form">
+        <label for="rf-title">Title</label>
+        <input type="text" id="rf-title" required placeholder="e.g. Coconut Chicken Curry">
+        <div class="form-row">
+          <div>
+            <label for="rf-category">Cookbook</label>
+            <input type="text" id="rf-category" list="rf-category-options" placeholder="e.g. Indian & curries">
+            <datalist id="rf-category-options"></datalist>
+          </div>
+          <div>
+            <label for="rf-servings">Serves</label>
+            <input type="number" id="rf-servings" min="1" max="12" value="4">
+          </div>
+        </div>
+        <label for="rf-ingredients">Ingredients — one per line, e.g. <code>400 ml coconut milk (full-fat)</code></label>
+        <textarea id="rf-ingredients" rows="6" required placeholder="400 ml coconut milk&#10;2 chicken breasts&#10;1 tbsp curry powder"></textarea>
+        <label for="rf-steps">Method — one step per line</label>
+        <textarea id="rf-steps" rows="5" required placeholder="Fry the onion until soft.&#10;Add the chicken and brown."></textarea>
+        <label for="rf-tags">Tags (comma-separated)</label>
+        <input type="text" id="rf-tags" placeholder="quick, freezer friendly, 30 minutes">
+        <label for="rf-image">Photo URL (optional)</label>
+        <input type="url" id="rf-image" placeholder="https://…">
+        <label for="rf-source">Source URL (optional)</label>
+        <input type="url" id="rf-source" placeholder="https://…">
+        <label class="meal-quick-label">
+          <input type="checkbox" id="rf-add-to-meals" checked>
+          Also add to the meal library (so it can be planned)
+        </label>
+        <p id="recipe-form-error" class="form-error" hidden></p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="recipe-form-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save recipe</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Settings modal -->
+  <div id="settings-overlay" class="modal-overlay" aria-hidden="true">
+    <div class="modal">
+      <button type="button" class="modal-close-btn" data-close-target="settings-overlay" aria-label="Close">×</button>
+      <h2>Settings</h2>
+      <form id="settings-form">
+        <h3 class="settings-section-title">Planning</h3>
+        <label for="set-horizon">Plan length</label>
+        <select id="set-horizon">
+          <option value="7">1 week</option>
+          <option value="10">10 days</option>
+          <option value="14">2 weeks</option>
+        </select>
+        <label class="meal-quick-label">
+          <input type="checkbox" id="set-weekend-lunch">
+          Plan lunches on weekends
+        </label>
+        <label>Quick-meal days (busy evenings)</label>
+        <div id="set-quick-days" class="quick-days-row">
+          <label><input type="checkbox" value="Monday">Mon</label>
+          <label><input type="checkbox" value="Tuesday">Tue</label>
+          <label><input type="checkbox" value="Wednesday">Wed</label>
+          <label><input type="checkbox" value="Thursday">Thu</label>
+          <label><input type="checkbox" value="Friday">Fri</label>
+          <label><input type="checkbox" value="Saturday">Sat</label>
+          <label><input type="checkbox" value="Sunday">Sun</label>
+        </div>
+        <div class="form-row">
+          <div>
+            <label for="set-salmon">Salmon meals / week</label>
+            <select id="set-salmon"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select>
+          </div>
+          <div>
+            <label for="set-meatfree">Meat-free days / week</label>
+            <select id="set-meatfree"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
+          </div>
+        </div>
+        <label class="meal-quick-label">
+          <input type="checkbox" id="set-long-weekend">
+          Big meals (roasts, lasagne) on weekends only
+        </label>
+        <label class="meal-quick-label">
+          <input type="checkbox" id="set-carb-repeat">
+          Avoid the same carb two meals in a row
+        </label>
+
+        <h3 class="settings-section-title">Sync between phones</h3>
+        <label for="set-family-key">Family key</label>
+        <input type="password" id="set-family-key" autocomplete="off" placeholder="Shared key — same on both phones">
+        <p id="sync-status-line" class="form-hint"></p>
+
+        <h3 class="settings-section-title">Daily reminder</h3>
+        <label for="set-notify-time">Send at</label>
+        <select id="set-notify-time">
+          <option value="07:00">07:00</option>
+          <option value="08:00">08:00</option>
+          <option value="09:00">09:00</option>
+          <option value="12:00">12:00</option>
+          <option value="16:00">16:00</option>
+          <option value="17:00">17:00</option>
+        </select>
+        <button type="button" class="btn btn-secondary btn-block" id="enable-reminders-btn">Enable reminders on this phone</button>
+        <button type="button" class="btn btn-secondary btn-block" id="test-notification-btn">Send a test notification</button>
+        <p id="reminders-note" class="form-hint"></p>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="settings-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
 </body>
 </html>

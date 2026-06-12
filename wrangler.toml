@@ -1,0 +1,22 @@
+name = "marnoch-pantry"
+main = "worker/index.js"
+compatibility_date = "2026-06-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# Hourly: the worker checks the household's notification time (Europe/London)
+# and only sends once per day, so the cron itself needs no timezone logic.
+[triggers]
+crons = ["0 * * * *"]
+
+[[kv_namespaces]]
+binding = "PANTRY"
+# Replace with the id printed by: wrangler kv namespace create PANTRY
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+# Secrets (set with `wrangler secret put <NAME>`):
+#   FAMILY_KEY        — shared key both phones enter once
+#   VAPID_PUBLIC_KEY  — base64url, from scripts/generate-vapid-keys.mjs
+#   VAPID_PRIVATE_KEY — base64url

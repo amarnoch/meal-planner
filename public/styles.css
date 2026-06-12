@@ -3,28 +3,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap');
 
 :root {
-  /* Blueberry & Slate palette: deep indigo primary, warm coral accent, cool grey background */
-  --bg: #eef0f4;
-  --surface: #f8f9fb;
-  --surface-raised: #e4e7ed;
-  --border: #c5c9d4;
-  --border-light: #d6d9e2;
-  --text: #1a1d26;
-  --text-muted: #5c6070;
-  --primary: #4f5fd5;
-  --primary-hover: #3d4dba;
-  --primary-light: rgba(79, 95, 213, 0.12);
-  --primary-lighter: rgba(79, 95, 213, 0.06);
-  --accent: #e26d5a;
-  --accent-2: #d4a03a;
-  --secondary: #6e7180;
-  --success: #2d8659;
-  --danger: #c84545;
-  --radius: 16px;
-  --radius-sm: 10px;
-  --shadow: 0 1px 3px rgba(26, 29, 38, 0.06), 0 1px 2px rgba(26, 29, 38, 0.04);
-  --shadow-md: 0 6px 18px rgba(26, 29, 38, 0.10), 0 2px 6px rgba(26, 29, 38, 0.05);
-  --shadow-lg: 0 18px 48px rgba(26, 29, 38, 0.14), 0 6px 14px rgba(26, 29, 38, 0.08);
+  /* v2 "Pantry fresh" palette (Mob-inspired): clean white base, ink actions, one warm accent */
+  --bg: #fafaf7;
+  --surface: #ffffff;
+  --surface-raised: #f1f1ec;
+  --border: #e4e4dd;
+  --border-light: #ecece6;
+  --text: #16181d;
+  --text-muted: #6b6e76;
+  --primary: #16181d;
+  --primary-hover: #2e323b;
+  --primary-light: rgba(22, 24, 29, 0.08);
+  --primary-lighter: rgba(22, 24, 29, 0.04);
+  --accent: #ff6b35;
+  --accent-2: #f4b400;
+  --secondary: #6b6e76;
+  --success: #1f9d61;
+  --danger: #d64541;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --shadow: 0 1px 2px rgba(22, 24, 29, 0.05);
+  --shadow-md: 0 8px 24px rgba(22, 24, 29, 0.08), 0 2px 6px rgba(22, 24, 29, 0.04);
+  --shadow-lg: 0 20px 50px rgba(22, 24, 29, 0.12), 0 6px 14px rgba(22, 24, 29, 0.06);
   --sidebar-width: 260px;
   --shopping-width: 260px;
   --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -67,7 +67,7 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+  background: var(--surface);
   padding: 1rem 1.75rem;
   border-bottom: 1px solid var(--border-light);
   box-shadow: var(--shadow);
@@ -78,13 +78,10 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 
 .app-header h1 {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 900;
+  font-size: 1.45rem;
+  font-weight: 800;
   letter-spacing: -0.03em;
-  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text);
   flex: 1;
   min-width: 0;
 }
@@ -2614,5 +2611,188 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
     width: 2.6rem;
     height: 2.6rem;
     font-size: 1.35rem;
+  }
+}
+
+/* ===================== v2 additions & Mob-style refresh ===================== */
+
+/* Buttons: solid ink pills with a warm accent hover ring */
+.btn {
+  border-radius: 999px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+/* Planner: today gets the warm accent */
+.planner-day-today {
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  background: #fff7f2;
+}
+
+.planner-today-pill {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+}
+
+/* Leftovers slots: dashed and calm */
+.planner-slot.leftovers .planned-meal {
+  background: var(--surface-raised);
+  border: 1.5px dashed var(--border);
+  color: var(--text-muted);
+}
+
+/* Recipe detail top bar (back + edit) */
+.recipe-detail-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Forms: shared bits for the recipe + settings modals */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.form-error {
+  color: var(--danger);
+  font-size: 0.85rem;
+  margin: 0.5rem 0 0;
+}
+
+.form-hint {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin: 0.35rem 0 0.75rem;
+}
+
+.settings-section-title {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-light);
+  padding-top: 1rem;
+}
+
+#settings-form select,
+#settings-form input[type="password"],
+#recipe-form textarea {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.quick-days-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.35rem 0 0.75rem;
+}
+
+.quick-days-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.65rem;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  background: var(--surface);
+}
+
+.quick-days-row label:has(input:checked) {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.quick-days-row input {
+  accent-color: var(--accent);
+}
+
+#settings-form .btn-block,
+#recipe-form .btn-block {
+  margin-top: 0.5rem;
+}
+
+/* Recipes header: search + add side by side */
+.recipes-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.recipes-controls input[type="search"] {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Cards: cleaner, photo-led */
+.recipe-card,
+.cookbook-tile,
+.meal-cuisine-tile,
+.meal-card {
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+}
+
+.recipe-card:hover,
+.cookbook-tile:hover,
+.meal-cuisine-tile:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.recipe-tag,
+.recipe-meta-chip {
+  border-radius: 999px;
+  background: var(--surface-raised);
+  color: var(--text);
+}
+
+/* Quick badge becomes a warm pill */
+.meal-quick-icon {
+  color: var(--accent);
+}
+
+/* Mobile tab bar: floating ink pill */
+@media (max-width: 768px) {
+  .mobile-tabs {
+    border-top: 1px solid var(--border-light);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+  }
+
+  .mobile-tab.active {
+    color: var(--accent);
   }
 }
