@@ -253,6 +253,8 @@
             <select id="set-meatfree"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
           </div>
         </div>
+        <label for="set-processed">Processed-meat meals / week (sausages, bacon, chorizo…)</label>
+        <select id="set-processed"><option value="0">0 — never pick them</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
         <label class="meal-quick-label">
           <input type="checkbox" id="set-long-weekend">
           Big meals (roasts, lasagne) on weekends only
@@ -261,6 +263,22 @@
           <input type="checkbox" id="set-carb-repeat">
           Avoid the same carb two meals in a row
         </label>
+
+        <h3 class="settings-section-title">Regular meals</h3>
+        <p class="form-hint">Always have these on the same day each week — Random week plans around them.</p>
+        <div id="regular-meals-list"></div>
+        <button type="button" class="btn btn-secondary btn-sm" id="add-regular-meal-btn">+ Add regular meal</button>
+
+        <h3 class="settings-section-title">Summary pills</h3>
+        <p class="form-hint">Choose what shows above the plan.</p>
+        <div id="set-summary-pills" class="quick-days-row">
+          <label><input type="checkbox" value="meat">Meat days</label>
+          <label><input type="checkbox" value="meatFree">Meat-free</label>
+          <label><input type="checkbox" value="salmon">Salmon</label>
+          <label><input type="checkbox" value="carbs">Carbs</label>
+          <label><input type="checkbox" value="processed">Processed</label>
+          <label><input type="checkbox" value="quick">Quick</label>
+        </div>
 
         <h3 class="settings-section-title">Sync between phones</h3>
         <label for="set-family-key">Family key</label>

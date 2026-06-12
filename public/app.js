@@ -33,7 +33,10 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     longMealsWeekendOnly: true,
     avoidCarbRepeat: true,
     weekendLunch: true,
-    notifyTime: '08:00'
+    notifyTime: '08:00',
+    processedPerWeek: 1,
+    summaryPills: ['meat', 'meatFree', 'salmon', 'carbs', 'processed'],
+    regularMeals: []   // e.g. [{ weekday: 'Tuesday', slot: 'Dinner', meal: 'Salmon' }]
   };
   let settings = { ...SETTINGS_DEFAULTS };
 
@@ -265,6 +268,134 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     return { variantName, sideName };
   }
 
+  // --- Dish-type / processed classification + scored picking ---
+  const DISH_TYPE_KEYWORDS = {
+    salad: ['salad'],
+    curry: ['curry', 'masala', 'korma', 'dahl', 'dal ', 'biryani'],
+    pasta: ['pasta', 'spaghetti', 'lasagne', 'lasagna', 'carbonara', 'bolognese', 'orzo', 'macaroni', 'linguine', 'penne', 'gnocchi'],
+    noodles: ['noodle', 'soba', 'pad thai', 'ramen', 'chow mein'],
+    'stir fry': ['stir fry', 'stir-fry'],
+    roast: ['roast'],
+    soup: ['soup', 'broth'],
+    'tex-mex': ['taco', 'fajita', 'quesadilla', 'burrito', 'enchilada', 'nacho', 'chilli con', 'chili con'],
+    fish: ['salmon', 'fish', 'cod', 'haddock', 'prawn', 'scampi', 'sea bass', 'tuna'],
+    pizza: ['pizza'],
+    burger: ['burger'],
+    stew: ['stew', 'casserole', 'hotpot', 'tagine'],
+    eggs: ['egg', 'omelette', 'frittata', 'shakshuka', 'quiche'],
+    'rice dish': ['risotto', 'paella', 'fried rice'],
+    wraps: ['wrap', 'gyros', 'pitta', 'kebab', 'souvlaki'],
+    traybake: ['traybake', 'tray bake'],
+    pie: ['pie'],
+    sandwich: ['sandwich', 'toastie']
+  };
+
+  function getDishTypes(meal) {
+    const types = new Set();
+    if (!meal) return types;
+    const text = `${meal.meal_name || ''} ${meal.category || ''}`.toLowerCase();
+    for (const [type, keywords] of Object.entries(DISH_TYPE_KEYWORDS)) {
+      if (keywords.some(k => text.includes(k))) types.add(type);
+    }
+    return types;
+  }
+
+  const PROCESSED_KEYWORDS = ['sausage', 'bacon', 'chorizo', 'ham', 'gammon', 'hot dog', 'hotdog', 'pepperoni', 'salami', 'frankfurter', 'spam'];
+
+  function isProcessedMeal(meal) {
+    if (!meal) return false;
+    const texts = [
+      meal.meal_name,
+      ...(meal.commonIngredients || []),
+      ...(meal.ingredients || []),
+      ...((meal.variants || []).flatMap(v => [v.name, ...(v.ingredients || [])]))
+    ].filter(Boolean);
+    return texts.some(t => containsKeyword(t, PROCESSED_KEYWORDS));
+  }
+
+  // Recency memory: meal name -> last planned date key. Synced inside the plan doc
+  // so both phones share the same "we had that recently" view.
+  const STORAGE_RECENT = 'mealPlanner_recentMeals';
+  let recentMeals = {};
+
+  function loadRecentMeals() {
+    try {
+      const raw = localStorage.getItem(STORAGE_RECENT);
+      if (raw) recentMeals = JSON.parse(raw) || {};
+    } catch (_) { recentMeals = {}; }
+  }
+
+  function saveRecentMeals() {
+    localStorage.setItem(STORAGE_RECENT, JSON.stringify(recentMeals));
+    markDirty('plan');
+  }
+
+  /**
+   * Score a candidate meal for one slot. Soft penalties keep variety without
+   * emptying the pool; -Infinity marks hard exclusions.
+   * ctx: { day, usedNames, prevDayDishTypes, prevCarbTypes, longMealDays,
+   *        preferQuick, needMeatFree, salmonWanted, processedCount, processedCap,
+   *        adjacentHasSalmon, adjacentHasLongMeal }
+   */
+  function scoreMeal(meal, ctx) {
+    if (isLongMeal(meal)) {
+      if (settings.longMealsWeekendOnly && !isWeekendDay(ctx.day)) return -Infinity;
+      if (ctx.adjacentHasLongMeal) return -Infinity;
+      const prevDay = planDays()[planDays().indexOf(ctx.day) - 1];
+      if (ctx.longMealDays && ctx.longMealDays.has(prevDay)) return -Infinity;
+    }
+    if (isProcessedMeal(meal) && ctx.processedCount >= ctx.processedCap) return -Infinity;
+    if (isSalmonMeal(meal) && ctx.adjacentHasSalmon) return -Infinity;
+
+    let s = 100;
+    if (ctx.usedNames.has(meal.meal_name)) s -= 1000;
+    if (isTakeawayMeal(meal)) s -= 80;
+    if ([...getDishTypes(meal)].some(t => ctx.prevDayDishTypes.has(t))) s -= 60;
+    if (settings.avoidCarbRepeat && [...getCarbTypes(meal, null, SIDE_NONE)].some(c => ctx.prevCarbTypes.has(c))) s -= 50;
+    const last = recentMeals[meal.meal_name];
+    if (last) {
+      const ageDays = Math.round((dateFromKey(ctx.day) - dateFromKey(last)) / 86400000);
+      if (ageDays >= 0 && ageDays < 14) s -= Math.max(0, 40 - ageDays * 3);
+    }
+    if (ctx.preferQuick) s += isQuickMeal(meal) ? 40 : -25;
+    if (ctx.needMeatFree) s += mealCanBeMeatFree(meal) ? 40 : -300;
+    if (ctx.salmonWanted) s += isSalmonMeal(meal) ? 150 : -30;
+    else if (isSalmonMeal(meal)) s -= 80;
+    s += Math.random() * 25; // jitter so equal candidates vary run-to-run
+    return s;
+  }
+
+  /** Weighted-random pick among the top-scoring candidates. */
+  function pickScored(meals, ctx) {
+    const scored = meals
+      .map(m => ({ m, s: scoreMeal(m, ctx) }))
+      .filter(x => x.s !== -Infinity)
+      .sort((a, b) => b.s - a.s);
+    if (scored.length === 0) return null;
+    const top = scored.slice(0, 8);
+    const floor = top[top.length - 1].s;
+    const weights = top.map(x => x.s - floor + 5);
+    let r = Math.random() * weights.reduce((a, b) => a + b, 0);
+    for (let i = 0; i < top.length; i++) {
+      r -= weights[i];
+      if (r <= 0) return top[i].m;
+    }
+    return top[0].m;
+  }
+
+  /** The regular-meal rule for a given day, if its meal exists in the library. */
+  function regularMealForDay(dayKey, mealType) {
+    const rule = (settings.regularMeals || []).find(r =>
+      r.weekday === weekdayOf(dayKey) && (r.slot || 'Dinner') === mealType && getMealByName(r.meal));
+    return rule ? getMealByName(rule.meal) : null;
+  }
+
+  function isPinnedSlot(dayKey, mealType, mealName) {
+    if (!mealName || isLeftoversName(mealName)) return false;
+    return (settings.regularMeals || []).some(r =>
+      r.weekday === weekdayOf(dayKey) && (r.slot || 'Dinner') === mealType && r.meal === mealName);
+  }
+
   function autoFillWeek() {
     if (!state.meals.length) {
       alert('Add some meals to your library first.');
@@ -280,12 +411,6 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     }
     const salmonMeals = state.meals.filter(isSalmonMeal);
     const meatFreeCandidates = state.meals.filter(mealCanBeMeatFree);
-    const quickMeals = state.meals.filter(isQuickMeal);
-    const salmonTarget = salmonMeals.length > 0 ? Math.round((settings.salmonPerWeek || 0) * weeks) : 0;
-    const salmonSlotIndices = new Set();
-    while (salmonSlotIndices.size < Math.min(salmonTarget, slots.length)) {
-      salmonSlotIndices.add(Math.floor(Math.random() * slots.length));
-    }
 
     for (const key of Object.keys(state.plan)) {
       delete state.plan[key];
@@ -299,75 +424,94 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     savePlanSides();
 
     const usedMealNames = new Set();
-    let prevCarbTypes = new Set();
-    let prevMealCarbTypes = new Set();
+    const longMealDays = new Set();
+    let processedCount = 0;
+    let salmonCount = 0;
+    const processedCap = Math.round((settings.processedPerWeek ?? 1) * weeks);
+
+    // 1) Pin the regular weekly meals first; the rest of the plan adapts around them.
+    const pinnedKeys = new Set();
+    for (let i = 0; i < slots.length; i++) {
+      const { day, mealType } = slots[i];
+      const meal = regularMealForDay(day, mealType);
+      if (!meal) continue;
+      const { variantName, sideName } = pickRandomVariantAndSide(meal, new Set(), false);
+      setPlannedMeal(day, mealType, meal.meal_name, variantName, sideName);
+      pinnedKeys.add(getPlanKey(day, mealType));
+      usedMealNames.add(meal.meal_name);
+      if (isProcessedMeal(meal)) processedCount++;
+      if (isSalmonMeal(meal)) salmonCount++;
+      if (isLongMeal(meal)) longMealDays.add(day);
+    }
+
+    // 2) Choose target days for salmon and meat-free among the unpinned slots.
+    const salmonTarget = salmonMeals.length > 0 ? Math.round((settings.salmonPerWeek || 0) * weeks) : 0;
+    const openSlotIndices = slots.map((s, i) => i).filter(i => !pinnedKeys.has(getPlanKey(slots[i].day, slots[i].mealType)));
+    const salmonSlotIndices = new Set();
+    const shuffledOpen = shuffleArray(openSlotIndices);
+    for (const i of shuffledOpen) {
+      if (salmonSlotIndices.size >= Math.max(0, salmonTarget - salmonCount)) break;
+      salmonSlotIndices.add(i);
+    }
     const meatFreeDayIndices = new Set();
     const meatFreeTarget = Math.round((settings.meatFreeDaysPerWeek || 0) * weeks);
     while (meatFreeDayIndices.size < Math.min(meatFreeTarget, days.length) && meatFreeCandidates.length >= 1) {
       meatFreeDayIndices.add(Math.floor(Math.random() * days.length));
     }
-    const shuffledMeals = shuffleArray(state.meals);
-    const nonSalmonMeals = shuffledMeals.filter(m => !isSalmonMeal(m));
-    const longMealDays = new Set();
 
-    const allowedForDay = (m, d) => {
-      if (!isLongMeal(m)) return true;
-      if (settings.longMealsWeekendOnly && !isWeekendDay(d)) return false;
-      const prevDay = days[days.indexOf(d) - 1];
-      return !longMealDays.has(prevDay);
-    };
-    const notUsedThisWeek = (m) => !usedMealNames.has(m.meal_name);
-
-    /** limitPool: only consider meals in this set after preferred is exhausted (e.g. meat-free days). */
-    function pickFromPool(preferred, day, allowRepeat, limitPool) {
-      const limit = limitPool || shuffledMeals;
-      const okUnused = (m) => allowedForDay(m, day) && notUsedThisWeek(m);
-      let pool = shuffleArray(preferred).filter(okUnused);
-      if (pool.length > 0) return pool[Math.floor(Math.random() * pool.length)];
-      pool = shuffleArray(limit).filter(okUnused);
-      if (pool.length > 0) return pool[Math.floor(Math.random() * pool.length)];
-      if (!allowRepeat) return null;
-      pool = shuffleArray(preferred).filter(m => allowedForDay(m, day));
-      if (pool.length > 0) return pool[Math.floor(Math.random() * pool.length)];
-      pool = shuffleArray(limit).filter(m => allowedForDay(m, day));
-      if (pool.length > 0) return pool[Math.floor(Math.random() * pool.length)];
-      return limit[0] || shuffledMeals[0] || null;
-    }
+    // 3) Fill the remaining slots with scored picks, tracking yesterday's dish
+    //    types and the previous meal's carbs as we go.
+    let prevCarbTypes = new Set();       // incl. chosen variant/side, for side selection
+    let prevMealCarbTypes = new Set();   // meal-level, for scoring
+    let prevDay = null;
+    let prevDayDishTypes = new Set();
+    let currentDayDishTypes = new Set();
 
     for (let i = 0; i < slots.length; i++) {
       const { day, mealType } = slots[i];
-      const dayIndex = days.indexOf(day);
-      const needMeatFreeDay = meatFreeDayIndices.has(dayIndex);
-      const isSalmonSlot = salmonSlotIndices.has(i);
-      const preferQuick = (settings.quickDays || []).includes(weekdayOf(day)) && !isSalmonSlot;
-
-      let meal = null;
-      let variantName = undefined;
-      let sideName = undefined;
-
-      const noCarbOverlap = (m) => !settings.avoidCarbRepeat || hasNoCarbOverlap(m, prevMealCarbTypes);
-
-      if (isSalmonSlot && salmonMeals.length > 0) {
-        meal = pickFromPool(salmonMeals, day, true, salmonMeals);
-      } else if (needMeatFreeDay && meatFreeCandidates.length > 0) {
-        const mfNonSalmon = meatFreeCandidates.filter(m => !isSalmonMeal(m));
-        const preferred = mfNonSalmon.filter(noCarbOverlap);
-        meal = pickFromPool(preferred.length > 0 ? preferred : mfNonSalmon.length > 0 ? mfNonSalmon : nonSalmonMeals, day, true, nonSalmonMeals);
-      } else if (preferQuick && quickMeals.length > 0) {
-        const quickNonSalmon = quickMeals.filter(m => !isSalmonMeal(m));
-        const preferred = quickNonSalmon.filter(noCarbOverlap);
-        meal = pickFromPool(preferred.length > 0 ? preferred : quickNonSalmon.length > 0 ? quickNonSalmon : nonSalmonMeals, day, true, nonSalmonMeals);
-      } else {
-        const nonTakeawayNonSalmon = nonSalmonMeals.filter(m => !isTakeawayMeal(m));
-        const preferred = nonTakeawayNonSalmon.filter(noCarbOverlap);
-        meal = pickFromPool(preferred.length > 0 ? preferred : nonTakeawayNonSalmon.length > 0 ? nonTakeawayNonSalmon : nonSalmonMeals, day, true, nonSalmonMeals);
+      if (day !== prevDay) {
+        prevDayDishTypes = currentDayDishTypes;
+        currentDayDishTypes = new Set();
+        prevDay = day;
       }
-      if (!meal) meal = shuffledMeals[0];
-      if (meal && isLongMeal(meal)) longMealDays.add(day);
 
-      const needMeatFree = needMeatFreeDay && !isSalmonSlot;
-      ({ variantName, sideName } = pickRandomVariantAndSide(meal, prevCarbTypes, needMeatFree));
+      if (pinnedKeys.has(getPlanKey(day, mealType))) {
+        const pinnedMeal = getMealByName(getPlannedMeal(day, mealType));
+        if (pinnedMeal) {
+          for (const t of getDishTypes(pinnedMeal)) currentDayDishTypes.add(t);
+          prevMealCarbTypes = getCarbTypes(pinnedMeal, null, SIDE_NONE);
+          prevCarbTypes = getCarbTypes(pinnedMeal, getPlannedVariant(day, mealType), getPlannedSide(day, mealType));
+        }
+        continue;
+      }
 
+      const dayIndex = days.indexOf(day);
+      const isSalmonSlot = salmonSlotIndices.has(i);
+      const needMeatFreeDay = meatFreeDayIndices.has(dayIndex) && !isSalmonSlot;
+      const ctx = {
+        day,
+        usedNames: usedMealNames,
+        prevDayDishTypes,
+        prevCarbTypes: prevMealCarbTypes,
+        longMealDays,
+        preferQuick: (settings.quickDays || []).includes(weekdayOf(day)) && !isSalmonSlot,
+        needMeatFree: needMeatFreeDay,
+        salmonWanted: isSalmonSlot,
+        processedCount,
+        processedCap,
+        adjacentHasSalmon: false,
+        adjacentHasLongMeal: false
+      };
+      let meal = pickScored(state.meals, ctx);
+      if (!meal) meal = state.meals[Math.floor(Math.random() * state.meals.length)];
+      if (!meal) continue;
+
+      if (isLongMeal(meal)) longMealDays.add(day);
+      if (isProcessedMeal(meal)) processedCount++;
+      if (isSalmonMeal(meal)) salmonCount++;
+      for (const t of getDishTypes(meal)) currentDayDishTypes.add(t);
+
+      const { variantName, sideName } = pickRandomVariantAndSide(meal, prevCarbTypes, needMeatFreeDay);
       setPlannedMeal(day, mealType, meal.meal_name, variantName, sideName);
       usedMealNames.add(meal.meal_name);
       prevCarbTypes = getCarbTypes(meal, variantName, sideName);
@@ -392,59 +536,66 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     clearDay(day);
 
     const daySlots = getSlotsForDay(day);
-    const shuffledMeals = shuffleArray(state.meals);
-    const dayHasLongMeal = (d) => getSlotsForDay(d).some(mt => {
-      const name = getPlannedMeal(d, mt);
-      return name && isLongMeal(state.meals.find(m => m.meal_name === name));
-    });
-    const adjDayHasSalmon = (d) => d && getSlotsForDay(d).some(mt => {
-      const name = getPlannedMeal(d, mt);
-      return name && isSalmonMeal(state.meals.find(m => m.meal_name === name));
-    });
+    const mealsForDay = (d) => getSlotsForDay(d)
+      .map(mt => getMealByName(getPlannedMeal(d, mt)))
+      .filter(Boolean);
     const prevDay = days[days.indexOf(day) - 1];
     const nextDay = days[days.indexOf(day) + 1];
-    const adjacentHasLongMeal = (prevDay && dayHasLongMeal(prevDay)) || (nextDay && dayHasLongMeal(nextDay));
-    const adjacentHasSalmon = adjDayHasSalmon(prevDay) || adjDayHasSalmon(nextDay);
-    const allowedForDay = (m, d) => {
-      if (isSalmonMeal(m) && adjacentHasSalmon) return false;
-      if (!isLongMeal(m)) return true;
-      if (settings.longMealsWeekendOnly && !isWeekendDay(d)) return false;
-      return !adjacentHasLongMeal;
-    };
-    const usedToday = new Set();
+    const adjacentMeals = [...(prevDay ? mealsForDay(prevDay) : []), ...(nextDay ? mealsForDay(nextDay) : [])];
+    const adjacentHasLongMeal = adjacentMeals.some(isLongMeal);
+    const adjacentHasSalmon = adjacentMeals.some(isSalmonMeal);
+    const prevDayDishTypes = new Set((prevDay ? mealsForDay(prevDay) : []).flatMap(m => [...getDishTypes(m)]));
+
+    // Names already planned anywhere this period (avoid repeats), and the
+    // current processed count across the plan so the cap holds for re-rolls.
+    const usedNames = new Set();
+    let processedCount = 0;
+    for (const d of days) {
+      if (d === day) continue;
+      for (const m of mealsForDay(d)) {
+        usedNames.add(m.meal_name);
+        if (isProcessedMeal(m)) processedCount++;
+      }
+    }
+    const processedCap = Math.round((settings.processedPerWeek ?? 1) * (days.length / 7));
+
     let prevCarbTypes = new Set();
-    // seed prevMealCarbTypes from the previous day's last planned meal
     let prevMealCarbTypes = (() => {
       if (!prevDay) return new Set();
       const slots = getSlotsForDay(prevDay);
       const name = getPlannedMeal(prevDay, slots[slots.length - 1]);
-      if (!name) return new Set();
-      const m = state.meals.find(meal => meal.meal_name === name);
+      const m = name ? state.meals.find(meal => meal.meal_name === name) : null;
       return m ? getCarbTypes(m, null, SIDE_NONE) : new Set();
     })();
 
     for (const mealType of daySlots) {
-      const preferQuick = (settings.quickDays || []).includes(weekdayOf(day)) && daySlots.length === 1;
-      const noCarbOverlap = (m) => !settings.avoidCarbRepeat || hasNoCarbOverlap(m, prevMealCarbTypes);
-
-      let pool = shuffledMeals.filter(m => allowedForDay(m, day) && !usedToday.has(m.meal_name) && !isTakeawayMeal(m) && noCarbOverlap(m));
-      if (pool.length === 0) pool = shuffledMeals.filter(m => allowedForDay(m, day) && !usedToday.has(m.meal_name) && !isTakeawayMeal(m));
-      if (pool.length === 0) pool = shuffledMeals.filter(m => allowedForDay(m, day) && !isTakeawayMeal(m));
-      if (pool.length === 0) pool = shuffledMeals.filter(m => !isTakeawayMeal(m));
-      if (pool.length === 0) pool = shuffledMeals.slice();
-
-      if (preferQuick) {
-        const quickPool = pool.filter(isQuickMeal);
-        if (quickPool.length > 0) pool = quickPool;
+      // Regular weekly meal wins this slot if one is configured.
+      let meal = regularMealForDay(day, mealType);
+      if (!meal) {
+        const ctx = {
+          day,
+          usedNames,
+          prevDayDishTypes,
+          prevCarbTypes: prevMealCarbTypes,
+          longMealDays: new Set(),
+          preferQuick: (settings.quickDays || []).includes(weekdayOf(day)) && daySlots.length === 1,
+          needMeatFree: false,
+          salmonWanted: false,
+          processedCount,
+          processedCap,
+          adjacentHasSalmon,
+          adjacentHasLongMeal
+        };
+        meal = pickScored(state.meals, ctx);
       }
-
-      const meal = pool[Math.floor(Math.random() * pool.length)];
+      if (!meal) meal = state.meals[Math.floor(Math.random() * state.meals.length)];
       if (!meal) continue;
 
+      if (isProcessedMeal(meal)) processedCount++;
       const { variantName, sideName } = pickRandomVariantAndSide(meal, prevCarbTypes, false);
 
       setPlannedMeal(day, mealType, meal.meal_name, variantName, sideName);
-      usedToday.add(meal.meal_name);
+      usedNames.add(meal.meal_name);
       prevCarbTypes = getCarbTypes(meal, variantName, sideName);
       prevMealCarbTypes = getCarbTypes(meal, null, SIDE_NONE);
     }
@@ -559,6 +710,7 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     }
     if (!Array.isArray(state.recipes)) state.recipes = [];
     loadShoppingRemoved();
+    loadRecentMeals();
     loadSettings();
     migrateWeekdayPlanKeys();
     prunePastPlanEntries();
@@ -614,6 +766,10 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     const key = getPlanKey(day, mealType);
     if (mealName) {
       state.plan[key] = mealName;
+      if (!isLeftoversName(mealName) && /^\d{4}-\d{2}-\d{2}$/.test(day)) {
+        recentMeals[mealName] = day;
+        saveRecentMeals();
+      }
       if (variantName != null) state.planVariants[key] = variantName;
       else delete state.planVariants[key];
       if (sideName != null) state.planSides[key] = sideName;
@@ -1311,11 +1467,12 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     return card;
   }
 
-  function renderCookbookCollage(thumbs) {
+  function renderCookbookCollage(recipes) {
+    // Photos only, each used at most once; remaining cells stay blank.
+    const uniqueImages = [...new Set((recipes || []).map(r => r.imageUrl).filter(Boolean))].slice(0, 4);
     const cells = [];
     for (let i = 0; i < 4; i++) {
-      const r = thumbs[i];
-      if (r) cells.push(`<div class="cookbook-collage-cell">${recipeThumbHtml(r)}</div>`);
+      if (i < uniqueImages.length) cells.push(`<div class="cookbook-collage-cell"><img src="${escapeHtml(uniqueImages[i])}" alt="" loading="lazy"></div>`);
       else cells.push('<div class="cookbook-collage-cell empty"></div>');
     }
     return `<div class="cookbook-collage">${cells.join('')}</div>`;
@@ -1418,7 +1575,7 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
       tile.className = 'cookbook-tile';
       tile.dataset.cookbook = cb.raw;
       tile.innerHTML = `
-        ${renderCookbookCollage(cb.thumbs)}
+        ${renderCookbookCollage(cb.recipes)}
         <h3>${escapeHtml(cb.name)}</h3>
         <p>${cb.count} recipe${cb.count !== 1 ? 's' : ''}</p>
       `;
@@ -1733,6 +1890,49 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
   }
 
   // --- Settings ---
+  function makeRegularMealRow(rule) {
+    const row = document.createElement('div');
+    row.className = 'regular-meal-row';
+    const daySel = document.createElement('select');
+    daySel.className = 'regular-day';
+    daySel.innerHTML = WEEKDAYS.map(d => `<option value="${d}">${d.slice(0, 3)}</option>`).join('');
+    daySel.value = rule?.weekday || 'Monday';
+    const slotSel = document.createElement('select');
+    slotSel.className = 'regular-slot';
+    slotSel.innerHTML = '<option value="Dinner">Dinner</option><option value="Lunch">Lunch</option>';
+    slotSel.value = rule?.slot || 'Dinner';
+    const mealSel = document.createElement('select');
+    mealSel.className = 'regular-meal';
+    const names = state.meals.map(m => m.meal_name).sort((a, b) => a.localeCompare(b));
+    mealSel.innerHTML = names.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+    if (rule?.meal) mealSel.value = rule.meal;
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'btn-icon regular-remove';
+    removeBtn.setAttribute('aria-label', 'Remove regular meal');
+    removeBtn.textContent = '×';
+    removeBtn.addEventListener('click', () => row.remove());
+    row.append(daySel, slotSel, mealSel, removeBtn);
+    return row;
+  }
+
+  function renderRegularMealRows() {
+    const list = document.getElementById('regular-meals-list');
+    if (!list) return;
+    list.innerHTML = '';
+    for (const rule of settings.regularMeals || []) list.appendChild(makeRegularMealRow(rule));
+  }
+
+  function collectRegularMealRows() {
+    return [...document.querySelectorAll('#regular-meals-list .regular-meal-row')]
+      .map(row => ({
+        weekday: row.querySelector('.regular-day').value,
+        slot: row.querySelector('.regular-slot').value,
+        meal: row.querySelector('.regular-meal').value
+      }))
+      .filter(r => r.meal);
+  }
+
   function openSettingsModal() {
     const overlay = document.getElementById('settings-overlay');
     if (!overlay) return;
@@ -1743,8 +1943,13 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     });
     document.getElementById('set-salmon').value = String(settings.salmonPerWeek);
     document.getElementById('set-meatfree').value = String(settings.meatFreeDaysPerWeek);
+    document.getElementById('set-processed').value = String(settings.processedPerWeek ?? 1);
     document.getElementById('set-long-weekend').checked = !!settings.longMealsWeekendOnly;
     document.getElementById('set-carb-repeat').checked = !!settings.avoidCarbRepeat;
+    document.querySelectorAll('#set-summary-pills input[type="checkbox"]').forEach(cb => {
+      cb.checked = (settings.summaryPills || SETTINGS_DEFAULTS.summaryPills).includes(cb.value);
+    });
+    renderRegularMealRows();
     document.getElementById('set-notify-time').value = settings.notifyTime || '08:00';
     document.getElementById('set-family-key').value = getFamilyKey();
     updateSyncStatusLine();
@@ -1787,8 +1992,11 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     settings.quickDays = [...document.querySelectorAll('#set-quick-days input:checked')].map(cb => cb.value);
     settings.salmonPerWeek = Number(document.getElementById('set-salmon').value) || 0;
     settings.meatFreeDaysPerWeek = Number(document.getElementById('set-meatfree').value) || 0;
+    settings.processedPerWeek = Number(document.getElementById('set-processed').value) || 0;
     settings.longMealsWeekendOnly = document.getElementById('set-long-weekend').checked;
     settings.avoidCarbRepeat = document.getElementById('set-carb-repeat').checked;
+    settings.summaryPills = [...document.querySelectorAll('#set-summary-pills input:checked')].map(cb => cb.value);
+    settings.regularMeals = collectRegularMealRows();
     settings.notifyTime = document.getElementById('set-notify-time').value || '08:00';
     saveSettings();
 
@@ -2066,6 +2274,13 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
             q.textContent = '⚡';
             btn.appendChild(q);
           }
+          if (isPinnedSlot(day, mealType, mealName)) {
+            const p = document.createElement('span');
+            p.className = 'meal-pinned-icon';
+            p.title = 'Regular meal (set in Settings)';
+            p.textContent = '📌';
+            btn.appendChild(p);
+          }
           slotDiv.appendChild(btn);
         }
         slotsWrap.appendChild(slotDiv);
@@ -2079,6 +2294,8 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     attachPlannerDragDrop();
   }
 
+  const CARB_PILL_LABELS = { rice: 'Rice', pasta: 'Pasta', pizza: 'Pizza', potato: 'Potato' };
+
   function renderWeekSummary() {
     const el = document.getElementById('week-summary');
     if (!el) return;
@@ -2086,6 +2303,9 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     const meatFreeByDay = new Set();
     const carbCounts = { rice: 0, pasta: 0, pizza: 0, potato: 0 };
     let salmonCount = 0;
+    let processedCount = 0;
+    let quickCount = 0;
+    let anyMeal = false;
     for (const day of planDays()) {
       const slots = getSlotsForDay(day);
       let dayHasMeat = false;
@@ -2102,18 +2322,32 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         const carbs = getCarbTypes(meal, v, s);
         for (const c of carbs) carbCounts[c] = (carbCounts[c] || 0) + 1;
         if (isSalmonMeal(meal)) salmonCount++;
+        if (isProcessedMeal(meal)) processedCount++;
+        if (isQuickMeal(meal)) quickCount++;
       }
+      if (dayHasAnyMeal) anyMeal = true;
       if (dayHasMeat) meatByDay.add(day);
       if (dayHasAnyMeal && !dayHasMeat) meatFreeByDay.add(day);
     }
+
+    const show = new Set(settings.summaryPills || SETTINGS_DEFAULTS.summaryPills);
+    const weeks = planDays().length / 7;
+    const processedCap = Math.round((settings.processedPerWeek ?? 1) * weeks);
     const parts = [];
-    if (meatByDay.size > 0) parts.push(`<span class="week-summary-pill week-summary-meat">Meat: ${meatByDay.size} days</span>`);
-    if (meatFreeByDay.size > 0) parts.push(`<span class="week-summary-pill week-summary-meatfree">Meat-free: ${meatFreeByDay.size} days</span>`);
-    if (salmonCount > 0) parts.push(`<span class="week-summary-pill week-summary-salmon">Salmon: ${salmonCount}x</span>`);
-    for (const [key, count] of Object.entries(carbCounts)) {
-      if (count > 0) parts.push(`<span class="week-summary-pill week-summary-carb">${key}: ${count}x</span>`);
+    if (show.has('meat') && meatByDay.size > 0) parts.push(`<span class="week-summary-pill week-summary-meat">Meat ×${meatByDay.size} days</span>`);
+    if (show.has('meatFree') && meatFreeByDay.size > 0) parts.push(`<span class="week-summary-pill week-summary-meatfree">Meat-free ×${meatFreeByDay.size} days</span>`);
+    if (show.has('salmon') && salmonCount > 0) parts.push(`<span class="week-summary-pill week-summary-salmon">Salmon ×${salmonCount}</span>`);
+    if (show.has('carbs')) {
+      for (const [key, count] of Object.entries(carbCounts)) {
+        if (count > 0) parts.push(`<span class="week-summary-pill week-summary-carb">${CARB_PILL_LABELS[key] || key} ×${count}</span>`);
+      }
     }
-    el.innerHTML = parts.length ? parts.join('') : '<span class="week-summary-empty">No meals planned</span>';
+    if (show.has('processed') && processedCount > 0) {
+      const over = processedCount > processedCap;
+      parts.push(`<span class="week-summary-pill week-summary-processed${over ? ' week-summary-warn' : ''}">Processed ×${processedCount}${over ? ' — over target' : ''}</span>`);
+    }
+    if (show.has('quick') && quickCount > 0) parts.push(`<span class="week-summary-pill week-summary-quick">Quick ×${quickCount}</span>`);
+    el.innerHTML = parts.length ? parts.join('') : (anyMeal ? '' : '<span class="week-summary-empty">No meals planned</span>');
   }
 
   function attachMealCardDragDrop() {
@@ -2775,26 +3009,14 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     tile.className = 'meal-cuisine-tile';
     tile.dataset.cuisine = cuisine.name;
     const cells = [];
-    // Each photo/emoji is used at most once — no repeated images in a tile.
-    // Photos first, then emoji cells from the remaining meals, then blanks.
+    // Photos only, each used at most once; remaining cells stay blank.
     const allMeals = cuisine.meals || cuisine.thumbs || [];
-    const withImage = allMeals
-      .map(m => ({ meal: m, imgUrl: getRecipeImageForMeal(m.meal_name) }))
-      .filter(x => x.imgUrl);
-    const uniqueImages = [...new Set(withImage.map(x => x.imgUrl))].slice(0, 4);
-    const photoMeals = new Set(withImage.map(x => x.meal.meal_name));
-    const emojiMeals = allMeals.filter(m => !photoMeals.has(m.meal_name));
+    const uniqueImages = [...new Set(allMeals.map(m => getRecipeImageForMeal(m.meal_name)).filter(Boolean))].slice(0, 4);
     for (let i = 0; i < 4; i++) {
       if (i < uniqueImages.length) {
         cells.push(`<div class="meal-cuisine-collage-cell"><img src="${escapeHtml(uniqueImages[i])}" alt="" loading="lazy"></div>`);
       } else {
-        const m = emojiMeals[i - uniqueImages.length];
-        if (m) {
-          const e = getMealEmoji(m) || '🍽';
-          cells.push(`<div class="meal-cuisine-collage-cell"><span>${escapeHtml(e)}</span></div>`);
-        } else {
-          cells.push('<div class="meal-cuisine-collage-cell empty"></div>');
-        }
+        cells.push('<div class="meal-cuisine-collage-cell empty"></div>');
       }
     }
     tile.innerHTML = `
@@ -3085,7 +3307,8 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
             planVariants: state.planVariants,
             planSides: state.planSides,
             shoppingChecked: state.shoppingChecked,
-            shoppingRemoved: [...shoppingRemoved]
+            shoppingRemoved: [...shoppingRemoved],
+            recentMeals
           }),
           apply: (data) => {
             if (!data) return;
@@ -3094,18 +3317,21 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
             state.planSides = data.planSides || {};
             state.shoppingChecked = data.shoppingChecked || {};
             shoppingRemoved = new Set(data.shoppingRemoved || []);
+            recentMeals = data.recentMeals || {};
             localStorage.setItem(STORAGE_PLAN, JSON.stringify(state.plan));
             localStorage.setItem(STORAGE_PLAN_VARIANTS, JSON.stringify(state.planVariants));
             localStorage.setItem(STORAGE_PLAN_SIDES, JSON.stringify(state.planSides));
             localStorage.setItem(STORAGE_SHOPPING_CHECKED, JSON.stringify(state.shoppingChecked));
             localStorage.setItem(STORAGE_SHOPPING_REMOVED, JSON.stringify([...shoppingRemoved]));
+            localStorage.setItem(STORAGE_RECENT, JSON.stringify(recentMeals));
           },
           merge: (local, server) => ({
             plan: mergeMaps((local || {}).plan, (server || {}).plan),
             planVariants: mergeMaps((local || {}).planVariants, (server || {}).planVariants),
             planSides: mergeMaps((local || {}).planSides, (server || {}).planSides),
             shoppingChecked: mergeMaps((local || {}).shoppingChecked, (server || {}).shoppingChecked),
-            shoppingRemoved: [...new Set([...((local || {}).shoppingRemoved || []), ...((server || {}).shoppingRemoved || [])])]
+            shoppingRemoved: [...new Set([...((local || {}).shoppingRemoved || []), ...((server || {}).shoppingRemoved || [])])],
+            recentMeals: mergeMaps((local || {}).recentMeals, (server || {}).recentMeals)
           })
         },
         settings: {
@@ -3323,6 +3549,9 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       } catch (err) {
         if (note) note.textContent = err.message;
       }
+    });
+    document.getElementById('add-regular-meal-btn')?.addEventListener('click', () => {
+      document.getElementById('regular-meals-list')?.appendChild(makeRegularMealRow());
     });
     document.getElementById('add-recipe-form-btn')?.addEventListener('click', () => openRecipeFormModal());
     document.getElementById('recipe-form')?.addEventListener('submit', handleRecipeFormSubmit);
