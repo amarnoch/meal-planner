@@ -180,6 +180,23 @@
       <button type="button" class="modal-close-btn" data-close-target="recipe-form-overlay" aria-label="Close">×</button>
       <h2 id="recipe-form-modal-title">Add recipe</h2>
       <form id="recipe-form">
+        <div class="rf-import-section">
+          <div class="rf-import-tabs">
+            <button type="button" class="rf-tab active" data-tab="url">From URL</button>
+            <button type="button" class="rf-tab" data-tab="text">Paste text</button>
+          </div>
+          <div id="rf-tab-url" class="rf-tab-panel">
+            <div class="rf-import-input-group">
+              <input type="url" id="rf-import-url" placeholder="https://www.bbcgoodfood.com/recipes/...">
+              <button type="button" id="rf-import-btn" class="btn btn-secondary btn-sm">Import</button>
+            </div>
+          </div>
+          <div id="rf-tab-text" class="rf-tab-panel" hidden>
+            <textarea id="rf-import-text" rows="4" placeholder="Paste recipe text from Instagram, a message, etc."></textarea>
+          </div>
+          <p id="rf-import-status" class="form-hint" hidden></p>
+        </div>
+        <hr class="form-divider">
         <label for="rf-title">Title</label>
         <input type="text" id="rf-title" required placeholder="e.g. Coconut Chicken Curry">
         <div class="form-row">
@@ -275,9 +292,11 @@
           <label><input type="checkbox" value="meat">Meat days</label>
           <label><input type="checkbox" value="meatFree">Meat-free</label>
           <label><input type="checkbox" value="salmon">Salmon</label>
+          <label><input type="checkbox" value="fish">Fish</label>
           <label><input type="checkbox" value="carbs">Carbs</label>
           <label><input type="checkbox" value="processed">Processed</label>
           <label><input type="checkbox" value="quick">Quick</label>
+          <label><input type="checkbox" value="leftovers">Leftovers</label>
         </div>
 
         <h3 class="settings-section-title">Sync between phones</h3>

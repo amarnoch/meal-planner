@@ -301,6 +301,7 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
   }
 
   const PROCESSED_KEYWORDS = ['sausage', 'bacon', 'chorizo', 'ham', 'gammon', 'hot dog', 'hotdog', 'pepperoni', 'salami', 'frankfurter', 'spam'];
+  const FISH_KEYWORDS = ['salmon', 'fish', 'cod', 'tuna', 'prawn', 'shrimp', 'haddock', 'sea bass', 'mackerel', 'trout', 'sardine', 'anchovy'];
 
   function isProcessedMeal(meal) {
     if (!meal) return false;
@@ -311,6 +312,24 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
       ...((meal.variants || []).flatMap(v => [v.name, ...(v.ingredients || [])]))
     ].filter(Boolean);
     return texts.some(t => containsKeyword(t, PROCESSED_KEYWORDS));
+  }
+
+  function isFishMeal(meal, variantName, sideName) {
+    if (!meal) return false;
+    const v = (meal.variants || []).find(vr => vr.name === variantName) || (meal.variants && meal.variants[0]);
+    let s = null;
+    if (meal.sides && meal.sides.length > 0) {
+      if (sideName === SIDE_NONE) s = null;
+      else s = sideName ? meal.sides.find(sd => sd.name === sideName) : meal.sides[0];
+    }
+    const texts = [
+      meal.meal_name,
+      ...(meal.commonIngredients || []),
+      ...(meal.ingredients || []),
+      v ? [v.name, ...(v.ingredients || [])] : [],
+      s ? [s.name, ...(s.ingredients || [])] : []
+    ].flat();
+    return texts.some(t => containsKeyword(t, FISH_KEYWORDS));
   }
 
   // Recency memory: meal name -> last planned date key. Synced inside the plan doc
@@ -1834,6 +1853,19 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     document.getElementById('rf-add-to-meals').checked = !recipe;
     const err = document.getElementById('recipe-form-error');
     if (err) err.hidden = true;
+    // Reset import section
+    const importUrl = document.getElementById('rf-import-url');
+    if (importUrl) importUrl.value = '';
+    const importText = document.getElementById('rf-import-text');
+    if (importText) importText.value = '';
+    const importStatus = document.getElementById('rf-import-status');
+    if (importStatus) importStatus.hidden = true;
+    // Reset to URL tab
+    document.querySelectorAll('.rf-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'url'));
+    const urlPanel = document.getElementById('rf-tab-url');
+    const textPanel = document.getElementById('rf-tab-text');
+    if (urlPanel) urlPanel.hidden = false;
+    if (textPanel) textPanel.hidden = true;
     // Datalist of existing cookbooks for the category field
     const datalist = document.getElementById('rf-category-options');
     if (datalist) {
@@ -1841,6 +1873,44 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
       datalist.innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">`).join('');
     }
     openOverlayById(overlay.id);
+  }
+
+  async function importRecipeFromUrl() {
+    const urlInput = document.getElementById('rf-import-url');
+    const statusEl = document.getElementById('rf-import-status');
+    const url = urlInput?.value?.trim();
+    if (!url) return;
+    try { new URL(url); } catch (_) {
+      if (statusEl) { statusEl.textContent = 'Enter a valid URL.'; statusEl.hidden = false; }
+      return;
+    }
+    const btn = document.getElementById('rf-import-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Importing…'; }
+    if (statusEl) statusEl.hidden = true;
+    try {
+      const key = getFamilyKey();
+      if (!key) throw new Error('Set a family key in Settings to use URL import.');
+      const res = await fetch(`/api/scrape-recipe?url=${encodeURIComponent(url)}`, {
+        headers: { Authorization: `Bearer ${key}` }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Import failed.');
+      if (data.title) document.getElementById('rf-title').value = data.title;
+      if (data.ingredients?.length) document.getElementById('rf-ingredients').value = data.ingredients.join('\n');
+      if (data.steps?.length) document.getElementById('rf-steps').value = data.steps.join('\n');
+      if (data.imageUrl) document.getElementById('rf-image').value = data.imageUrl;
+      if (data.servings) document.getElementById('rf-servings').value = String(data.servings);
+      if (data.sourceUrl) document.getElementById('rf-source').value = data.sourceUrl;
+      urlInput.value = '';
+      if (data.partial && statusEl) {
+        statusEl.textContent = 'Only title and image found — this site doesn’t have structured recipe data. Fill in ingredients and steps manually.';
+        statusEl.hidden = false;
+      }
+    } catch (err) {
+      if (statusEl) { statusEl.textContent = err.message; statusEl.hidden = false; }
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Import'; }
+    }
   }
 
   function handleRecipeFormSubmit(e) {
@@ -2305,6 +2375,8 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     let salmonCount = 0;
     let processedCount = 0;
     let quickCount = 0;
+    let fishCount = 0;
+    let leftoversCount = 0;
     let anyMeal = false;
     for (const day of planDays()) {
       const slots = getSlotsForDay(day);
@@ -2312,7 +2384,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       let dayHasAnyMeal = false;
       for (const mealType of slots) {
         const mealName = getPlannedMeal(day, mealType);
-        if (isLeftoversName(mealName)) { dayHasAnyMeal = true; continue; }
+        if (isLeftoversName(mealName)) { dayHasAnyMeal = true; leftoversCount++; continue; }
         const meal = getMealByName(mealName);
         if (!meal) continue;
         dayHasAnyMeal = true;
@@ -2322,6 +2394,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         const carbs = getCarbTypes(meal, v, s);
         for (const c of carbs) carbCounts[c] = (carbCounts[c] || 0) + 1;
         if (isSalmonMeal(meal)) salmonCount++;
+        if (isFishMeal(meal, v, s)) fishCount++;
         if (isProcessedMeal(meal)) processedCount++;
         if (isQuickMeal(meal)) quickCount++;
       }
@@ -2334,9 +2407,10 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     const weeks = planDays().length / 7;
     const processedCap = Math.round((settings.processedPerWeek ?? 1) * weeks);
     const parts = [];
-    if (show.has('meat') && meatByDay.size > 0) parts.push(`<span class="week-summary-pill week-summary-meat">Meat ×${meatByDay.size} days</span>`);
-    if (show.has('meatFree') && meatFreeByDay.size > 0) parts.push(`<span class="week-summary-pill week-summary-meatfree">Meat-free ×${meatFreeByDay.size} days</span>`);
+    if (show.has('meat') && meatByDay.size > 0) parts.push(`<span class="week-summary-pill week-summary-meat">Meat ×${meatByDay.size}</span>`);
+    if (show.has('meatFree') && meatFreeByDay.size > 0) parts.push(`<span class="week-summary-pill week-summary-meatfree">Meat-free ×${meatFreeByDay.size}</span>`);
     if (show.has('salmon') && salmonCount > 0) parts.push(`<span class="week-summary-pill week-summary-salmon">Salmon ×${salmonCount}</span>`);
+    if (show.has('fish') && fishCount > 0) parts.push(`<span class="week-summary-pill week-summary-fish">Fish ×${fishCount}</span>`);
     if (show.has('carbs')) {
       for (const [key, count] of Object.entries(carbCounts)) {
         if (count > 0) parts.push(`<span class="week-summary-pill week-summary-carb">${CARB_PILL_LABELS[key] || key} ×${count}</span>`);
@@ -2347,6 +2421,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       parts.push(`<span class="week-summary-pill week-summary-processed${over ? ' week-summary-warn' : ''}">Processed ×${processedCount}${over ? ' — over target' : ''}</span>`);
     }
     if (show.has('quick') && quickCount > 0) parts.push(`<span class="week-summary-pill week-summary-quick">Quick ×${quickCount}</span>`);
+    if (show.has('leftovers') && leftoversCount > 0) parts.push(`<span class="week-summary-pill week-summary-leftovers">Leftovers ×${leftoversCount}</span>`);
     el.innerHTML = parts.length ? parts.join('') : (anyMeal ? '' : '<span class="week-summary-empty">No meals planned</span>');
   }
 
@@ -2548,11 +2623,22 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       });
       body.appendChild(leftoversBtn);
 
+      const searchInput = document.createElement('input');
+      searchInput.type = 'text';
+      searchInput.className = 'assign-meal-search';
+      searchInput.placeholder = 'Search meals…';
+      body.appendChild(searchInput);
+
+      const mealList = document.createElement('div');
+      mealList.className = 'assign-meal-list';
+      body.appendChild(mealList);
+
       const meals = state.meals.slice().sort((a, b) => a.meal_name.localeCompare(b.meal_name));
       if (meals.length === 0) {
-        body.innerHTML = '<p class="assign-meal-hint">No meals yet — add one from the Meals tab.</p>';
+        mealList.innerHTML = '<p class="assign-meal-hint">No meals yet — add one from the Meals tab.</p>';
         return;
       }
+      const mealBtns = [];
       meals.forEach(meal => {
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -2568,8 +2654,27 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
           else { commitAssignToTarget(); return; }
           renderAssignMealModal();
         });
-        body.appendChild(btn);
+        mealList.appendChild(btn);
+        mealBtns.push({ btn, meal });
       });
+
+      const noMatch = document.createElement('p');
+      noMatch.className = 'assign-meal-hint';
+      noMatch.textContent = 'No meals match.';
+      noMatch.hidden = true;
+      mealList.appendChild(noMatch);
+
+      searchInput.addEventListener('input', () => {
+        const term = searchInput.value.trim().toLowerCase();
+        let visible = 0;
+        mealBtns.forEach(({ btn, meal }) => {
+          const show = !term || mealMatchesSearch(meal, term);
+          btn.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+        noMatch.hidden = visible > 0;
+      });
+      requestAnimationFrame(() => searchInput.focus());
       return;
     }
 
@@ -3556,6 +3661,25 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     document.getElementById('add-recipe-form-btn')?.addEventListener('click', () => openRecipeFormModal());
     document.getElementById('recipe-form')?.addEventListener('submit', handleRecipeFormSubmit);
     document.getElementById('recipe-form-cancel')?.addEventListener('click', () => closeOverlay('recipe-form-overlay'));
+    document.getElementById('rf-import-btn')?.addEventListener('click', importRecipeFromUrl);
+    document.getElementById('rf-import-url')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); importRecipeFromUrl(); }
+    });
+    document.querySelectorAll('.rf-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.rf-tab').forEach(t => t.classList.toggle('active', t === tab));
+        document.getElementById('rf-tab-url').hidden = tab.dataset.tab !== 'url';
+        document.getElementById('rf-tab-text').hidden = tab.dataset.tab !== 'text';
+      });
+    });
+    document.getElementById('rf-import-text')?.addEventListener('input', (e) => {
+      const text = e.target.value;
+      const igMatch = text.match(/https?:\/\/(?:www\.)?instagram\.com\/\S+/i);
+      if (igMatch) {
+        const src = document.getElementById('rf-source');
+        if (src && !src.value) src.value = igMatch[0];
+      }
+    });
     document.getElementById('add-recipe-btn')?.addEventListener('click', openRecipeModal);
     document.getElementById('recipe-modal-cancel')?.addEventListener('click', closeRecipeModal);
     document.getElementById('recipe-wizard-back')?.addEventListener('click', () => setRecipeWizardStep(recipeWizardStep - 1));

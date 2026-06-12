@@ -34,6 +34,128 @@ async function getDoc(env, name) {
   return JSON.parse(raw);
 }
 
+async function scrapeRecipe(targetUrl) {
+  const res = await fetch(targetUrl, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (compatible; MarnochPantry/2.0)',
+      'Accept': 'text/html'
+    },
+    signal: AbortSignal.timeout(10000)
+  });
+  if (!res.ok) throw new Error(`Site returned ${res.status}`);
+  const ct = res.headers.get('content-type') || '';
+  if (!ct.includes('text/html') && !ct.includes('application/xhtml')) {
+    throw new Error('Not an HTML page');
+  }
+  const html = await res.text();
+  if (html.length > 2_000_000) throw new Error('Page too large');
+
+  // Try JSON-LD first
+  const recipe = extractJsonLdRecipe(html);
+  if (recipe) {
+    return {
+      title: recipe.name || '',
+      ingredients: normaliseIngredients(recipe.recipeIngredient),
+      steps: normaliseSteps(recipe.recipeInstructions),
+      imageUrl: normaliseImage(recipe.image),
+      servings: normaliseServings(recipe.recipeYield),
+      sourceUrl: recipe.url || targetUrl,
+      partial: false
+    };
+  }
+
+  // Fallback: OpenGraph / meta tags
+  const title = extractMeta(html, 'og:title') || extractTitle(html) || '';
+  const imageUrl = extractMeta(html, 'og:image') || null;
+  return { title, ingredients: [], steps: [], imageUrl, servings: null, sourceUrl: targetUrl, partial: true };
+}
+
+function extractJsonLdRecipe(html) {
+  const re = /<script[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  let match;
+  while ((match = re.exec(html)) !== null) {
+    try {
+      const parsed = JSON.parse(match[1]);
+      const found = findRecipeInLd(parsed);
+      if (found) return found;
+    } catch (_) {}
+  }
+  return null;
+}
+
+function findRecipeInLd(obj) {
+  if (!obj) return null;
+  if (Array.isArray(obj)) {
+    for (const item of obj) {
+      const found = findRecipeInLd(item);
+      if (found) return found;
+    }
+    return null;
+  }
+  if (typeof obj !== 'object') return null;
+  const type = obj['@type'];
+  if (type === 'Recipe' || (Array.isArray(type) && type.includes('Recipe'))) return obj;
+  if (obj['@graph']) return findRecipeInLd(obj['@graph']);
+  return null;
+}
+
+function normaliseIngredients(raw) {
+  if (!raw) return [];
+  if (typeof raw === 'string') return raw.split('\n').map(s => s.trim()).filter(Boolean);
+  if (Array.isArray(raw)) return raw.map(i => typeof i === 'string' ? i.trim() : (i.text || String(i))).filter(Boolean);
+  return [];
+}
+
+function normaliseSteps(raw) {
+  if (!raw) return [];
+  if (typeof raw === 'string') return raw.split('\n').map(s => s.trim()).filter(Boolean);
+  if (Array.isArray(raw)) {
+    const steps = [];
+    for (const item of raw) {
+      if (typeof item === 'string') { steps.push(item.trim()); continue; }
+      if (item && item['@type'] === 'HowToStep') { steps.push((item.text || '').trim()); continue; }
+      if (item && item['@type'] === 'HowToSection') {
+        const inner = item.itemListElement || [];
+        for (const sub of inner) {
+          if (typeof sub === 'string') steps.push(sub.trim());
+          else if (sub.text) steps.push(sub.text.trim());
+        }
+      }
+    }
+    return steps.filter(Boolean);
+  }
+  return [];
+}
+
+function normaliseImage(raw) {
+  if (!raw) return null;
+  if (typeof raw === 'string') return raw;
+  if (Array.isArray(raw)) return typeof raw[0] === 'string' ? raw[0] : (raw[0] && raw[0].url) || null;
+  if (raw.url) return raw.url;
+  return null;
+}
+
+function normaliseServings(raw) {
+  if (!raw) return null;
+  const str = Array.isArray(raw) ? raw[0] : String(raw);
+  const m = String(str).match(/(\d+)/);
+  return m ? parseInt(m[1], 10) : null;
+}
+
+function extractMeta(html, property) {
+  const re = new RegExp(`<meta[^>]*property=["']${property}["'][^>]*content=["']([^"']*)["']`, 'i');
+  const m = html.match(re);
+  if (m) return m[1];
+  const re2 = new RegExp(`<meta[^>]*content=["']([^"']*)["'][^>]*property=["']${property}["']`, 'i');
+  const m2 = html.match(re2);
+  return m2 ? m2[1] : null;
+}
+
+function extractTitle(html) {
+  const m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  return m ? m[1].trim() : null;
+}
+
 async function handleApi(request, env) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/+$/, '');
@@ -89,6 +211,18 @@ async function handleApi(request, env) {
   if (path === '/api/notify-test' && request.method === 'POST') {
     const result = await sendDailyNotification(env, { force: true, title: 'The Marnoch Pantry', testNote: 'Test notification — you are all set up. 🎉' });
     return json(result);
+  }
+
+  if (path === '/api/scrape-recipe' && request.method === 'GET') {
+    const targetUrl = url.searchParams.get('url');
+    if (!targetUrl) return json({ error: 'url parameter required' }, 400);
+    try { new URL(targetUrl); } catch (_) { return json({ error: 'invalid URL' }, 400); }
+    try {
+      const result = await scrapeRecipe(targetUrl);
+      return json(result);
+    } catch (err) {
+      return json({ error: err.message || 'Failed to fetch recipe' }, 502);
+    }
   }
 
   return json({ error: 'not found' }, 404);

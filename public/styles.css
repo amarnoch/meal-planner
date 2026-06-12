@@ -541,6 +541,27 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   border: 1px solid var(--border-light);
 }
 
+.week-summary-quick {
+  background: rgba(255, 180, 50, 0.2);
+  color: #8a6200;
+}
+
+.week-summary-processed {
+  background: rgba(160, 120, 100, 0.2);
+  color: var(--text-muted);
+}
+
+.week-summary-fish {
+  background: rgba(70, 140, 180, 0.2);
+  color: #1a5276;
+}
+
+.week-summary-leftovers {
+  background: rgba(130, 130, 130, 0.15);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 .planner-header-actions {
   display: flex;
   gap: 0.5rem;
@@ -1190,6 +1211,27 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 .assign-meal-pick-btn {
   text-align: left;
   font-weight: 500;
+}
+
+.assign-meal-search {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: 0.9rem;
+  background: var(--surface);
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.assign-meal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
 /* Meal info modal (read-only ingredient view) */
@@ -2696,6 +2738,62 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   color: var(--text-muted);
   border-top: 1px solid var(--border-light);
   padding-top: 1rem;
+}
+
+.rf-import-section {
+  margin-bottom: 0;
+}
+
+.rf-import-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1.5px solid var(--border-light);
+  margin-bottom: 0.75rem;
+}
+
+.rf-tab {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.rf-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.rf-import-input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.rf-import-input-group input {
+  flex: 1;
+  min-width: 0;
+}
+
+.rf-import-input-group .btn {
+  flex-shrink: 0;
+}
+
+.rf-tab-panel textarea {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  background: var(--surface);
+  color: var(--text);
+  resize: vertical;
 }
 
 #settings-form select,
