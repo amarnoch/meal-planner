@@ -14,7 +14,7 @@ crons = ["0 * * * *"]
 [[kv_namespaces]]
 binding = "PANTRY"
 # Replace with the id printed by: wrangler kv namespace create PANTRY
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+id = "2b28451d694f422ebfcdd0fad2b9ac50"
 
 # Secrets (set with `wrangler secret put <NAME>`):
 #   FAMILY_KEY        — shared key both phones enter once
