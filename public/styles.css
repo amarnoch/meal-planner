@@ -2954,3 +2954,77 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   font-size: 0.75rem;
   margin-left: 0.25rem;
 }
+
+/* Launch splash — painted wordmark on the app background, fades out on load */
+#app-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  opacity: 1;
+  transition: opacity 0.45s ease;
+}
+
+#app-splash.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.splash-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 1.5rem;
+  animation: splash-rise 0.6s ease both;
+}
+
+.splash-wordmark {
+  font-family: 'Yellowtail', cursive;
+  font-weight: 400;
+  font-size: 3.6rem;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.splash-tagline {
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+
+.splash-dots {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 1.5rem;
+}
+
+.splash-dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text);
+  opacity: 0.25;
+  animation: splash-dot 1s ease-in-out infinite;
+}
+
+.splash-dots span:nth-child(2) { animation-delay: 0.15s; }
+.splash-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes splash-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes splash-dot {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  50% { opacity: 0.9; transform: translateY(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #app-splash { transition: none; }
+  .splash-inner, .splash-dots span { animation: none; }
+}

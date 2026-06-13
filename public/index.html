@@ -15,6 +15,13 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div id="app-splash" role="status" aria-label="The Pantry — loading">
+    <div class="splash-inner">
+      <div class="splash-wordmark">The Pantry</div>
+      <div class="splash-tagline">Meal planning, recipes, inspiration</div>
+      <div class="splash-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+    </div>
+  </div>
   <header class="app-header">
     <h1 class="brand-wordmark">The Pantry</h1>
     <div class="header-actions">
@@ -327,5 +334,22 @@
   </div>
 
   <script type="module" src="app.js"></script>
+  <script>
+    // Launch splash: show the wordmark briefly, then fade out once the app is ready.
+    (function () {
+      var splash = document.getElementById('app-splash');
+      if (!splash) return;
+      var MIN = 900, start = Date.now(), done = false;
+      function hide() {
+        if (done) return; done = true;
+        splash.classList.add('hide');
+        setTimeout(function () { if (splash.parentNode) splash.parentNode.removeChild(splash); }, 600);
+      }
+      function ready() { setTimeout(hide, Math.max(0, MIN - (Date.now() - start))); }
+      if (document.readyState === 'complete') ready();
+      else window.addEventListener('load', ready);
+      setTimeout(hide, 3500); // safety net if load never fires
+    })();
+  </script>
 </body>
 </html>
