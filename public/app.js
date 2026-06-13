@@ -2093,10 +2093,33 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     switch (state) {
       case 'unlinked': return 'Not linked — tap to enter your family key.';
       case 'error': return 'Sync error — tap to check the family key in Settings.';
-      case 'offline': return 'Offline — your changes will sync when you reconnect.';
+      case 'offline': return 'Offline — tap to retry syncing.';
       case 'syncing': return 'Syncing with the family link…';
-      default: return lastSyncedAt ? `In sync with the family link · last synced ${relativeTime(lastSyncedAt)}` : 'In sync with the family link.';
+      default: return (lastSyncedAt ? `In sync · last synced ${relativeTime(lastSyncedAt)}` : 'In sync with the family link.') + ' · tap to sync now';
     }
+  }
+
+  // Force a sync now: pull the latest from the family link, then push local edits.
+  function syncNow() {
+    if (!syncEnabled() || !syncRef) { updateSyncStatusLine(); return; }
+    if (!navigator.onLine) {
+      setHeaderSyncStatus('offline');
+      updateSyncStatusLine('Offline — changes will sync when you reconnect.');
+      return;
+    }
+    setHeaderSyncStatus('syncing');
+    updateSyncStatusLine('Syncing…');
+    Promise.resolve(syncRef.pullAll())
+      .then(() => syncRef.flush())
+      .then(() => { if (syncEnabled()) updateSyncStatusLine('Synced just now.'); });
+  }
+
+  // Header chip tap: sync now when linked & healthy, otherwise open Settings to fix the key.
+  function onSyncChipClick() {
+    const el = document.getElementById('sync-status');
+    const state = el ? el.dataset.state : '';
+    if (!syncEnabled() || state === 'error') { openSettingsModal(); return; }
+    syncNow();
   }
 
   // Header sync chip. States: idle | syncing | offline | error | unlinked.
@@ -3832,7 +3855,8 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     document.getElementById('recipes-btn')?.addEventListener('click', () => showAppPanel('recipes'));
     document.getElementById('close-recipes-btn')?.addEventListener('click', () => showAppPanel('planner'));
     document.getElementById('settings-btn')?.addEventListener('click', openSettingsModal);
-    document.getElementById('sync-status')?.addEventListener('click', openSettingsModal);
+    document.getElementById('sync-status')?.addEventListener('click', onSyncChipClick);
+    document.getElementById('sync-now-btn')?.addEventListener('click', syncNow);
     document.getElementById('settings-form')?.addEventListener('submit', handleSettingsSave);
     document.getElementById('settings-cancel')?.addEventListener('click', () => closeOverlay('settings-overlay'));
     document.getElementById('enable-reminders-btn')?.addEventListener('click', async () => {
