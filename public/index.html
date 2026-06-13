@@ -25,6 +25,10 @@
   <header class="app-header">
     <h1 class="brand-wordmark">The Pantry</h1>
     <div class="header-actions">
+      <button type="button" class="sync-status" id="sync-status" data-state="unlinked" aria-live="polite" title="Sync status">
+        <span class="sync-dot" aria-hidden="true"></span>
+        <span class="sync-label">…</span>
+      </button>
       <button type="button" class="btn btn-secondary btn-sm" id="recipes-btn">Recipes</button>
       <button type="button" class="btn btn-secondary btn-sm" id="settings-btn" aria-label="Settings" title="Settings">⚙︎</button>
     </div>

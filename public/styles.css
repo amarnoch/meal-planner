@@ -99,6 +99,56 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   display: flex;
   gap: 0.4rem;
   flex-shrink: 0;
+  align-items: center;
+}
+
+/* Sync status chip — shows whether the app is in sync with the family link */
+.sync-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--border-light);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sync-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.sync-status[data-state="idle"] { color: #2e7d4f; border-color: rgba(46, 158, 91, 0.35); }
+.sync-status[data-state="idle"] .sync-dot { background: #2e9e5b; }
+.sync-status[data-state="syncing"] .sync-dot { background: #d98a2b; animation: sync-pulse 1s ease-in-out infinite; }
+.sync-status[data-state="offline"] .sync-dot { background: #9a9183; }
+.sync-status[data-state="error"] { color: #b5384a; border-color: rgba(209, 73, 91, 0.4); }
+.sync-status[data-state="error"] .sync-dot { background: #d1495b; }
+.sync-status[data-state="unlinked"] .sync-dot { background: #b8b0a2; }
+
+@keyframes sync-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sync-status[data-state="syncing"] .sync-dot { animation: none; }
+}
+
+/* Only on the very narrowest screens, drop the label to keep the header tidy */
+@media (max-width: 360px) {
+  .sync-status .sync-label { display: none; }
+  .sync-status { padding: 0.35rem; }
 }
 
 /* Main layout */

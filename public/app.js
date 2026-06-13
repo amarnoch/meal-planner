@@ -2077,6 +2077,41 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     openOverlayById(overlay.id);
   }
 
+  let lastSyncedAt = null;
+
+  function relativeTime(ts) {
+    const s = Math.round((Date.now() - ts) / 1000);
+    if (s < 10) return 'just now';
+    if (s < 60) return `${s}s ago`;
+    const m = Math.round(s / 60);
+    if (m < 60) return `${m} min${m === 1 ? '' : 's'} ago`;
+    const h = Math.round(m / 60);
+    return `${h} hour${h === 1 ? '' : 's'} ago`;
+  }
+
+  function syncStatusTitle(state) {
+    switch (state) {
+      case 'unlinked': return 'Not linked — tap to enter your family key.';
+      case 'error': return 'Sync error — tap to check the family key in Settings.';
+      case 'offline': return 'Offline — your changes will sync when you reconnect.';
+      case 'syncing': return 'Syncing with the family link…';
+      default: return lastSyncedAt ? `In sync with the family link · last synced ${relativeTime(lastSyncedAt)}` : 'In sync with the family link.';
+    }
+  }
+
+  // Header sync chip. States: idle | syncing | offline | error | unlinked.
+  function setHeaderSyncStatus(state) {
+    const el = document.getElementById('sync-status');
+    if (!el) return;
+    if (!syncEnabled()) state = 'unlinked';
+    if (state === 'idle') lastSyncedAt = Date.now();
+    const labels = { idle: 'Synced', syncing: 'Syncing…', offline: 'Offline', error: 'Sync error', unlinked: 'Not linked' };
+    el.dataset.state = state;
+    const labelEl = el.querySelector('.sync-label');
+    if (labelEl) labelEl.textContent = labels[state] || 'Synced';
+    el.title = syncStatusTitle(state);
+  }
+
   function updateSyncStatusLine(text) {
     const el = document.getElementById('sync-status-line');
     if (!el) return;
@@ -2123,6 +2158,7 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     const keyInput = document.getElementById('set-family-key').value.trim();
     const hadKey = syncEnabled();
     setFamilyKey(keyInput);
+    setHeaderSyncStatus(syncEnabled() ? 'syncing' : 'unlinked');
     if (keyInput && !hadKey && syncRef) {
       updateSyncStatusLine('Connecting…');
       syncRef.seedIfEmpty()
@@ -3610,6 +3646,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         renderRecipes();
       },
       onStatus: (s) => {
+        setHeaderSyncStatus(s);
         if (s === 'error') updateSyncStatusLine('Sync error — check the family key in Settings.');
       }
     });
@@ -3624,6 +3661,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       refreshUI();
       renderRecipesList();
       wireEventListeners();
+      setHeaderSyncStatus(syncEnabled() ? 'syncing' : 'unlinked');
       syncRef.start();
       registerServiceWorker();
       revalidateSubscription();
@@ -3794,6 +3832,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     document.getElementById('recipes-btn')?.addEventListener('click', () => showAppPanel('recipes'));
     document.getElementById('close-recipes-btn')?.addEventListener('click', () => showAppPanel('planner'));
     document.getElementById('settings-btn')?.addEventListener('click', openSettingsModal);
+    document.getElementById('sync-status')?.addEventListener('click', openSettingsModal);
     document.getElementById('settings-form')?.addEventListener('submit', handleSettingsSave);
     document.getElementById('settings-cancel')?.addEventListener('click', () => closeOverlay('settings-overlay'));
     document.getElementById('enable-reminders-btn')?.addEventListener('click', async () => {
