@@ -1,6 +1,6 @@
 /* Meal Planner - CSS */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Yellowtail&display=swap');
 
 :root {
   /* v2 "Pantry fresh" palette (Mob-inspired): clean white base, ink actions, one warm accent */
@@ -84,6 +84,15 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   color: var(--text);
   flex: 1;
   min-width: 0;
+}
+
+/* Painted "The Pantry" wordmark — matches the app icon */
+.app-header h1.brand-wordmark {
+  font-family: 'Yellowtail', cursive;
+  font-weight: 400;
+  font-size: 2rem;
+  letter-spacing: 0;
+  line-height: 1.15;
 }
 
 .header-actions {
@@ -2131,6 +2140,10 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 
   .app-header h1 {
     font-size: 1.15rem;
+  }
+
+  .app-header h1.brand-wordmark {
+    font-size: 1.6rem;
   }
 
   .header-actions .btn {
