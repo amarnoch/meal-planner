@@ -835,12 +835,18 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     return meal;
   }
 
+  // Tidy a free-text meal name: trim, collapse internal whitespace (so
+  // "Beef  Stew" matches "Beef Stew"), and cap length to keep layouts sane.
+  function normalizeMealName(raw) {
+    return String(raw || '').trim().replace(/\s+/g, ' ').slice(0, 60);
+  }
+
   // Free-text "meal idea": just type a name and it's added as a plannable meal,
   // filed under an "Ideas" cuisine. Flesh it out later via the meal's edit form.
   function quickAddMeal() {
     const input = document.getElementById('quick-meal-input');
     if (!input) return;
-    const name = input.value.trim();
+    const name = normalizeMealName(input.value);
     if (!name) { input.focus(); return; }
     if (state.meals.some(m => m.meal_name.toLowerCase() === name.toLowerCase())) {
       alert(`"${name}" is already in your meals.`);
@@ -2650,7 +2656,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     // Pick a meal first (entry from empty slot)
     if (s.step === 'pickMeal') {
       heading.textContent = `Pick meal for ${dayLabel(s.targetDay)} ${s.targetMealType}`;
-      hint.textContent = 'Tap a meal to add it to this slot.';
+      hint.textContent = 'Tap a meal, or type a new one and add it.';
       subtitle.innerHTML = '';
       if (backBtn) backBtn.hidden = true;
 
@@ -2670,8 +2676,35 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       const searchInput = document.createElement('input');
       searchInput.type = 'text';
       searchInput.className = 'assign-meal-search';
-      searchInput.placeholder = 'Search meals…';
+      searchInput.placeholder = 'Search or add a new meal…';
+      searchInput.maxLength = 60;
       body.appendChild(searchInput);
+
+      // Free-text create: type a name that isn't in the library and add it
+      // straight into this slot (saved as an "Ideas" meal).
+      const createBtn = document.createElement('button');
+      createBtn.type = 'button';
+      createBtn.className = 'btn btn-primary btn-block assign-meal-create-btn';
+      createBtn.hidden = true;
+      body.appendChild(createBtn);
+
+      const addFreeTextMeal = (raw) => {
+        const name = normalizeMealName(raw);
+        if (!name) return;
+        let meal = state.meals.find(m => m.meal_name.toLowerCase() === name.toLowerCase());
+        if (!meal) {
+          meal = addMeal(name, []);
+          meal.category = 'Ideas';
+          if (!meal.emoji) meal.emoji = '💡';
+          saveMeals();
+        }
+        s.mealName = meal.meal_name;
+        s.meal = meal;
+        if (meal.variants && meal.variants.length > 0) { s.step = 'variant'; renderAssignMealModal(); return; }
+        if (meal.sides && meal.sides.length > 0) { s.step = 'side'; renderAssignMealModal(); return; }
+        commitAssignToTarget();
+      };
+      createBtn.addEventListener('click', () => addFreeTextMeal(searchInput.value));
 
       const mealList = document.createElement('div');
       mealList.className = 'assign-meal-list';
@@ -2742,8 +2775,9 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       noMatch.hidden = true;
       mealList.appendChild(noMatch);
 
-      searchInput.addEventListener('input', () => {
-        const term = searchInput.value.trim().toLowerCase();
+      const updateFilter = () => {
+        const raw = searchInput.value.trim();
+        const term = raw.toLowerCase();
         let visible = 0;
         sections.forEach(({ details, sectionBtns }) => {
           let sectionVisible = 0;
@@ -2755,7 +2789,16 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
           details.hidden = !!term && sectionVisible === 0;
           details.open = true; // keep sections expanded while filtering
         });
-        noMatch.hidden = visible > 0;
+        const norm = normalizeMealName(raw);
+        const exact = norm && state.meals.some(m => m.meal_name.toLowerCase() === norm.toLowerCase());
+        const showCreate = !!norm && !exact;
+        createBtn.hidden = !showCreate;
+        if (showCreate) createBtn.textContent = `➕ Add “${norm}”`;
+        noMatch.hidden = visible > 0 || showCreate;
+      };
+      searchInput.addEventListener('input', updateFilter);
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !createBtn.hidden) { e.preventDefault(); addFreeTextMeal(searchInput.value); }
       });
       requestAnimationFrame(() => searchInput.focus());
       return;

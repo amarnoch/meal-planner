@@ -1271,6 +1271,11 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   z-index: 1;
 }
 
+.assign-meal-create-btn {
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
 .assign-meal-list {
   display: flex;
   flex-direction: column;
