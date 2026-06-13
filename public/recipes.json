@@ -3212,5 +3212,123 @@
     "notes": "Store-cupboard friendly. The mascarpone makes it creamy without a separate white sauce.",
     "createdAt": "2026-06-04T00:00:00Z",
     "mealName": "Tuna Pasta"
+  },
+  {
+    "id": "rec_chocolate_pb_granola",
+    "title": "Chocolate Peanut Butter Granola",
+    "source": {
+      "type": "instagram",
+      "url": null,
+      "label": "@EatingHealthyToday"
+    },
+    "imageUrl": null,
+    "servings": 15,
+    "category": "Breakfast",
+    "tags": [
+      "breakfast",
+      "granola",
+      "high fibre",
+      "meal prep",
+      "vegetarian"
+    ],
+    "ingredients": [
+      {
+        "qty": "200",
+        "unit": "g",
+        "name": "rolled oats",
+        "notes": null,
+        "emoji": "🌾"
+      },
+      {
+        "qty": "25",
+        "unit": "g",
+        "name": "flaxseed",
+        "notes": null,
+        "emoji": "🌱"
+      },
+      {
+        "qty": "25",
+        "unit": "g",
+        "name": "chia seeds",
+        "notes": null,
+        "emoji": "🌱"
+      },
+      {
+        "qty": "25",
+        "unit": "g",
+        "name": "almonds",
+        "notes": null,
+        "emoji": "🌰"
+      },
+      {
+        "qty": "25",
+        "unit": "g",
+        "name": "walnuts",
+        "notes": null,
+        "emoji": "🌰"
+      },
+      {
+        "qty": "25",
+        "unit": "g",
+        "name": "pecans",
+        "notes": null,
+        "emoji": "🌰"
+      },
+      {
+        "qty": "25",
+        "unit": "g",
+        "name": "pumpkin seeds",
+        "notes": null,
+        "emoji": "🎃"
+      },
+      {
+        "qty": "25",
+        "unit": "g",
+        "name": "coconut shavings",
+        "notes": null,
+        "emoji": "🥥"
+      },
+      {
+        "qty": "60",
+        "unit": "g",
+        "name": "dried cranberries",
+        "notes": null,
+        "emoji": "🫐"
+      },
+      {
+        "qty": "80",
+        "unit": "g",
+        "name": "honey",
+        "notes": null,
+        "emoji": "🍯"
+      },
+      {
+        "qty": "80",
+        "unit": "g",
+        "name": "peanut butter",
+        "notes": null,
+        "emoji": "🥜"
+      },
+      {
+        "qty": "80",
+        "unit": "g",
+        "name": "dark chocolate",
+        "notes": "added after baking",
+        "emoji": "🍫"
+      }
+    ],
+    "steps": [
+      "Preheat oven to 160°C (320°F).",
+      "Add all ingredients except the dark chocolate to a large bowl.",
+      "Mix until everything is evenly combined.",
+      "Spread evenly onto a lined baking tray.",
+      "Bake for 25–30 minutes until golden.",
+      "Allow to cool for 15 minutes.",
+      "Stir through the dark chocolate until melted and coated.",
+      "Let set completely before breaking into clusters."
+    ],
+    "notes": "Makes 15 servings. Per serving: 191 cal · 5g protein · 20g carbs · 10g fat · 4.5g fibre. Serving suggestion: 1 portion + 250g 0% Greek yogurt + 100g raspberries = 356 cal · 31g protein · 11g fibre. Recipe-only (not added to the weekly meal list). From Instagram @EatingHealthyToday.",
+    "createdAt": "2026-06-13T19:12:27.708Z",
+    "mealName": null
   }
 ]
