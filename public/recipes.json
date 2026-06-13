@@ -693,7 +693,7 @@
     },
     "imageUrl": "https://images.unsplash.com/photo-1565087170449-fa23854a6100?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
-    "category": "Bakes",
+    "category": "Breakfast",
     "tags": [
       "breakfast",
       "sweet",
@@ -761,7 +761,7 @@
     },
     "imageUrl": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?fm=jpg&q=70&w=600&auto=format&fit=crop",
     "servings": 4,
-    "category": "Bakes",
+    "category": "Breakfast",
     "tags": [
       "breakfast",
       "sweet",
@@ -3330,5 +3330,455 @@
     "notes": "Makes 15 servings. Per serving: 191 cal · 5g protein · 20g carbs · 10g fat · 4.5g fibre. Serving suggestion: 1 portion + 250g 0% Greek yogurt + 100g raspberries = 356 cal · 31g protein · 11g fibre. Recipe-only (not added to the weekly meal list). From Instagram @EatingHealthyToday.",
     "createdAt": "2026-06-13T19:12:27.708Z",
     "mealName": null
+  },
+  {
+    "id": "rec_healthy_banana_bread",
+    "title": "Healthy Banana Bread",
+    "source": {
+      "type": "manual",
+      "url": null,
+      "label": null
+    },
+    "imageUrl": null,
+    "servings": 10,
+    "category": "Bakes",
+    "tags": [
+      "baking",
+      "banana bread",
+      "snack",
+      "freezer friendly"
+    ],
+    "ingredients": [
+      {
+        "qty": "",
+        "unit": "",
+        "name": "2–3 bananas, mashed (about 320g / 1⅓ cups)",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "1 large egg",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "15ml (13g) vanilla extract",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "38g light brown sugar",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "25g granulated sugar",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "2.6g ground cinnamon",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "4g baking powder",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "5g baking soda (bicarbonate of soda)",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "2.5g salt",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "180g all-purpose flour (plain or white whole-wheat)",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "28g unsalted butter, melted (or 30g applesauce)",
+        "notes": null,
+        "emoji": null
+      }
+    ],
+    "steps": [
+      "Grease a standard 9×5\" loaf pan (line the bottom with parchment paper to stop the loaf sticking).",
+      "Mash the bananas in a mixing bowl. Add the egg, vanilla, brown sugar, granulated sugar and cinnamon and stir well to combine.",
+      "In a separate small bowl, stir together the flour, baking powder, baking soda and salt. Add to the banana mixture and stir to combine.",
+      "Gently stir in the melted butter.",
+      "Bake at 350°F / 175°C for 35–45 minutes, or until a toothpick inserted into the centre comes out clean.",
+      "Allow to cool in the pan for 5–10 minutes before inverting onto a wire cooling rack."
+    ],
+    "notes": "Storing: keeps at room temperature for 3–5 days. Freezing: cool completely, then store airtight for up to 3 months; thaw to room temperature before serving. Muffins: divide the batter into a greased/lined 12-cup muffin tin and bake 18–25 minutes. Mix-ins: stir in ¾ cup of chopped nuts, chocolate chips or raisins before adding the batter to the pan. Recipe-only (not added to the weekly meal list).",
+    "createdAt": "2026-06-13T19:34:37.739Z",
+    "mealName": null
+  },
+  {
+    "id": "rec_bbc_brownies",
+    "title": "Chocolate Brownies",
+    "source": {
+      "type": "url",
+      "url": "https://www.bbc.co.uk/food/recipes/how_to_make_brownies_14648",
+      "label": "BBC Food"
+    },
+    "imageUrl": "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/how_to_make_brownies_14648_16x9.jpg",
+    "servings": 16,
+    "category": "Bakes",
+    "tags": [
+      "baking",
+      "chocolate",
+      "dessert",
+      "treat"
+    ],
+    "ingredients": [
+      {
+        "qty": "",
+        "unit": "",
+        "name": "200g/7oz dark chocolate (70% cocoa solids)",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "150g/5½oz unsalted butter, plus extra for greasing the tin",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "100g/3½oz milk or white chocolate, or a mix of both",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "125g/4½oz dark muscovado sugar",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "125g/4½oz golden caster sugar",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "4 free-range eggs, at room temperature",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "85g/3oz plain flour",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "2 tbsp cocoa powder, plus a little extra for dusting, if you like",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "¼ tsp fine salt",
+        "notes": null,
+        "emoji": null
+      }
+    ],
+    "steps": [
+      "Preheat the oven to 180C/350F/Gas 4.",
+      "Use a little butter to grease the inside of a 23cm/9in square baking tin and line with baking parchment, easing it into the corners.",
+      "Chop the dark chocolate into small pieces and place with the butter in a large heatproof bowl.",
+      "Set the bowl over a pan of gently simmering water (bowl not touching the water) and stir occasionally until mostly melted, then remove from the heat.",
+      "Chop the white/milk chocolate into penny-sized pieces and set aside.",
+      "Whisk the sugar into the melted chocolate, then add the eggs and whisk well until slightly bubbly.",
+      "Sift the flour, cocoa powder and salt into a separate bowl, then fold into the chocolate mixture a third at a time until just combined.",
+      "Pour into the tin, scatter the chunks of chocolate on top and bake for 20–25 minutes — the middle should still wobble slightly.",
+      "Cool completely in the tin, then lift out, cut into squares and dust with icing sugar or cocoa."
+    ],
+    "notes": "From BBC Food. Recipe-only (not added to the weekly meal list).",
+    "createdAt": "2026-06-13T19:34:37.739Z",
+    "mealName": null
+  },
+  {
+    "id": "rec_bbc_scones",
+    "title": "Plain Scones with Jam & Cream",
+    "source": {
+      "type": "url",
+      "url": "https://www.bbc.co.uk/food/recipes/scones_with_jam_and_10035",
+      "label": "BBC Food"
+    },
+    "imageUrl": "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/scones_with_jam_and_10035_16x9.jpg",
+    "servings": 10,
+    "category": "Bakes",
+    "tags": [
+      "baking",
+      "afternoon tea",
+      "treat"
+    ],
+    "ingredients": [
+      {
+        "qty": "",
+        "unit": "",
+        "name": "225g/8oz self-raising flour, plus extra for dusting",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "pinch of salt",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "55g/2oz cold butter, cut into cubes",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "25g/1oz caster sugar",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "150ml/5fl oz milk",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "500g/1lb 1oz clotted cream",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "1 large jar raspberry jam",
+        "notes": null,
+        "emoji": null
+      }
+    ],
+    "steps": [
+      "Preheat the oven to 220C/425F/Gas 7 and line a baking tray with greaseproof paper.",
+      "Sift the flour and salt into a bowl. Rub in the butter with your fingertips until it resembles breadcrumbs, then add the sugar and milk and lightly mix until just combined.",
+      "Tip onto a lightly floured surface and flatten to about 2cm/1in thick. Cut out 8–12 scones with a 5cm/2in fluted cutter.",
+      "Place on the tray and bake for 12–15 minutes until golden-brown and well risen, then cool on a wire rack.",
+      "Serve with clotted cream and raspberry jam."
+    ],
+    "notes": "From BBC Food. Recipe-only (not added to the weekly meal list).",
+    "createdAt": "2026-06-13T19:34:37.739Z",
+    "mealName": null
+  },
+  {
+    "id": "rec_chilli_fried_tofu",
+    "title": "Chilli-fried Tofu with Egg-fried Rice",
+    "source": {
+      "type": "url",
+      "url": "https://www.bbc.co.uk/food/recipes/chillifriedtofuwithe_93035",
+      "label": "BBC Food"
+    },
+    "imageUrl": "https://ichef.bbci.co.uk/food/ic/food_16x9_1600/recipes/chillifriedtofuwithe_93035_16x9.jpg",
+    "servings": 4,
+    "category": "Chinese",
+    "tags": [
+      "dinner",
+      "tofu",
+      "vegetarian",
+      "chinese",
+      "spicy"
+    ],
+    "ingredients": [
+      {
+        "qty": "",
+        "unit": "",
+        "name": "2 tbsp vegetable oil, plus extra for shallow frying",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "500g/1lb 2oz firm tofu, drained, patted dry, cut into 1.5cm/½in cubes",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "4 tbsp cornflour",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "2 tbsp Sichuan peppercorns, crushed",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "75g/3oz cashew nuts",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "150ml/5fl oz rice wine vinegar",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "150g/5oz caster sugar",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "4 tbsp soy sauce",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "2 red chillies, finely diced",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "2 tsp dried chilli flakes",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "10cm/4in piece fresh root ginger, peeled, finely grated",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "2 carrots, peeled, julienned",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "2 tbsp groundnut oil",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "2 large free-range eggs, lightly beaten",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "2 tsp sesame oil",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "200g/7oz cooked basmati rice, cooled",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "salt and freshly ground black pepper",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "4 spring onions, finely sliced",
+        "notes": null,
+        "emoji": null
+      },
+      {
+        "qty": "",
+        "unit": "",
+        "name": "3 tbsp chopped fresh coriander leaves",
+        "notes": null,
+        "emoji": null
+      }
+    ],
+    "steps": [
+      "Mix the tofu with 2 tablespoons of vegetable oil.",
+      "Pour vegetable oil into a deep heavy-based frying pan to a depth of 3cm/1in and heat over a medium heat. (Caution: hot oil — do not leave unattended.)",
+      "Mix the cornflour and crushed peppercorns in a bowl. Dredge the tofu in the mix, shake off excess, then fry in batches for 1–2 minutes until crisp. Drain on kitchen paper.",
+      "Fry the cashew nuts in the hot oil for 1 minute until golden and crisp, then drain on kitchen paper.",
+      "For the sauce, heat the vinegar, sugar and soy sauce in a non-reactive pan until boiling. Add the chillies, chilli flakes and ginger and cook 2 minutes until reduced.",
+      "Add the fried tofu, cashews and carrots, stir well and cook for 2 minutes until the carrots soften.",
+      "For the egg-fried rice, beat the eggs with the sesame oil and add to a hot wok; let set a little then scramble and remove. Add a little oil and stir-fry the rice for 3 minutes until hot. Season, then stir through the egg, spring onions and coriander.",
+      "Spoon the egg-fried rice onto plates and top with the chilli-fried tofu."
+    ],
+    "notes": "From BBC Food.",
+    "createdAt": "2026-06-13T19:34:37.739Z",
+    "mealName": "Chilli-fried Tofu"
   }
 ]
