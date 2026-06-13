@@ -835,6 +835,31 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     return meal;
   }
 
+  // Free-text "meal idea": just type a name and it's added as a plannable meal,
+  // filed under an "Ideas" cuisine. Flesh it out later via the meal's edit form.
+  function quickAddMeal() {
+    const input = document.getElementById('quick-meal-input');
+    if (!input) return;
+    const name = input.value.trim();
+    if (!name) { input.focus(); return; }
+    if (state.meals.some(m => m.meal_name.toLowerCase() === name.toLowerCase())) {
+      alert(`"${name}" is already in your meals.`);
+      input.select();
+      return;
+    }
+    const meal = addMeal(name, []);
+    meal.category = 'Ideas';
+    if (!meal.emoji) meal.emoji = '💡';
+    saveMeals();
+    input.value = '';
+    mealSearchTerm = '';
+    const search = document.getElementById('meal-search');
+    if (search) search.value = '';
+    renderMealLibrary();
+    refreshUI();
+    input.focus();
+  }
+
   function removeMeal(mealName) {
     state.meals = state.meals.filter(m => m.meal_name !== mealName);
     saveMeals();
@@ -3623,6 +3648,10 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
 
   function wireEventListeners() {
     document.getElementById('add-meal-btn')?.addEventListener('click', () => openMealModal());
+    document.getElementById('quick-meal-add-btn')?.addEventListener('click', quickAddMeal);
+    document.getElementById('quick-meal-input')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); quickAddMeal(); }
+    });
     document.getElementById('meal-form')?.addEventListener('submit', handleMealFormSubmit);
     document.getElementById('meal-search')?.addEventListener('input', function () {
       mealSearchTerm = this.value || '';
