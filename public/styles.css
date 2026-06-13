@@ -1298,6 +1298,10 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   font-style: italic;
 }
 
+.meal-info-recipe-link {
+  margin-top: 0.85rem;
+}
+
 .planned-action-clear {
   color: var(--danger);
   border-color: rgba(200, 69, 69, 0.35);
@@ -1477,6 +1481,10 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
   flex-direction: column;
   gap: 1.25rem;
 }
+
+/* The hidden attribute must win over the display rules above, so the cookbook
+   grid stays hidden while a recipe detail is open (id beats the class rules). */
+#recipes-list[hidden] { display: none; }
 
 .cookbooks-grid-inner {
   display: grid;

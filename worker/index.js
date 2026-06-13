@@ -334,12 +334,15 @@ export default {
     ctx.waitUntil((async () => {
       const { date, hour } = londonNow();
       const settingsDoc = await getDoc(env, 'settings');
-      const notifyHour = Number(((settingsDoc.data || {}).notifyTime || '08:00').split(':')[0]);
+      const notifyTime = (settingsDoc.data || {}).notifyTime || '08:00';
+      const notifyHour = Number(notifyTime.split(':')[0]);
       if (hour !== notifyHour) return;
-      const already = await env.PANTRY.get('lastNotifiedDate');
-      if (already === date) return;
-      await env.PANTRY.put('lastNotifiedDate', date);
-      await sendDailyNotification(env);
+      // Dedupe on day + chosen time so (a) an empty/no-op run never "uses up"
+      // the day, and (b) changing the notify time re-arms it the same day.
+      const stamp = `${date}|${notifyTime}`;
+      if (await env.PANTRY.get('lastNotified') === stamp) return;
+      const result = await sendDailyNotification(env);
+      if (result && result.sent > 0) await env.PANTRY.put('lastNotified', stamp);
     })());
   }
 };

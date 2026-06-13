@@ -26,7 +26,7 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
   // --- Settings (synced; replaces the old hardcoded rules) ---
   const STORAGE_SETTINGS = 'mealPlanner_settings';
   const SETTINGS_DEFAULTS = {
-    horizonDays: 7,            // 7 | 10 | 14
+    horizonDays: 14,           // 7 | 10 | 14
     quickDays: ['Tuesday', 'Thursday'],
     salmonPerWeek: 1,
     meatFreeDaysPerWeek: 2,
@@ -1404,6 +1404,25 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     return state.recipes.find(recipe => recipe.id === id) || null;
   }
 
+  // A meal links to a recipe by name (recipe.mealName === meal.meal_name).
+  function getRecipeForMeal(mealName) {
+    if (!mealName || !Array.isArray(state.recipes)) return null;
+    const lower = String(mealName).toLowerCase();
+    return state.recipes.find(r => r && r.mealName && r.mealName.toLowerCase() === lower) || null;
+  }
+
+  // Jump from a meal to its linked recipe — used by meal cards, the meal info
+  // modal and the planned-meal actions. Returns false if there's no recipe.
+  function openRecipeForMeal(mealName) {
+    const recipe = getRecipeForMeal(mealName);
+    if (!recipe) return false;
+    activeRecipeId = recipe.id;
+    recipesView = 'detail';
+    showAppPanel('recipes');
+    renderRecipeDetail(recipe.id);
+    return true;
+  }
+
   function getRecipeSearchTerm() {
     return (document.getElementById('recipe-search')?.value || '').trim().toLowerCase();
   }
@@ -2638,8 +2657,18 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         mealList.innerHTML = '<p class="assign-meal-hint">No meals yet — add one from the Meals tab.</p>';
         return;
       }
-      const mealBtns = [];
+
+      // Group meals into collapsible accordion sections by category (reuses the
+      // meal-library accordion styles). Search filters across every section.
+      const groups = new Map();
       meals.forEach(meal => {
+        const cat = (meal.category && String(meal.category).trim()) || 'Other';
+        if (!groups.has(cat)) groups.set(cat, []);
+        groups.get(cat).push(meal);
+      });
+      const cats = [...groups.keys()].sort((a, b) => a.localeCompare(b));
+
+      const buildPickBtn = (meal) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn btn-secondary btn-block assign-meal-pick-btn';
@@ -2654,8 +2683,32 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
           else { commitAssignToTarget(); return; }
           renderAssignMealModal();
         });
-        mealList.appendChild(btn);
-        mealBtns.push({ btn, meal });
+        return btn;
+      };
+
+      const mealBtns = [];
+      const sections = [];
+      cats.forEach(cat => {
+        const details = document.createElement('details');
+        details.className = 'meal-library-group';
+        details.open = true;
+        const summary = document.createElement('summary');
+        summary.className = 'meal-library-group-heading';
+        summary.innerHTML = `<span>${escapeHtml(cat)}</span><span class="meal-library-group-count">${groups.get(cat).length}</span>`;
+        details.appendChild(summary);
+        const groupList = document.createElement('div');
+        groupList.className = 'meal-library-group-list';
+        const sectionBtns = [];
+        groups.get(cat).forEach(meal => {
+          const btn = buildPickBtn(meal);
+          groupList.appendChild(btn);
+          const entry = { btn, meal };
+          mealBtns.push(entry);
+          sectionBtns.push(entry);
+        });
+        details.appendChild(groupList);
+        mealList.appendChild(details);
+        sections.push({ details, sectionBtns });
       });
 
       const noMatch = document.createElement('p');
@@ -2667,10 +2720,15 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       searchInput.addEventListener('input', () => {
         const term = searchInput.value.trim().toLowerCase();
         let visible = 0;
-        mealBtns.forEach(({ btn, meal }) => {
-          const show = !term || mealMatchesSearch(meal, term);
-          btn.style.display = show ? '' : 'none';
-          if (show) visible++;
+        sections.forEach(({ details, sectionBtns }) => {
+          let sectionVisible = 0;
+          sectionBtns.forEach(({ btn, meal }) => {
+            const show = !term || mealMatchesSearch(meal, term);
+            btn.style.display = show ? '' : 'none';
+            if (show) { sectionVisible++; visible++; }
+          });
+          details.hidden = !!term && sectionVisible === 0;
+          details.open = true; // keep sections expanded while filtering
         });
         noMatch.hidden = visible > 0;
       });
@@ -2875,6 +2933,17 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     }
 
     body.innerHTML = sections.join('');
+
+    const recipeForMeal = getRecipeForMeal(mealName);
+    if (recipeForMeal) {
+      const rLink = document.createElement('button');
+      rLink.type = 'button';
+      rLink.className = 'btn btn-secondary btn-block meal-info-recipe-link';
+      rLink.textContent = '📖 View full recipe';
+      rLink.addEventListener('click', () => { closeOverlay(overlay.id); openRecipeForMeal(mealName); });
+      body.appendChild(rLink);
+    }
+
     openOverlayById(overlay.id);
   }
 
@@ -2956,6 +3025,16 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       body.appendChild(sBtn);
     }
 
+    const recipeForMeal = (!isLeftovers && mealName) ? getRecipeForMeal(mealName) : null;
+    if (recipeForMeal) {
+      const rBtn = document.createElement('button');
+      rBtn.type = 'button';
+      rBtn.className = 'btn btn-secondary btn-block';
+      rBtn.textContent = '📖 View recipe';
+      rBtn.addEventListener('click', () => { close(); openRecipeForMeal(mealName); });
+      body.appendChild(rBtn);
+    }
+
     const clearBtn = document.createElement('button');
     clearBtn.type = 'button';
     clearBtn.className = 'btn btn-secondary btn-block planned-action-clear';
@@ -3030,10 +3109,12 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     }
     if (hasSides) desc = (desc ? desc + ' · ' : '') + 'Sides: ' + meal.sides.map(s => s.name).join(', ');
     const emoji = getMealEmoji(meal);
+    const recipeForMeal = getRecipeForMeal(meal.meal_name);
     card.innerHTML = `
       <div class="meal-card-header">
         <div class="meal-name"><span class="meal-emoji-display">${emoji}</span>${escapeHtml(meal.meal_name)}${meal.quick ? ' <span class="meal-quick-icon" title="Quick meal">⚡</span>' : ''}${hasVariants ? ' <span class="meal-variant-badge">' + meal.variants.length + ' options</span>' : ''}${hasSides ? ' <span class="meal-variant-badge">' + meal.sides.length + ' sides</span>' : ''}</div>
         <div class="meal-card-actions">
+          ${recipeForMeal ? '<button type="button" class="btn-icon recipe-meal-btn" title="View recipe" aria-label="View recipe">📖</button>' : ''}
           <button type="button" class="btn-icon info-meal-btn" title="View ingredients" aria-label="View ingredients">&#9432;</button>
           <button type="button" class="btn-icon edit-meal-btn" title="Edit">&#9998;</button>
           <button type="button" class="btn-icon delete-meal-btn" title="Delete">&times;</button>
@@ -3057,6 +3138,12 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         refreshUI();
       }
     });
+    if (recipeForMeal) {
+      card.querySelector('.recipe-meal-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openRecipeForMeal(meal.meal_name);
+      });
+    }
     card.addEventListener('click', function (e) {
       if (e.target.closest('.btn-icon')) return;
       if (isMobileViewport()) {
