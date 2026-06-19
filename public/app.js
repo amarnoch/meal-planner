@@ -34,6 +34,14 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     avoidCarbRepeat: true,
     // Which meal slots appear as rows in the planner. Each: 'off' | 'weekends' | 'daily'.
     slotConfig: { Breakfast: 'off', Lunch: 'weekends', Dinner: 'daily' },
+    // Daily reference intakes (NHS / Eatwell Guide). Shared, editable in Settings.
+    nutritionTargets: {
+      male:   { kcal: 2500, protein: 55, carbs: 300, sugar: 30, fat: 90, satFat: 30, fibre: 30, salt: 6 },
+      female: { kcal: 2000, protein: 45, carbs: 260, sugar: 30, fat: 70, satFat: 20, fibre: 30, salt: 6 }
+    },
+    // "Typical day" meals that count toward Nutrition totals but never show on
+    // the planner. Each: { source, label, nutrition } or null.
+    typicalMeals: { breakfastWeekday: null, breakfastWeekend: null, lunch: null },
     notifyTime: '08:00',
     processedPerWeek: 1,
     summaryPills: ['meat', 'meatFree', 'salmon', 'carbs', 'processed'],
@@ -41,20 +49,43 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
   };
   let settings = { ...SETTINGS_DEFAULTS };
 
+  // Merge a raw settings object onto the defaults, deep-merging the nested
+  // slotConfig + nutritionTargets and migrating the old weekendLunch flag.
+  // Used for both localStorage load and synced settings from another device.
+  function normaliseSettings(parsed) {
+    const p = parsed || {};
+    const s = { ...SETTINGS_DEFAULTS, ...p };
+    s.slotConfig = { ...SETTINGS_DEFAULTS.slotConfig, ...(p.slotConfig || {}) };
+    if (p.slotConfig === undefined && p.weekendLunch !== undefined) {
+      s.slotConfig.Lunch = p.weekendLunch ? 'weekends' : 'off';
+    }
+    delete s.weekendLunch;
+    s.nutritionTargets = {
+      male:   { ...SETTINGS_DEFAULTS.nutritionTargets.male,   ...((p.nutritionTargets || {}).male || {}) },
+      female: { ...SETTINGS_DEFAULTS.nutritionTargets.female, ...((p.nutritionTargets || {}).female || {}) }
+    };
+    s.typicalMeals = normaliseTypicalMeals(p.typicalMeals);
+    return s;
+  }
+
+  // Validate the three "typical day" slots; each becomes { source, label, nutrition } or null.
+  function normaliseTypicalMeals(raw) {
+    const out = { breakfastWeekday: null, breakfastWeekend: null, lunch: null };
+    if (!raw || typeof raw !== 'object') return out;
+    for (const key of Object.keys(out)) {
+      const e = raw[key];
+      if (e && typeof e === 'object') {
+        const nutrition = normaliseNutrition(e.nutrition);
+        if (nutrition) out[key] = { source: typeof e.source === 'string' ? e.source : 'custom', label: String(e.label || 'Typical'), nutrition };
+      }
+    }
+    return out;
+  }
+
   function loadSettings() {
     try {
       const raw = localStorage.getItem(STORAGE_SETTINGS);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        settings = { ...SETTINGS_DEFAULTS, ...parsed };
-        // Deep-merge slotConfig so a partial saved config keeps defaults for any missing slot.
-        settings.slotConfig = { ...SETTINGS_DEFAULTS.slotConfig, ...(parsed.slotConfig || {}) };
-        // Migrate the old single weekendLunch flag into slotConfig.Lunch.
-        if (parsed.slotConfig === undefined && parsed.weekendLunch !== undefined) {
-          settings.slotConfig.Lunch = parsed.weekendLunch ? 'weekends' : 'off';
-        }
-        delete settings.weekendLunch;
-      }
+      settings = normaliseSettings(raw ? JSON.parse(raw) : null);
     } catch (_) { settings = { ...SETTINGS_DEFAULTS }; }
   }
 
@@ -660,6 +691,7 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
   function refreshUI() {
     renderPlannerGrid();
     renderShoppingList();
+    if (document.querySelector('.stats-panel.mobile-visible')) renderStats();
   }
 
   function openOverlayById(id) {
@@ -946,7 +978,7 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
   }
 
   function mealsToCsv() {
-    const header = 'meal_name,emoji,quick,common_ingredients,variants_json,sides_json,category,image_url';
+    const header = 'meal_name,emoji,quick,common_ingredients,variants_json,sides_json,category,image_url,nutrition_json';
     const rows = state.meals.map(m => {
       const hasVariants = m.variants && m.variants.length > 0;
       const common = hasVariants ? (m.commonIngredients || []).join(';') : (m.ingredients || []).join(';');
@@ -956,7 +988,8 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
       const quick = m.quick ? 'yes' : '';
       const category = m.category || '';
       const imageUrl = m.image_url || '';
-      return `${escapeCsvField(m.meal_name)},${escapeCsvField(emoji)},${escapeCsvField(quick)},${escapeCsvField(common)},${escapeCsvField(variantsJson)},${escapeCsvField(sidesJson)},${escapeCsvField(category)},${escapeCsvField(imageUrl)}`;
+      const nutritionJson = m.nutrition ? JSON.stringify(m.nutrition) : '';
+      return `${escapeCsvField(m.meal_name)},${escapeCsvField(emoji)},${escapeCsvField(quick)},${escapeCsvField(common)},${escapeCsvField(variantsJson)},${escapeCsvField(sidesJson)},${escapeCsvField(category)},${escapeCsvField(imageUrl)},${escapeCsvField(nutritionJson)}`;
     });
     return [header, ...rows].join('\n');
   }
@@ -1068,6 +1101,10 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
       if (meal && categoryStr) meal.category = categoryStr;
       const imageUrlStr = (row.image_url || row.imageUrl || '').trim();
       if (meal && imageUrlStr) meal.image_url = imageUrlStr;
+      const nutritionStr = (row.nutrition_json || row.nutritionJson || '').trim();
+      if (meal && nutritionStr) {
+        try { const n = normaliseNutrition(JSON.parse(nutritionStr)); if (n) meal.nutrition = n; } catch (_) {}
+      }
       if (meal && !state.meals.some(m => m.meal_name === name)) {
         state.meals.push(meal);
       }
@@ -1306,6 +1343,21 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     };
   }
 
+  // Per-serving macros, kept in this order for display. basis = how we know it.
+  const NUTRITION_KEYS = ['kcal', 'protein', 'carbs', 'sugar', 'fat', 'satFat', 'fibre', 'salt'];
+  function normaliseNutrition(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    const out = {};
+    let any = false;
+    for (const k of NUTRITION_KEYS) {
+      const v = Number(raw[k]);
+      if (Number.isFinite(v) && v >= 0) { out[k] = v; any = true; }
+    }
+    if (!any) return null;
+    out.basis = ['estimated', 'scraped', 'stated', 'manual'].includes(raw.basis) ? raw.basis : 'estimated';
+    return out;
+  }
+
   function normaliseRecipe(raw) {
     if (!raw || typeof raw !== 'object') return { error: 'Recipe must be a JSON object.' };
     const title = String(raw.title || '').trim();
@@ -1339,7 +1391,10 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
       steps,
       notes: raw.notes == null ? '' : String(raw.notes),
       createdAt: raw.createdAt ? String(raw.createdAt) : new Date().toISOString(),
-      mealName: raw.mealName ? String(raw.mealName) : null
+      mealName: raw.mealName ? String(raw.mealName) : null,
+      nutrition: normaliseNutrition(raw.nutrition),
+      nutritionManual: !!raw.nutritionManual,
+      nutritionNote: raw.nutritionNote ? String(raw.nutritionNote) : null
     };
     return { recipe };
   }
@@ -1411,7 +1466,10 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
       return {
         ...br,
         notes: notesFromLocal.length ? loc.notes : br.notes,
-        mealName: loc.mealName != null ? loc.mealName : br.mealName
+        mealName: loc.mealName != null ? loc.mealName : br.mealName,
+        // Keep a user's manual nutrition edit; otherwise the bundle's value is canonical.
+        nutrition: loc.nutritionManual && loc.nutrition ? loc.nutrition : br.nutrition,
+        nutritionManual: !!loc.nutritionManual
       };
     });
     for (const r of localList || []) {
@@ -1780,6 +1838,20 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     }
   }
 
+  function renderRecipeNutrition(recipe) {
+    const n = recipe.nutrition;
+    if (!n) return '';
+    const items = [['kcal', 'Energy'], ['protein', 'Protein'], ['carbs', 'Carbs'], ['fat', 'Fat'], ['fibre', 'Fibre'], ['salt', 'Salt']]
+      .map(([k, label]) => `<div class="rn-item"><span class="rn-val">${fmtStat(n[k], k)}${k === 'kcal' ? '' : 'g'}</span><span class="rn-label">${label}</span></div>`).join('');
+    const basisLabel = { estimated: 'estimated', scraped: 'from the recipe', stated: 'as eaten', manual: 'your estimate' }[n.basis] || '';
+    const note = recipe.nutritionNote ? `<p class="rn-note">${escapeHtml(recipe.nutritionNote)}</p>` : '';
+    return `<section class="recipe-detail-section recipe-nutrition">
+        <h3>Per serving${basisLabel ? ` <span class="rn-basis">· ${basisLabel}</span>` : ''}</h3>
+        <div class="rn-grid">${items}</div>
+        ${note}
+      </section>`;
+  }
+
   function renderRecipeDetail(recipeId) {
     const recipe = getRecipeById(recipeId);
     const list = document.getElementById('recipes-list');
@@ -1803,6 +1875,7 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
       return `<li>${emoji}<span>${qtyMarkup}${escapeHtml(ingredient.name)}${notes}</span></li>`;
     }).join('');
     const steps = recipe.steps.map(step => `<li>${escapeHtml(step)}</li>`).join('');
+    const nutritionSection = renderRecipeNutrition(recipe);
     const isMeal = recipe.category === 'meal';
     const heroContent = recipeThumbHtml(recipe, 'recipe-detail-hero-emoji');
     detail.innerHTML = `
@@ -1830,6 +1903,7 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
         <h3>Method</h3>
         <ol class="recipe-steps">${steps}</ol>
       </section>
+      ${nutritionSection}
       <details class="recipe-notes-details">
         <summary>Comments / notes</summary>
         <textarea id="recipe-notes-input" rows="3" placeholder="Anything to remember next time">${escapeHtml(recipe.notes || '')}</textarea>
@@ -1915,6 +1989,11 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     document.getElementById('rf-servings').value = recipe ? (recipe.servings || 4) : 4;
     document.getElementById('rf-image').value = recipe ? (recipe.imageUrl || '') : '';
     document.getElementById('rf-source').value = recipe ? (recipe.source?.url || '') : '';
+    const rn = recipe && recipe.nutrition ? recipe.nutrition : null;
+    NUTRITION_KEYS.forEach(k => {
+      const el = document.getElementById('rf-n-' + k);
+      if (el) el.value = rn && Number.isFinite(Number(rn[k])) ? rn[k] : '';
+    });
     document.getElementById('rf-tags').value = recipe ? (recipe.tags || []).join(', ') : '';
     document.getElementById('rf-ingredients').value = recipe ? (recipe.ingredients || []).map(ingredientToLine).join('\n') : '';
     document.getElementById('rf-steps').value = recipe ? (recipe.steps || []).join('\n') : '';
@@ -1969,6 +2048,12 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
       if (data.imageUrl) document.getElementById('rf-image').value = data.imageUrl;
       if (data.servings) document.getElementById('rf-servings').value = String(data.servings);
       if (data.sourceUrl) document.getElementById('rf-source').value = data.sourceUrl;
+      if (data.nutrition) {
+        NUTRITION_KEYS.forEach(k => {
+          const el = document.getElementById('rf-n-' + k);
+          if (el && Number.isFinite(Number(data.nutrition[k]))) el.value = data.nutrition[k];
+        });
+      }
       urlInput.value = '';
       if (data.partial && statusEl) {
         statusEl.textContent = 'Only title and image found — this site doesn’t have structured recipe data. Fill in ingredients and steps manually.';
@@ -2007,6 +2092,19 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
       createdAt: existing ? existing.createdAt : new Date().toISOString(),
       mealName: existing ? existing.mealName : null
     };
+    // Manual nutrition override if the form has values; otherwise keep what's there.
+    const rawN = {};
+    NUTRITION_KEYS.forEach(k => { rawN[k] = document.getElementById('rf-n-' + k)?.value; });
+    const manualN = normaliseNutrition(rawN);
+    if (manualN) {
+      manualN.basis = 'manual';
+      recipe.nutrition = manualN;
+      recipe.nutritionManual = true;
+    } else {
+      recipe.nutrition = existing ? (existing.nutrition || null) : null;
+      recipe.nutritionManual = existing ? !!existing.nutritionManual : false;
+    }
+    recipe.nutritionNote = existing ? (existing.nutritionNote || null) : null;
     upsertRecipes([recipe]);
 
     // Optionally make it plannable straight away
@@ -2071,6 +2169,92 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
       .filter(r => r.meal);
   }
 
+  // Build the male/female × metric targets grid in Settings (NUTRITION_KEYS order).
+  function renderTargetsGrid() {
+    const grid = document.getElementById('targets-grid');
+    if (!grid) return;
+    const t = settings.nutritionTargets || SETTINGS_DEFAULTS.nutritionTargets;
+    grid.innerHTML = '<div class="targets-row targets-head"><span></span><span>Andy</span><span>Laura</span></div>'
+      + NUTRITION_KEYS.map(k => {
+          const label = METRIC_META[k].label + (METRIC_META[k].unit === 'g' ? ' (g)' : '');
+          return `<div class="targets-row"><label>${escapeHtml(label)}</label>`
+            + `<input type="number" min="0" step="any" inputmode="decimal" data-tgt="male:${k}" value="${Number(t.male[k]) || 0}">`
+            + `<input type="number" min="0" step="any" inputmode="decimal" data-tgt="female:${k}" value="${Number(t.female[k]) || 0}"></div>`;
+        }).join('');
+  }
+
+  const TYPICAL_SLOTS = [
+    ['breakfastWeekday', 'Weekday breakfast'],
+    ['breakfastWeekend', 'Weekend breakfast'],
+    ['lunch', 'Lunch (every day)']
+  ];
+
+  // Build the "Typical day" rows in Settings: each slot picks a recipe/meal or a custom estimate.
+  function renderTypicalMeals() {
+    const wrap = document.getElementById('typical-meals');
+    if (!wrap) return;
+    const tm = settings.typicalMeals || {};
+    const recipeOpts = (state.recipes || []).filter(r => r.nutrition).slice().sort((a, b) => a.title.localeCompare(b.title))
+      .map(r => `<option value="recipe:${escapeHtml(String(r.id))}">${escapeHtml(r.title)}</option>`).join('');
+    const mealOpts = (state.meals || []).filter(m => m.nutrition).slice().sort((a, b) => a.meal_name.localeCompare(b.meal_name))
+      .map(m => `<option value="meal:${escapeHtml(m.meal_name)}">${escapeHtml(m.meal_name)}</option>`).join('');
+    wrap.innerHTML = TYPICAL_SLOTS.map(([key, label]) => {
+      const entry = tm[key];
+      const isCustom = entry && entry.source === 'custom';
+      const n = isCustom ? (entry.nutrition || {}) : {};
+      const customInputs = NUTRITION_KEYS.map(k =>
+        `<label class="typical-n"><span>${escapeHtml(METRIC_META[k].label)}${METRIC_META[k].unit === 'g' ? ' (g)' : ''}</span>`
+        + `<input type="number" min="0" step="any" data-n="${k}" value="${isCustom && Number.isFinite(Number(n[k])) ? n[k] : ''}"></label>`).join('');
+      return `<div class="typical-row" data-slot="${key}">
+        <label class="typical-label">${label}</label>
+        <select class="typical-source">
+          <option value="none">(none)</option>
+          <optgroup label="Recipes">${recipeOpts}</optgroup>
+          <optgroup label="Meals">${mealOpts}</optgroup>
+          <option value="custom">Custom estimate…</option>
+        </select>
+        <div class="typical-custom"${isCustom ? '' : ' hidden'}>
+          <input type="text" class="typical-custom-label" placeholder="Name (e.g. PB toast)" value="${isCustom ? escapeHtml(entry.label || '') : ''}">
+          <div class="typical-custom-grid">${customInputs}</div>
+        </div>
+      </div>`;
+    }).join('');
+    // Apply the saved selection now the options exist (fall back to none if it's gone).
+    wrap.querySelectorAll('.typical-row').forEach(row => {
+      const entry = (settings.typicalMeals || {})[row.dataset.slot];
+      const sel = row.querySelector('.typical-source');
+      sel.value = entry ? entry.source : 'none';
+      if (!sel.value) sel.value = 'none';
+    });
+  }
+
+  function collectTypicalMeals() {
+    const out = { breakfastWeekday: null, breakfastWeekend: null, lunch: null };
+    document.querySelectorAll('#typical-meals .typical-row').forEach(row => {
+      const key = row.dataset.slot;
+      const src = row.querySelector('.typical-source').value;
+      if (src === 'none') return;
+      if (src === 'custom') {
+        const label = row.querySelector('.typical-custom-label').value.trim() || 'Custom';
+        const raw = {};
+        row.querySelectorAll('[data-n]').forEach(inp => { raw[inp.dataset.n] = inp.value; });
+        const nutrition = normaliseNutrition(raw);
+        out[key] = nutrition ? { source: 'custom', label, nutrition } : null;
+        return;
+      }
+      const idx = src.indexOf(':');
+      const kind = src.slice(0, idx), ref = src.slice(idx + 1);
+      if (kind === 'recipe') {
+        const r = (state.recipes || []).find(x => String(x.id) === ref);
+        if (r && r.nutrition) out[key] = { source: src, label: r.title, nutrition: r.nutrition };
+      } else if (kind === 'meal') {
+        const m = getMealByName(ref);
+        if (m && m.nutrition) out[key] = { source: src, label: m.meal_name, nutrition: m.nutrition };
+      }
+    });
+    return out;
+  }
+
   function openSettingsModal() {
     const overlay = document.getElementById('settings-overlay');
     if (!overlay) return;
@@ -2091,6 +2275,8 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
       cb.checked = (settings.summaryPills || SETTINGS_DEFAULTS.summaryPills).includes(cb.value);
     });
     renderRegularMealRows();
+    renderTypicalMeals();
+    renderTargetsGrid();
     document.getElementById('set-notify-time').value = settings.notifyTime || '08:00';
     document.getElementById('set-family-key').value = getFamilyKey();
     updateSyncStatusLine();
@@ -2200,6 +2386,14 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     settings.avoidCarbRepeat = document.getElementById('set-carb-repeat').checked;
     settings.summaryPills = [...document.querySelectorAll('#set-summary-pills input:checked')].map(cb => cb.value);
     settings.regularMeals = collectRegularMealRows();
+    settings.typicalMeals = collectTypicalMeals();
+    const targets = { male: { ...settings.nutritionTargets.male }, female: { ...settings.nutritionTargets.female } };
+    document.querySelectorAll('#targets-grid [data-tgt]').forEach(inp => {
+      const [person, key] = inp.dataset.tgt.split(':');
+      const v = Number(inp.value);
+      if (targets[person] && Number.isFinite(v) && v >= 0) targets[person][key] = v;
+    });
+    settings.nutritionTargets = targets;
     settings.notifyTime = document.getElementById('set-notify-time').value || '08:00';
     saveSettings();
 
@@ -3682,7 +3876,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
           collect: () => settings,
           apply: (data) => {
             if (!data) return;
-            settings = { ...SETTINGS_DEFAULTS, ...data };
+            settings = normaliseSettings(data);
             localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
           },
           merge: (local, server) => ({ ...(server || {}), ...(local || {}) })
@@ -3702,6 +3896,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
 
   function init() {
     loadState();
+    loadStatsPrefs();
     syncRef = createSyncEngine();
 
     function finishInit() {
@@ -3879,11 +4074,31 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
 
     document.getElementById('recipes-btn')?.addEventListener('click', () => showAppPanel('recipes'));
     document.getElementById('close-recipes-btn')?.addEventListener('click', () => showAppPanel('planner'));
+
+    document.querySelector('.stats-panel')?.addEventListener('click', (e) => {
+      const pBtn = e.target.closest('.stats-person');
+      if (pBtn) { statsPerson = pBtn.dataset.person; saveStatsPrefs(); renderStats(); return; }
+      const vBtn = e.target.closest('.stats-view');
+      if (vBtn) { statsView = vBtn.dataset.view; saveStatsPrefs(); renderStats(); return; }
+      const chip = e.target.closest('[data-metric-toggle]');
+      if (chip) {
+        const k = chip.dataset.metricToggle;
+        statsHidden = statsHidden.includes(k) ? statsHidden.filter(x => x !== k) : [...statsHidden, k];
+        saveStatsPrefs(); renderStats(); return;
+      }
+      if (e.target.closest('#stats-edit-targets')) openSettingsModal();
+    });
     document.getElementById('settings-btn')?.addEventListener('click', openSettingsModal);
     document.getElementById('sync-status')?.addEventListener('click', onSyncChipClick);
     document.getElementById('sync-now-btn')?.addEventListener('click', syncNow);
     document.getElementById('settings-form')?.addEventListener('submit', handleSettingsSave);
     document.getElementById('settings-cancel')?.addEventListener('click', () => closeOverlay('settings-overlay'));
+    document.getElementById('typical-meals')?.addEventListener('change', (e) => {
+      const sel = e.target.closest('.typical-source');
+      if (!sel) return;
+      const custom = sel.closest('.typical-row')?.querySelector('.typical-custom');
+      if (custom) custom.hidden = sel.value !== 'custom';
+    });
     document.getElementById('enable-reminders-btn')?.addEventListener('click', async () => {
       const note = document.getElementById('reminders-note');
       try {
@@ -3985,6 +4200,203 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     initMobileTabs();
   }
 
+  // --- Stats: weekly nutrition overview ---
+  const STATS_PREFS = 'mealPlanner_statsPrefs';
+  let statsPerson = 'male';      // which target set to compare against (local, per device)
+  let statsView = 'average';     // 'average' | 'lights' | 'totals'
+  let statsHidden = [];          // metric keys the user has hidden
+
+  const METRIC_META = {
+    kcal:    { label: 'Energy',      unit: 'kcal', kind: 'range' },
+    protein: { label: 'Protein',     unit: 'g',    kind: 'min'   },
+    carbs:   { label: 'Carbs',       unit: 'g',    kind: 'range' },
+    sugar:   { label: 'Free sugars', unit: 'g',    kind: 'max'   },
+    fat:     { label: 'Fat',         unit: 'g',    kind: 'max'   },
+    satFat:  { label: 'Saturates',   unit: 'g',    kind: 'max'   },
+    fibre:   { label: 'Fibre',       unit: 'g',    kind: 'min'   },
+    salt:    { label: 'Salt',        unit: 'g',    kind: 'max'   }
+  };
+  // The 7 headline metrics (saturates is shown as a sub-line under fat).
+  const STATS_METRICS = ['kcal', 'protein', 'carbs', 'sugar', 'fat', 'fibre', 'salt'];
+
+  function loadStatsPrefs() {
+    try {
+      const p = JSON.parse(localStorage.getItem(STATS_PREFS) || '{}');
+      if (p.person === 'male' || p.person === 'female') statsPerson = p.person;
+      if (['average', 'lights', 'totals'].includes(p.view)) statsView = p.view;
+      if (Array.isArray(p.hidden)) statsHidden = p.hidden.filter(k => STATS_METRICS.includes(k));
+    } catch (_) {}
+  }
+  function saveStatsPrefs() {
+    localStorage.setItem(STATS_PREFS, JSON.stringify({ person: statsPerson, view: statsView, hidden: statsHidden }));
+  }
+
+  // Per-serving nutrition for a planned slot (meal, its linked recipe, or a leftovers source).
+  function nutritionForPlanned(mealName, variantName) {
+    if (!mealName) return null;
+    if (isLeftoversName(mealName)) {
+      if (!variantName) return null;
+      const base = String(variantName).replace(/\s*\(.*\)$/, '').trim();
+      const src = getMealByName(base) || getMealByName(variantName);
+      return src && src.nutrition ? src.nutrition : null;
+    }
+    const meal = getMealByName(mealName);
+    if (meal && meal.nutrition) return meal.nutrition;
+    const rec = (state.recipes || []).find(r => r.mealName === mealName && r.nutrition);
+    return rec ? rec.nutrition : null;
+  }
+
+  function computeStats() {
+    const days = planDays();
+    const tm = settings.typicalMeals || {};
+    const perDay = [];
+    let plannedCovered = 0, plannedTotal = 0, countedMeals = 0;
+    const mealList = [];
+    for (const day of days) {
+      const totals = {};
+      NUTRITION_KEYS.forEach(k => { totals[k] = 0; });
+      const filled = new Set();
+      for (const mealType of getSlotsForDay(day)) {
+        const name = getPlannedMeal(day, mealType);
+        if (!name) continue;
+        filled.add(mealType);
+        plannedTotal++;
+        const variant = getPlannedVariant(day, mealType);
+        const side = getPlannedSide(day, mealType);
+        const n = nutritionForPlanned(name, variant);
+        mealList.push({ day, mealType, label: plannedDisplayName(name, variant, side), n, typical: false });
+        if (n) { plannedCovered++; countedMeals++; NUTRITION_KEYS.forEach(k => { totals[k] += Number(n[k] || 0); }); }
+      }
+      // Typical background meals fill the slots you don't plan (never double-counted).
+      const addTypical = (slotType, entry) => {
+        if (!entry || !entry.nutrition || filled.has(slotType)) return;
+        countedMeals++;
+        NUTRITION_KEYS.forEach(k => { totals[k] += Number(entry.nutrition[k] || 0); });
+        mealList.push({ day, mealType: slotType, label: `${entry.label} · typical`, n: entry.nutrition, typical: true });
+      };
+      addTypical('Breakfast', isWeekendDay(day) ? tm.breakfastWeekend : tm.breakfastWeekday);
+      addTypical('Lunch', tm.lunch);
+      perDay.push({ day, totals });
+    }
+    const activeDays = perDay.filter(d => NUTRITION_KEYS.some(k => d.totals[k] > 0));
+    const avg = {}, total = {};
+    NUTRITION_KEYS.forEach(k => {
+      total[k] = perDay.reduce((s, d) => s + d.totals[k], 0);
+      avg[k] = activeDays.length ? total[k] / activeDays.length : 0;
+    });
+    const hasTypical = !!(tm.breakfastWeekday || tm.breakfastWeekend || tm.lunch);
+    return { days, perDay, plannedCovered, plannedTotal, countedMeals, activeDays: activeDays.length, avg, total, mealList, hasTypical };
+  }
+
+  // Traffic-light status for a metric vs its daily target.
+  function metricStatus(key, value, target) {
+    if (!target) return { level: 'na', word: '' };
+    const pct = value / target;
+    const kind = METRIC_META[key].kind;
+    if (kind === 'min') {
+      if (pct >= 0.95) return { level: 'good', word: 'good' };
+      if (pct >= 0.7)  return { level: 'amber', word: 'a little low' };
+      return { level: 'bad', word: 'low' };
+    }
+    if (kind === 'max') {
+      if (pct <= 1.0) return { level: 'good', word: 'within guide' };
+      if (pct <= 1.2) return { level: 'amber', word: 'a bit high' };
+      return { level: 'bad', word: 'high' };
+    }
+    if (pct >= 0.8 && pct <= 1.1) return { level: 'good', word: 'on track' };
+    if (pct >= 0.7 && pct <= 1.3) return { level: 'amber', word: 'slightly off' };
+    return { level: 'bad', word: pct > 1 ? 'high' : 'low' };
+  }
+
+  function fmtStat(v, key) {
+    if (key === 'kcal') return Math.round(v).toLocaleString();
+    return v >= 10 ? String(Math.round(v)) : String(Math.round(v * 10) / 10);
+  }
+
+  function renderStats() {
+    const body = document.getElementById('stats-body');
+    if (!body) return;
+    document.querySelectorAll('.stats-person').forEach(b => b.classList.toggle('active', b.dataset.person === statsPerson));
+    document.querySelectorAll('.stats-view').forEach(b => b.classList.toggle('active', b.dataset.view === statsView));
+
+    const targets = (settings.nutritionTargets || SETTINGS_DEFAULTS.nutritionTargets)[statsPerson] || {};
+    const s = computeStats();
+    const coverage = document.getElementById('stats-coverage');
+    const nudge = document.getElementById('stats-nudge');
+    const metricToggles = document.getElementById('stats-metric-toggles');
+    const list = document.getElementById('stats-meal-list');
+
+    if (metricToggles) {
+      metricToggles.innerHTML = STATS_METRICS.map(k =>
+        `<label><input type="checkbox" data-metric-toggle="${k}" ${statsHidden.includes(k) ? '' : 'checked'}>${escapeHtml(METRIC_META[k].label)}</label>`
+      ).join('');
+    }
+
+    if (s.plannedTotal === 0) {
+      if (coverage) coverage.textContent = '';
+      if (nudge) nudge.hidden = true;
+      body.innerHTML = '<div class="stats-empty">Plan some meals, then come back to see your week’s nutrition.</div>';
+      if (list) list.innerHTML = '';
+      return;
+    }
+
+    // If a day only describes a dinner (no typical breakfast/lunch), the total
+    // naturally sits below a full-day guide — say so rather than flashing red.
+    const mealsPerDay = s.countedMeals / Math.max(1, s.days.length);
+    const partialDay = mealsPerDay < 2.5;
+    if (coverage) {
+      const missing = s.plannedCovered < s.plannedTotal;
+      coverage.innerHTML = `${s.plannedCovered} of ${s.plannedTotal} planned meals counted${missing ? ' · free-text meals have no info yet' : ''}${s.hasTypical ? ' · plus your typical breakfast/lunch' : ''}. You both eat the same plan, so only the target differs.`
+        + (partialDay ? '<span class="stats-caveat">Mostly dinners — set a regular breakfast &amp; lunch under Settings → Typical day so the totals reflect your whole day.</span>' : '');
+    }
+
+    if (nudge) {
+      const ps = metricStatus('protein', s.avg.protein, targets.protein);
+      // Only nudge on protein when the plan actually covers most of the day,
+      // otherwise "low protein" is just an artefact of tracking dinners only.
+      if (!partialDay && (ps.level === 'amber' || ps.level === 'bad')) {
+        nudge.hidden = false;
+        nudge.innerHTML = `💪 Protein is ${escapeHtml(ps.word)} this week. A few more protein-rich meals (eggs, fish, beans, chicken, Greek yoghurt) would help reach the ${fmtStat(targets.protein, 'protein')}g guide.`;
+      } else nudge.hidden = true;
+    }
+
+    const visible = STATS_METRICS.filter(k => !statsHidden.includes(k));
+
+    if (statsView === 'lights') {
+      body.innerHTML = visible.map(k => {
+        const st = metricStatus(k, s.avg[k], targets[k]);
+        const u = METRIC_META[k].unit === 'g' ? 'g' : '';
+        return `<div class="stat-light stat-${st.level}"><span class="stat-light-dot"></span><span class="stat-light-label">${escapeHtml(METRIC_META[k].label)}</span><span class="stat-light-word">${escapeHtml(st.word)}</span><span class="stat-light-val">${fmtStat(s.avg[k], k)}${u}/day</span></div>`;
+      }).join('');
+    } else if (statsView === 'totals') {
+      const n = s.days.length;
+      body.innerHTML = `<p class="stats-sub">Totals across the next ${n} day${n === 1 ? '' : 's'} you’ve planned.</p>` + visible.map(k => {
+        const u = METRIC_META[k].unit === 'g' ? 'g' : ' kcal';
+        return `<div class="stat-row stat-total-row"><span class="stat-row-label">${escapeHtml(METRIC_META[k].label)}</span><span class="stat-row-val">${fmtStat(s.total[k], k)}${u}</span><span class="stat-row-sub">≈ ${fmtStat(s.avg[k], k)}${u}/day</span></div>`;
+      }).join('');
+    } else {
+      body.innerHTML = visible.map(k => {
+        const st = metricStatus(k, s.avg[k], targets[k]);
+        const tgt = targets[k] || 0;
+        const pct = tgt ? Math.min(100, Math.round(s.avg[k] / tgt * 100)) : 0;
+        const u = METRIC_META[k].unit === 'g' ? 'g' : '';
+        let sub = '';
+        if (k === 'fat') {
+          const sst = metricStatus('satFat', s.avg.satFat, targets.satFat);
+          sub = `<div class="stat-subline stat-${sst.level}">of which saturates ${fmtStat(s.avg.satFat, 'satFat')}g <span class="stat-target">/ ${fmtStat(targets.satFat, 'satFat')}g</span></div>`;
+        }
+        return `<div class="stat-row stat-${st.level}"><div class="stat-row-head"><span class="stat-row-label">${escapeHtml(METRIC_META[k].label)}</span><span class="stat-row-val">${fmtStat(s.avg[k], k)}${u} <span class="stat-target">/ ${fmtStat(tgt, k)}${u}</span></span></div><div class="stat-bar"><div class="stat-bar-fill" style="width:${pct}%"></div></div>${sub}</div>`;
+      }).join('');
+    }
+
+    if (list) {
+      list.innerHTML = s.mealList.map(m => {
+        const macros = m.n ? `${fmtStat(m.n.kcal, 'kcal')} kcal · ${fmtStat(m.n.protein, 'protein')}g protein` : 'no info yet';
+        return `<div class="stats-meal-row${m.n ? '' : ' no-info'}${m.typical ? ' typical' : ''}"><span class="stats-meal-day">${escapeHtml(dayAbbrev(m.day))} ${escapeHtml(m.mealType)}</span><span class="stats-meal-name">${escapeHtml(m.label)}</span><span class="stats-meal-macros">${macros}</span></div>`;
+      }).join('');
+    }
+  }
+
   let currentPanel = null;
 
   function showAppPanel(name) {
@@ -3999,7 +4411,8 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       planner: document.querySelector('.planner'),
       sidebar: document.querySelector('.sidebar'),
       recipes: document.querySelector('.recipes-panel'),
-      shopping: document.querySelector('.shopping-panel')
+      shopping: document.querySelector('.shopping-panel'),
+      stats: document.querySelector('.stats-panel')
     };
     Object.entries(panels).forEach(([key, panel]) => {
       if (panel) panel.classList.toggle('mobile-visible', key === name);
@@ -4008,6 +4421,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
       tab.classList.toggle('active', tab.dataset.tab === name);
     });
     if (name === 'recipes') renderRecipes();
+    if (name === 'stats') renderStats();
   }
 
   function initMobileTabs() {

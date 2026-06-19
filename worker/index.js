@@ -59,6 +59,7 @@ async function scrapeRecipe(targetUrl) {
       steps: normaliseSteps(recipe.recipeInstructions),
       imageUrl: normaliseImage(recipe.image),
       servings: normaliseServings(recipe.recipeYield),
+      nutrition: normaliseLdNutrition(recipe.nutrition),
       sourceUrl: recipe.url || targetUrl,
       partial: false
     };
@@ -140,6 +141,40 @@ function normaliseServings(raw) {
   const str = Array.isArray(raw) ? raw[0] : String(raw);
   const m = String(str).match(/(\d+)/);
   return m ? parseInt(m[1], 10) : null;
+}
+
+// schema.org NutritionInformation is per serving. Pull the figures we track and
+// convert sodium → salt (salt_g = sodium × 2.5). Strings like "23 g" / "520 mg".
+function parseNutritionNumber(v) {
+  if (v == null) return null;
+  const m = String(v).match(/-?\d+(?:\.\d+)?/);
+  return m ? parseFloat(m[0]) : null;
+}
+
+function normaliseLdNutrition(raw) {
+  if (!raw || typeof raw !== 'object') return null;
+  const out = {};
+  const round1 = (n) => Math.round(n * 10) / 10;
+  const kcal = parseNutritionNumber(raw.calories);
+  if (kcal != null) out.kcal = Math.round(kcal);
+  const map = {
+    protein: raw.proteinContent,
+    carbs: raw.carbohydrateContent,
+    sugar: raw.sugarContent,
+    fat: raw.fatContent,
+    satFat: raw.saturatedFatContent,
+    fibre: raw.fiberContent != null ? raw.fiberContent : raw.fibreContent
+  };
+  for (const [k, v] of Object.entries(map)) {
+    const n = parseNutritionNumber(v);
+    if (n != null) out[k] = round1(n);
+  }
+  const sodium = parseNutritionNumber(raw.sodiumContent);
+  if (sodium != null) {
+    const grams = /\bmg\b|milligram/i.test(String(raw.sodiumContent)) ? sodium / 1000 : sodium;
+    out.salt = round1(grams * 2.5);
+  }
+  return Object.keys(out).length ? { ...out, basis: 'scraped' } : null;
 }
 
 function extractMeta(html, property) {

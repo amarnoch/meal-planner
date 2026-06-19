@@ -44,6 +44,7 @@
     <button type="button" class="mobile-tab" data-tab="sidebar">Meals</button>
     <button type="button" class="mobile-tab" data-tab="recipes">Recipes</button>
     <button type="button" class="mobile-tab" data-tab="shopping">Shopping</button>
+    <button type="button" class="mobile-tab" data-tab="stats">Nutrition</button>
   </nav>
 
   <main class="app-main">
@@ -98,6 +99,34 @@
         </div>
       </div>
       <div id="shopping-list" class="shopping-list" role="list"></div>
+    </section>
+
+    <!-- Stats: weekly nutrition overview -->
+    <section class="stats-panel" aria-label="Nutrition stats">
+      <div class="stats-header">
+        <h2>Nutrition</h2>
+        <div class="stats-person-toggle" role="group" aria-label="Whose targets">
+          <button type="button" class="stats-person active" data-person="male">Andy</button>
+          <button type="button" class="stats-person" data-person="female">Laura</button>
+        </div>
+      </div>
+      <div class="stats-view-toggle" role="group" aria-label="View">
+        <button type="button" class="stats-view active" data-view="average">Average day</button>
+        <button type="button" class="stats-view" data-view="lights">Traffic lights</button>
+        <button type="button" class="stats-view" data-view="totals">Totals</button>
+      </div>
+      <p id="stats-coverage" class="stats-coverage"></p>
+      <div id="stats-nudge" class="stats-nudge" hidden></div>
+      <div id="stats-body" class="stats-body"></div>
+      <details class="stats-customise">
+        <summary>Show/hide metrics</summary>
+        <div id="stats-metric-toggles" class="quick-days-row"></div>
+      </details>
+      <details class="stats-meals">
+        <summary>Per-meal breakdown</summary>
+        <div id="stats-meal-list" class="stats-meal-list"></div>
+      </details>
+      <p class="stats-foot">Guides are NHS daily reference intakes. <button type="button" class="link-btn" id="stats-edit-targets">Edit targets</button></p>
     </section>
   </main>
 
@@ -242,6 +271,20 @@
         <input type="url" id="rf-image" placeholder="https://…">
         <label for="rf-source">Source URL (optional)</label>
         <input type="url" id="rf-source" placeholder="https://…">
+        <details class="rf-nutrition">
+          <summary>Nutrition per serving (optional)</summary>
+          <p class="form-hint">Fill these to set or override the figures used in the Nutrition tab. Recipe imports fill them automatically when the site provides them.</p>
+          <div class="rf-nutrition-grid">
+            <label>Energy (kcal)<input type="number" min="0" step="any" id="rf-n-kcal"></label>
+            <label>Protein (g)<input type="number" min="0" step="any" id="rf-n-protein"></label>
+            <label>Carbs (g)<input type="number" min="0" step="any" id="rf-n-carbs"></label>
+            <label>Free sugars (g)<input type="number" min="0" step="any" id="rf-n-sugar"></label>
+            <label>Fat (g)<input type="number" min="0" step="any" id="rf-n-fat"></label>
+            <label>Saturates (g)<input type="number" min="0" step="any" id="rf-n-satFat"></label>
+            <label>Fibre (g)<input type="number" min="0" step="any" id="rf-n-fibre"></label>
+            <label>Salt (g)<input type="number" min="0" step="any" id="rf-n-salt"></label>
+          </div>
+        </details>
         <label class="meal-quick-label">
           <input type="checkbox" id="rf-add-to-meals" checked>
           Also add to the meal library (so it can be planned)
@@ -332,6 +375,14 @@
           <label><input type="checkbox" value="quick">Quick</label>
           <label><input type="checkbox" value="leftovers">Leftovers</label>
         </div>
+
+        <h3 class="settings-section-title">Typical day</h3>
+        <p class="form-hint">A regular breakfast &amp; lunch so Nutrition reflects your whole day. These count in the Nutrition tab but never show on the planner.</p>
+        <div id="typical-meals" class="typical-meals"></div>
+
+        <h3 class="settings-section-title">Nutrition targets</h3>
+        <p class="form-hint">Daily guides shown on the Nutrition tab. Defaults are NHS reference intakes — change to suit you.</p>
+        <div id="targets-grid" class="targets-grid"></div>
 
         <h3 class="settings-section-title">Sync between phones</h3>
         <label for="set-family-key">Family key</label>
