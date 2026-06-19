@@ -4086,6 +4086,9 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         statsHidden = statsHidden.includes(k) ? statsHidden.filter(x => x !== k) : [...statsHidden, k];
         saveStatsPrefs(); renderStats(); return;
       }
+      if (e.target.closest('[data-rec-reset]')) { statsRecMetric = null; renderStats(); return; }
+      const mRow = e.target.closest('[data-metric]');
+      if (mRow) { const mk = mRow.dataset.metric; statsRecMetric = statsRecMetric === mk ? null : mk; renderStats(); return; }
       if (e.target.closest('#stats-edit-targets')) openSettingsModal();
     });
     document.getElementById('settings-btn')?.addEventListener('click', openSettingsModal);
@@ -4205,6 +4208,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
   let statsPerson = 'male';      // which target set to compare against (local, per device)
   let statsView = 'average';     // 'average' | 'lights' | 'totals'
   let statsHidden = [];          // metric keys the user has hidden
+  let statsRecMetric = null;     // metric tapped for a specific tip (transient, not persisted)
 
   const METRIC_META = {
     kcal:    { label: 'Energy',      unit: 'kcal', kind: 'range' },
@@ -4313,6 +4317,46 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     return v >= 10 ? String(Math.round(v)) : String(Math.round(v * 10) / 10);
   }
 
+  // Direction of a metric's deviation from target: 'high' (over a cap / over range) or 'low'.
+  function issueDirection(key, avg, target) {
+    const kind = METRIC_META[key].kind;
+    if (kind === 'max') return 'high';
+    if (kind === 'min') return 'low';
+    return avg > target ? 'high' : 'low';
+  }
+
+  // Plain-English tip for a metric given its status (dir matters for range metrics).
+  function metricAdvice(key, level, dir) {
+    const good = level === 'good';
+    switch (key) {
+      case 'protein': return good
+        ? { emoji: '💪', text: 'Protein’s on track — a good mix of meat, fish, eggs or beans.' }
+        : { emoji: '💪', text: 'Protein’s a bit low — add eggs, chicken, fish, beans, tofu or Greek yoghurt to a meal or two.' };
+      case 'fibre': return good
+        ? { emoji: '🌾', text: 'Fibre’s good — plenty of veg, beans and wholegrains.' }
+        : { emoji: '🌾', text: 'Fibre’s low — lean on wholegrains, beans, lentils, fruit and veg.' };
+      case 'sugar': return good
+        ? { emoji: '🍬', text: 'Free sugars are within the guide.' }
+        : { emoji: '🍬', text: 'Free sugars are high — fewer sweet bakes, desserts and sugary drinks; use fruit for sweetness.' };
+      case 'salt': return good
+        ? { emoji: '🧂', text: 'Salt’s within the guide.' }
+        : { emoji: '🧂', text: 'Salt’s high — fewer processed/takeaway meals, and go easy on sauces, stock and added salt.' };
+      case 'satFat': return good
+        ? { emoji: '🧈', text: 'Saturates are within the guide.' }
+        : { emoji: '🧈', text: 'Saturates are high — less butter, cream and cheese; leaner cuts and more fish.' };
+      case 'fat': return good
+        ? { emoji: '🫒', text: 'Fat’s within the guide.' }
+        : { emoji: '🫒', text: 'Fat’s a bit high — lighter cooking, less oil and cheese.' };
+      case 'carbs': return good
+        ? { emoji: '🍚', text: 'Carbs are about right.' }
+        : { emoji: '🍚', text: dir === 'high' ? 'Carbs are high — smaller rice, pasta and bread portions.' : 'Carbs are low — a bit more rice, pasta, potato or bread if you need the energy.' };
+      case 'kcal': return good
+        ? { emoji: '⚡', text: 'Energy’s about right for a typical day.' }
+        : { emoji: '⚡', text: dir === 'high' ? 'Energy’s above the guide — trim portions or pick lighter meals.' : 'Energy’s below the guide for a typical day — fine if you snack off-plan, or add a side.' };
+      default: return { emoji: '🍽️', text: '' };
+    }
+  }
+
   function renderStats() {
     const body = document.getElementById('stats-body');
     if (!body) return;
@@ -4350,29 +4394,55 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         + (partialDay ? '<span class="stats-caveat">Mostly dinners — set a regular breakfast &amp; lunch under Settings → Typical day so the totals reflect your whole day.</span>' : '');
     }
 
-    if (nudge) {
-      const ps = metricStatus('protein', s.avg.protein, targets.protein);
-      // Only nudge on protein when the plan actually covers most of the day,
-      // otherwise "low protein" is just an artefact of tracking dinners only.
-      if (!partialDay && (ps.level === 'amber' || ps.level === 'bad')) {
-        nudge.hidden = false;
-        nudge.innerHTML = `💪 Protein is ${escapeHtml(ps.word)} this week. A few more protein-rich meals (eggs, fish, beans, chicken, Greek yoghurt) would help reach the ${fmtStat(targets.protein, 'protein')}g guide.`;
-      } else nudge.hidden = true;
-    }
-
     const visible = STATS_METRICS.filter(k => !statsHidden.includes(k));
+    const personName = statsPerson === 'male' ? 'Andy' : 'Laura';
+
+    if (nudge) {
+      const selKey = (statsRecMetric && visible.includes(statsRecMetric)) ? statsRecMetric : null;
+      const PRIORITY = ['salt', 'sugar', 'satFat', 'protein', 'fibre', 'fat', 'kcal', 'carbs'];
+      if (selKey) {
+        // User tapped a specific metric — show its tip whatever the status.
+        const st = metricStatus(selKey, s.avg[selKey], targets[selKey]);
+        const dir = issueDirection(selKey, s.avg[selKey], targets[selKey]);
+        const a = metricAdvice(selKey, st.level, dir);
+        nudge.hidden = false;
+        nudge.innerHTML = `<div class="rec-head"><span class="rec-metric">${escapeHtml(METRIC_META[selKey].label)} · ${escapeHtml(st.word || 'on track')}</span><button type="button" class="rec-reset" data-rec-reset>‹ show what’s off</button></div><div class="rec-text">${a.emoji} ${escapeHtml(a.text)}</div>`;
+      } else {
+        // Auto: surface the most off-target metric for this person.
+        let pool = visible
+          .map(k => ({ k, st: metricStatus(k, s.avg[k], targets[k]), dir: issueDirection(k, s.avg[k], targets[k]) }))
+          .filter(c => c.st.level === 'amber' || c.st.level === 'bad');
+        // On a dinner-only day, lows are under-count artefacts — only flag highs.
+        if (partialDay) pool = pool.filter(c => c.dir === 'high');
+        pool.sort((a, b) => {
+          const lv = x => (x.st.level === 'bad' ? 0 : 1);
+          return lv(a) - lv(b) || PRIORITY.indexOf(a.k) - PRIORITY.indexOf(b.k);
+        });
+        const top = pool[0];
+        if (top) {
+          const a = metricAdvice(top.k, top.st.level, top.dir);
+          nudge.hidden = false;
+          nudge.innerHTML = `<div class="rec-text">${a.emoji} ${escapeHtml(a.text)}</div><div class="rec-hint">Tap a metric below for a specific tip.</div>`;
+        } else if (!partialDay) {
+          nudge.hidden = false;
+          nudge.innerHTML = `<div class="rec-text">✅ Looks balanced against ${escapeHtml(personName)}’s daily guides.</div><div class="rec-hint">Tap a metric below for a specific tip.</div>`;
+        } else {
+          nudge.hidden = true;
+        }
+      }
+    }
 
     if (statsView === 'lights') {
       body.innerHTML = visible.map(k => {
         const st = metricStatus(k, s.avg[k], targets[k]);
         const u = METRIC_META[k].unit === 'g' ? 'g' : '';
-        return `<div class="stat-light stat-${st.level}"><span class="stat-light-dot"></span><span class="stat-light-label">${escapeHtml(METRIC_META[k].label)}</span><span class="stat-light-word">${escapeHtml(st.word)}</span><span class="stat-light-val">${fmtStat(s.avg[k], k)}${u}/day</span></div>`;
+        return `<div class="stat-light stat-${st.level}${statsRecMetric === k ? ' is-selected' : ''}" data-metric="${k}"><span class="stat-light-dot"></span><span class="stat-light-label">${escapeHtml(METRIC_META[k].label)}</span><span class="stat-light-word">${escapeHtml(st.word)}</span><span class="stat-light-val">${fmtStat(s.avg[k], k)}${u}/day</span></div>`;
       }).join('');
     } else if (statsView === 'totals') {
       const n = s.days.length;
       body.innerHTML = `<p class="stats-sub">Totals across the next ${n} day${n === 1 ? '' : 's'} you’ve planned.</p>` + visible.map(k => {
         const u = METRIC_META[k].unit === 'g' ? 'g' : ' kcal';
-        return `<div class="stat-row stat-total-row"><span class="stat-row-label">${escapeHtml(METRIC_META[k].label)}</span><span class="stat-row-val">${fmtStat(s.total[k], k)}${u}</span><span class="stat-row-sub">≈ ${fmtStat(s.avg[k], k)}${u}/day</span></div>`;
+        return `<div class="stat-row stat-total-row${statsRecMetric === k ? ' is-selected' : ''}" data-metric="${k}"><span class="stat-row-label">${escapeHtml(METRIC_META[k].label)}</span><span class="stat-row-val">${fmtStat(s.total[k], k)}${u}</span><span class="stat-row-sub">≈ ${fmtStat(s.avg[k], k)}${u}/day</span></div>`;
       }).join('');
     } else {
       body.innerHTML = visible.map(k => {
@@ -4385,7 +4455,7 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
           const sst = metricStatus('satFat', s.avg.satFat, targets.satFat);
           sub = `<div class="stat-subline stat-${sst.level}">of which saturates ${fmtStat(s.avg.satFat, 'satFat')}g <span class="stat-target">/ ${fmtStat(targets.satFat, 'satFat')}g</span></div>`;
         }
-        return `<div class="stat-row stat-${st.level}"><div class="stat-row-head"><span class="stat-row-label">${escapeHtml(METRIC_META[k].label)}</span><span class="stat-row-val">${fmtStat(s.avg[k], k)}${u} <span class="stat-target">/ ${fmtStat(tgt, k)}${u}</span></span></div><div class="stat-bar"><div class="stat-bar-fill" style="width:${pct}%"></div></div>${sub}</div>`;
+        return `<div class="stat-row stat-${st.level}${statsRecMetric === k ? ' is-selected' : ''}" data-metric="${k}"><div class="stat-row-head"><span class="stat-row-label">${escapeHtml(METRIC_META[k].label)}</span><span class="stat-row-val">${fmtStat(s.avg[k], k)}${u} <span class="stat-target">/ ${fmtStat(tgt, k)}${u}</span></span></div><div class="stat-bar"><div class="stat-bar-fill" style="width:${pct}%"></div></div>${sub}</div>`;
       }).join('');
     }
 

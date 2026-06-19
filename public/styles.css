@@ -3043,13 +3043,20 @@ h1, h2, .recipe-detail-header h2, .recipe-card h3 {
 .stats-caveat { display: block; margin-top: 0.4rem; font-size: 0.76rem; font-style: italic; }
 
 .stats-nudge {
-  background: rgba(255, 180, 50, 0.14);
-  border: 1px solid rgba(255, 180, 50, 0.4);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-sm);
-  padding: 0.6rem 0.75rem;
+  padding: 0.7rem 0.85rem;
   font-size: 0.82rem;
   margin-bottom: 0.8rem;
 }
+.rec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; margin-bottom: 0.25rem; }
+.rec-metric { font-weight: 700; font-size: 0.78rem; }
+.rec-reset { background: none; border: none; color: var(--accent); font: inherit; font-size: 0.76rem; cursor: pointer; padding: 0; white-space: nowrap; }
+.rec-text { line-height: 1.4; }
+.rec-hint { margin-top: 0.35rem; font-size: 0.72rem; color: var(--text-muted); }
+.stat-row[data-metric], .stat-light[data-metric] { cursor: pointer; }
+.stat-row.is-selected, .stat-light.is-selected { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
 
 .stats-body { display: flex; flex-direction: column; gap: 0.75rem; }
 .stats-empty { color: var(--text-muted); text-align: center; padding: 2rem 1rem; }
