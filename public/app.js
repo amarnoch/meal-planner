@@ -32,7 +32,8 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     meatFreeDaysPerWeek: 2,
     longMealsWeekendOnly: true,
     avoidCarbRepeat: true,
-    weekendLunch: true,
+    // Which meal slots appear as rows in the planner. Each: 'off' | 'weekends' | 'daily'.
+    slotConfig: { Breakfast: 'off', Lunch: 'weekends', Dinner: 'daily' },
     notifyTime: '08:00',
     processedPerWeek: 1,
     summaryPills: ['meat', 'meatFree', 'salmon', 'carbs', 'processed'],
@@ -43,7 +44,17 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
   function loadSettings() {
     try {
       const raw = localStorage.getItem(STORAGE_SETTINGS);
-      if (raw) settings = { ...SETTINGS_DEFAULTS, ...JSON.parse(raw) };
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        settings = { ...SETTINGS_DEFAULTS, ...parsed };
+        // Deep-merge slotConfig so a partial saved config keeps defaults for any missing slot.
+        settings.slotConfig = { ...SETTINGS_DEFAULTS.slotConfig, ...(parsed.slotConfig || {}) };
+        // Migrate the old single weekendLunch flag into slotConfig.Lunch.
+        if (parsed.slotConfig === undefined && parsed.weekendLunch !== undefined) {
+          settings.slotConfig.Lunch = parsed.weekendLunch ? 'weekends' : 'off';
+        }
+        delete settings.weekendLunch;
+      }
     } catch (_) { settings = { ...SETTINGS_DEFAULTS }; }
   }
 
@@ -134,9 +145,15 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     potato: ['potato', 'potatoes', 'chips', 'fries', 'wedges', 'mash', 'jacket']
   };
 
-  // Slots: weekdays = dinner only; Sat/Sun = lunch + dinner (configurable)
+  // Meal slots shown in reading order. Which appear per day comes from settings.slotConfig.
+  const SLOT_ORDER = ['Breakfast', 'Lunch', 'Dinner'];
   function getSlotsForDay(dayKey) {
-    return (isWeekendDay(dayKey) && settings.weekendLunch) ? ['Lunch', 'Dinner'] : ['Dinner'];
+    const cfg = settings.slotConfig || SETTINGS_DEFAULTS.slotConfig;
+    const weekend = isWeekendDay(dayKey);
+    return SLOT_ORDER.filter(slot => {
+      const mode = cfg[slot] || 'off';
+      return mode === 'daily' || (mode === 'weekends' && weekend);
+    });
   }
 
   /** Reserved plan value for a leftovers slot. The "variant" stores what it's leftovers of. */
@@ -425,6 +442,7 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     const slots = [];
     for (const day of days) {
       for (const mealType of getSlotsForDay(day)) {
+        if (mealType === 'Breakfast') continue; // breakfast is a manual line item, never auto-filled
         slots.push({ day, mealType });
       }
     }
@@ -554,7 +572,7 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
 
     clearDay(day);
 
-    const daySlots = getSlotsForDay(day);
+    const daySlots = getSlotsForDay(day).filter(mt => mt !== 'Breakfast'); // breakfast stays manual
     const mealsForDay = (d) => getSlotsForDay(d)
       .map(mt => getMealByName(getPlannedMeal(d, mt)))
       .filter(Boolean);
@@ -2057,7 +2075,10 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
     const overlay = document.getElementById('settings-overlay');
     if (!overlay) return;
     document.getElementById('set-horizon').value = String(settings.horizonDays);
-    document.getElementById('set-weekend-lunch').checked = !!settings.weekendLunch;
+    const slotCfg = settings.slotConfig || SETTINGS_DEFAULTS.slotConfig;
+    document.getElementById('set-slot-breakfast').value = slotCfg.Breakfast || 'off';
+    document.getElementById('set-slot-lunch').value = slotCfg.Lunch || 'weekends';
+    document.getElementById('set-slot-dinner').value = slotCfg.Dinner || 'daily';
     document.querySelectorAll('#set-quick-days input[type="checkbox"]').forEach(cb => {
       cb.checked = (settings.quickDays || []).includes(cb.value);
     });
@@ -2166,7 +2187,11 @@ import { canUsePush, isStandalone, enableReminders, remindersEnabled, revalidate
   function handleSettingsSave(e) {
     e.preventDefault();
     settings.horizonDays = Number(document.getElementById('set-horizon').value) || 7;
-    settings.weekendLunch = document.getElementById('set-weekend-lunch').checked;
+    settings.slotConfig = {
+      Breakfast: document.getElementById('set-slot-breakfast').value,
+      Lunch: document.getElementById('set-slot-lunch').value,
+      Dinner: document.getElementById('set-slot-dinner').value
+    };
     settings.quickDays = [...document.querySelectorAll('#set-quick-days input:checked')].map(cb => cb.value);
     settings.salmonPerWeek = Number(document.getElementById('set-salmon').value) || 0;
     settings.meatFreeDaysPerWeek = Number(document.getElementById('set-meatfree').value) || 0;

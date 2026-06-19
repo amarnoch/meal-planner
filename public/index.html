@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>The Pantry</title>
   <link rel="icon" type="image/png" sizes="192x192" href="mp-touch-192.png">
   <link rel="apple-touch-icon" sizes="180x180" href="mp-touch-180.png">
@@ -12,6 +12,10 @@
   <link rel="apple-touch-icon-precomposed" href="mp-touch-180.png">
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="The Pantry">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -264,10 +268,22 @@
           <option value="10">10 days</option>
           <option value="14">2 weeks</option>
         </select>
-        <label class="meal-quick-label">
-          <input type="checkbox" id="set-weekend-lunch">
-          Plan lunches on weekends
-        </label>
+        <label>Meal slots</label>
+        <p class="form-hint">Which meals show as rows in the planner. Breakfast is a manual line — Random week only fills lunch &amp; dinner.</p>
+        <div class="slot-config">
+          <div class="slot-config-row">
+            <span class="slot-config-name">Breakfast</span>
+            <select id="set-slot-breakfast"><option value="off">Off</option><option value="weekends">Weekends</option><option value="daily">Every day</option></select>
+          </div>
+          <div class="slot-config-row">
+            <span class="slot-config-name">Lunch</span>
+            <select id="set-slot-lunch"><option value="off">Off</option><option value="weekends">Weekends</option><option value="daily">Every day</option></select>
+          </div>
+          <div class="slot-config-row">
+            <span class="slot-config-name">Dinner</span>
+            <select id="set-slot-dinner"><option value="off">Off</option><option value="weekends">Weekends</option><option value="daily">Every day</option></select>
+          </div>
+        </div>
         <label>Quick-meal days (busy evenings)</label>
         <div id="set-quick-days" class="quick-days-row">
           <label><input type="checkbox" value="Monday">Mon</label>
