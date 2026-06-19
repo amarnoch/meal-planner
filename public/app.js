@@ -4325,36 +4325,62 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
     return avg > target ? 'high' : 'low';
   }
 
-  // Plain-English tip for a metric given its status (dir matters for range metrics).
+  // Plain-English tip for a metric given its status. Returns the status clause
+  // (issue) and the suggested fix separately so a "worst day" callout can slot between.
   function metricAdvice(key, level, dir) {
     const good = level === 'good';
     switch (key) {
       case 'protein': return good
-        ? { emoji: '💪', text: 'Protein’s on track — a good mix of meat, fish, eggs or beans.' }
-        : { emoji: '💪', text: 'Protein’s a bit low — add eggs, chicken, fish, beans, tofu or Greek yoghurt to a meal or two.' };
+        ? { emoji: '💪', issue: 'Protein’s on track', fix: '' }
+        : { emoji: '💪', issue: 'Protein’s a bit low', fix: 'Add eggs, chicken, fish, beans, tofu or Greek yoghurt that day.' };
       case 'fibre': return good
-        ? { emoji: '🌾', text: 'Fibre’s good — plenty of veg, beans and wholegrains.' }
-        : { emoji: '🌾', text: 'Fibre’s low — lean on wholegrains, beans, lentils, fruit and veg.' };
+        ? { emoji: '🌾', issue: 'Fibre’s good', fix: '' }
+        : { emoji: '🌾', issue: 'Fibre’s low', fix: 'Lean on wholegrains, beans, lentils, fruit and veg.' };
       case 'sugar': return good
-        ? { emoji: '🍬', text: 'Free sugars are within the guide.' }
-        : { emoji: '🍬', text: 'Free sugars are high — fewer sweet bakes, desserts and sugary drinks; use fruit for sweetness.' };
+        ? { emoji: '🍬', issue: 'Free sugars are within the guide', fix: '' }
+        : { emoji: '🍬', issue: 'Free sugars are high', fix: 'Fewer sweet bakes, desserts and sugary drinks — use fruit for sweetness.' };
       case 'salt': return good
-        ? { emoji: '🧂', text: 'Salt’s within the guide.' }
-        : { emoji: '🧂', text: 'Salt’s high — fewer processed/takeaway meals, and go easy on sauces, stock and added salt.' };
+        ? { emoji: '🧂', issue: 'Salt’s within the guide', fix: '' }
+        : { emoji: '🧂', issue: 'Salt’s high', fix: 'Fewer processed/takeaway meals, and go easy on sauces, stock and added salt.' };
       case 'satFat': return good
-        ? { emoji: '🧈', text: 'Saturates are within the guide.' }
-        : { emoji: '🧈', text: 'Saturates are high — less butter, cream and cheese; leaner cuts and more fish.' };
+        ? { emoji: '🧈', issue: 'Saturates are within the guide', fix: '' }
+        : { emoji: '🧈', issue: 'Saturates are high', fix: 'Less butter, cream and cheese; leaner cuts and more fish.' };
       case 'fat': return good
-        ? { emoji: '🫒', text: 'Fat’s within the guide.' }
-        : { emoji: '🫒', text: 'Fat’s a bit high — lighter cooking, less oil and cheese.' };
+        ? { emoji: '🫒', issue: 'Fat’s within the guide', fix: '' }
+        : { emoji: '🫒', issue: 'Fat’s a bit high', fix: 'Lighter cooking, less oil and cheese.' };
       case 'carbs': return good
-        ? { emoji: '🍚', text: 'Carbs are about right.' }
-        : { emoji: '🍚', text: dir === 'high' ? 'Carbs are high — smaller rice, pasta and bread portions.' : 'Carbs are low — a bit more rice, pasta, potato or bread if you need the energy.' };
+        ? { emoji: '🍚', issue: 'Carbs are about right', fix: '' }
+        : { emoji: '🍚', issue: dir === 'high' ? 'Carbs are high' : 'Carbs are low', fix: dir === 'high' ? 'Smaller rice, pasta and bread portions.' : 'A bit more rice, pasta, potato or bread if you need the energy.' };
       case 'kcal': return good
-        ? { emoji: '⚡', text: 'Energy’s about right for a typical day.' }
-        : { emoji: '⚡', text: dir === 'high' ? 'Energy’s above the guide — trim portions or pick lighter meals.' : 'Energy’s below the guide for a typical day — fine if you snack off-plan, or add a side.' };
-      default: return { emoji: '🍽️', text: '' };
+        ? { emoji: '⚡', issue: 'Energy’s about right', fix: '' }
+        : { emoji: '⚡', issue: dir === 'high' ? 'Energy’s above the guide' : 'Energy’s below the guide for a typical day', fix: dir === 'high' ? 'Trim portions or pick lighter meals.' : 'Fine if you snack off-plan, or add a side.' };
+      default: return { emoji: '🍽️', issue: '', fix: '' };
     }
+  }
+
+  // The day that most drives a metric's issue — lowest day for a "low" metric, highest for a "high" one.
+  function worstDayFor(perDay, key, dir) {
+    const active = (perDay || []).filter(d => NUTRITION_KEYS.some(kk => d.totals[kk] > 0));
+    if (!active.length) return null;
+    let best = active[0];
+    for (const d of active) {
+      if (dir === 'high' ? d.totals[key] > best.totals[key] : d.totals[key] < best.totals[key]) best = d;
+    }
+    return { day: best.day, val: best.totals[key] };
+  }
+
+  // Full recommendation sentence: "{emoji} {issue} — {Day} is the lowest/highest (N). {fix}"
+  function buildRecText(key, level, dir, perDay) {
+    const a = metricAdvice(key, level, dir);
+    let dayPart = '';
+    if (level !== 'good') {
+      const wd = worstDayFor(perDay, key, dir);
+      if (wd) {
+        const u = METRIC_META[key].unit === 'g' ? 'g' : ' kcal';
+        dayPart = ` — ${dayAbbrev(wd.day)} is ${dir === 'high' ? 'the highest' : 'your lowest'} (${fmtStat(wd.val, key)}${u})`;
+      }
+    }
+    return `${a.emoji} ${a.issue}${dayPart}.${a.fix ? ' ' + a.fix : ''}`;
   }
 
   function renderStats() {
@@ -4404,9 +4430,8 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         // User tapped a specific metric — show its tip whatever the status.
         const st = metricStatus(selKey, s.avg[selKey], targets[selKey]);
         const dir = issueDirection(selKey, s.avg[selKey], targets[selKey]);
-        const a = metricAdvice(selKey, st.level, dir);
         nudge.hidden = false;
-        nudge.innerHTML = `<div class="rec-head"><span class="rec-metric">${escapeHtml(METRIC_META[selKey].label)} · ${escapeHtml(st.word || 'on track')}</span><button type="button" class="rec-reset" data-rec-reset>‹ show what’s off</button></div><div class="rec-text">${a.emoji} ${escapeHtml(a.text)}</div>`;
+        nudge.innerHTML = `<div class="rec-head"><span class="rec-metric">${escapeHtml(METRIC_META[selKey].label)} · ${escapeHtml(st.word || 'on track')}</span><button type="button" class="rec-reset" data-rec-reset>‹ show what’s off</button></div><div class="rec-text">${escapeHtml(buildRecText(selKey, st.level, dir, s.perDay))}</div>`;
       } else {
         // Auto: surface the most off-target metric for this person.
         let pool = visible
@@ -4420,9 +4445,8 @@ ${notes || 'Paste/attach the screenshot or recipe notes here.'}`;
         });
         const top = pool[0];
         if (top) {
-          const a = metricAdvice(top.k, top.st.level, top.dir);
           nudge.hidden = false;
-          nudge.innerHTML = `<div class="rec-text">${a.emoji} ${escapeHtml(a.text)}</div><div class="rec-hint">Tap a metric below for a specific tip.</div>`;
+          nudge.innerHTML = `<div class="rec-text">${escapeHtml(buildRecText(top.k, top.st.level, top.dir, s.perDay))}</div><div class="rec-hint">Tap a metric below for a specific tip.</div>`;
         } else if (!partialDay) {
           nudge.hidden = false;
           nudge.innerHTML = `<div class="rec-text">✅ Looks balanced against ${escapeHtml(personName)}’s daily guides.</div><div class="rec-hint">Tap a metric below for a specific tip.</div>`;
