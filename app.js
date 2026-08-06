@@ -113,6 +113,23 @@
     return meal && containsKeyword(meal.meal_name || '', ['salmon']);
   }
 
+  /** Salads are lunch-y extras: manually plannable, but never auto-suggested. */
+  function isSaladMeal(meal) {
+    if (!meal) return false;
+    if ((meal.category || '').trim().toLowerCase() === 'salads') return true;
+    return containsKeyword(meal.meal_name || '', ['salad']);
+  }
+
+  function getMealCategory(meal) {
+    return ((meal && meal.category) || '').trim() || 'Uncategorized';
+  }
+
+  /** Pool for random fills: no salads, no takeaway/no-cook nights. */
+  function autoFillCandidates() {
+    const pool = state.meals.filter(m => !isSaladMeal(m) && !isTakeawayMeal(m));
+    return pool.length > 0 ? pool : state.meals.slice();
+  }
+
   function isTakeawayMeal(meal) {
     return meal && containsKeyword(meal.meal_name || '', ['takeaway', 'take away', 'take-out', 'take out', 'delivery', 'eating out', 'ready meal']);
   }
@@ -122,7 +139,7 @@
   }
 
   function isLongMeal(meal) {
-    return meal && containsKeyword(meal.meal_name || '', ['lasagna', 'lasagne', 'roast dinner', 'japanese curry', 'casserole', 'fish pie', 'paella']);
+    return meal && containsKeyword(meal.meal_name || '', ['lasagna', 'lasagne', 'roast dinner', 'japanese curry', 'casserole', 'pie', 'paella', 'stew']);
   }
 
   function mealCanBeMeatFree(meal) {
@@ -191,10 +208,22 @@
         slots.push({ day, mealType });
       }
     }
-    const salmonMeals = state.meals.filter(isSalmonMeal);
-    const meatFreeCandidates = state.meals.filter(mealCanBeMeatFree);
-    const quickMeals = state.meals.filter(isQuickMeal);
-    const salmonSlotIndex = salmonMeals.length > 0 ? Math.floor(Math.random() * slots.length) : -1;
+    const candidates = autoFillCandidates();
+    const salmonMeals = candidates.filter(isSalmonMeal);
+    const meatFreeCandidates = candidates.filter(mealCanBeMeatFree);
+    const quickMeals = candidates.filter(isQuickMeal);
+    const longMeals = candidates.filter(isLongMeal);
+
+    // One long-cook meal per week, on a weekend dinner — Sunday most weeks.
+    const longSlotDay = Math.random() < 0.7 ? 'Sunday' : 'Saturday';
+    const longSlotIndex = longMeals.length > 0
+      ? slots.findIndex(s => s.day === longSlotDay && s.mealType === 'Dinner')
+      : -1;
+    let salmonSlotIndex = -1;
+    if (salmonMeals.length > 0) {
+      const openIndices = slots.map((_, i) => i).filter(i => i !== longSlotIndex);
+      salmonSlotIndex = openIndices[Math.floor(Math.random() * openIndices.length)];
+    }
 
     for (const key of Object.keys(state.plan)) {
       delete state.plan[key];
@@ -210,36 +239,46 @@
     const usedMealNames = new Set();
     let prevCarbTypes = new Set();
     let prevMealCarbTypes = new Set();
-    const meatFreeDayIndices = new Set();
-    while (meatFreeDayIndices.size < 2 && meatFreeCandidates.length >= 1) {
-      meatFreeDayIndices.add(Math.floor(Math.random() * 7));
-    }
-    const shuffledMeals = shuffleArray(state.meals);
-    const nonSalmonMeals = shuffledMeals.filter(m => !isSalmonMeal(m));
-    const longMealDays = new Set();
+    let prevCategory = null;
+    const categoryCounts = {};
 
-    const allowedForDay = (m, d) => {
-      if (!isLongMeal(m)) return true;
-      if (d !== 'Saturday' && d !== 'Sunday') return false;
-      const prevDay = DAYS[DAYS.indexOf(d) - 1];
-      return !longMealDays.has(prevDay);
-    };
+    // Two meat-free days: not adjacent, avoiding the salmon and long-meal days.
+    // Relax constraints step by step if the week is too tight to satisfy them.
+    const salmonDay = salmonSlotIndex >= 0 ? DAYS.indexOf(slots[salmonSlotIndex].day) : -1;
+    const longDay = longSlotIndex >= 0 ? DAYS.indexOf(slots[longSlotIndex].day) : -1;
+    const meatFreeDayIndices = new Set();
+    if (meatFreeCandidates.length >= 1) {
+      const tiers = [
+        (d) => d !== salmonDay && d !== longDay && ![...meatFreeDayIndices].some(c => Math.abs(c - d) <= 1),
+        (d) => d !== salmonDay && d !== longDay && !meatFreeDayIndices.has(d),
+        (d) => !meatFreeDayIndices.has(d)
+      ];
+      for (const ok of tiers) {
+        while (meatFreeDayIndices.size < 2) {
+          const pool = [0, 1, 2, 3, 4, 5, 6].filter(ok);
+          if (pool.length === 0) break;
+          meatFreeDayIndices.add(pool[Math.floor(Math.random() * pool.length)]);
+        }
+        if (meatFreeDayIndices.size >= 2) break;
+      }
+    }
+
+    const shuffledMeals = shuffleArray(candidates);
+    const nonSalmonMeals = shuffledMeals.filter(m => !isSalmonMeal(m));
+    // Long meals live only in their reserved weekend slot.
+    const everydayMeals = nonSalmonMeals.filter(m => !isLongMeal(m));
     const notUsedThisWeek = (m) => !usedMealNames.has(m.meal_name);
 
     /** limitPool: only consider meals in this set after preferred is exhausted (e.g. meat-free days). */
-    function pickFromPool(preferred, day, allowRepeat, limitPool) {
+    function pickFromPool(preferred, limitPool) {
       const limit = limitPool || shuffledMeals;
-      const okUnused = (m) => allowedForDay(m, day) && notUsedThisWeek(m);
-      let pool = shuffleArray(preferred).filter(okUnused);
+      let pool = preferred.filter(notUsedThisWeek);
       if (pool.length > 0) return pool[Math.floor(Math.random() * pool.length)];
-      pool = shuffleArray(limit).filter(okUnused);
+      pool = limit.filter(notUsedThisWeek);
       if (pool.length > 0) return pool[Math.floor(Math.random() * pool.length)];
-      if (!allowRepeat) return null;
-      pool = shuffleArray(preferred).filter(m => allowedForDay(m, day));
-      if (pool.length > 0) return pool[Math.floor(Math.random() * pool.length)];
-      pool = shuffleArray(limit).filter(m => allowedForDay(m, day));
-      if (pool.length > 0) return pool[Math.floor(Math.random() * pool.length)];
-      return limit[0] || shuffledMeals[0] || null;
+      if (preferred.length > 0) return preferred[Math.floor(Math.random() * preferred.length)];
+      if (limit.length > 0) return limit[Math.floor(Math.random() * limit.length)];
+      return shuffledMeals[0] || null;
     }
 
     for (let i = 0; i < slots.length; i++) {
@@ -247,37 +286,45 @@
       const dayIndex = DAYS.indexOf(day);
       const needMeatFreeDay = meatFreeDayIndices.has(dayIndex);
       const isSalmonSlot = i === salmonSlotIndex;
+      const isLongSlot = i === longSlotIndex;
       const preferQuick = (day === 'Tuesday' || day === 'Thursday') && !isSalmonSlot;
 
-      let meal = null;
-      let variantName = undefined;
-      let sideName = undefined;
-
       const noCarbOverlap = (m) => hasNoCarbOverlap(m, prevMealCarbTypes);
+      const cuisineOk = (m) => {
+        const cat = getMealCategory(m);
+        return cat !== prevCategory && (categoryCounts[cat] || 0) < 2;
+      };
+      /** Preference tiers: carb + cuisine variety → carb variety only → anything in the pool. */
+      const bestOf = (pool) => {
+        let best = pool.filter(m => noCarbOverlap(m) && cuisineOk(m));
+        if (best.length === 0) best = pool.filter(noCarbOverlap);
+        return best.length > 0 ? best : pool;
+      };
 
-      if (isSalmonSlot && salmonMeals.length > 0) {
-        meal = pickFromPool(salmonMeals, day, true, salmonMeals);
+      let meal = null;
+      if (isLongSlot) {
+        meal = pickFromPool(bestOf(longMeals), longMeals);
+      } else if (isSalmonSlot && salmonMeals.length > 0) {
+        meal = pickFromPool(bestOf(salmonMeals), salmonMeals);
       } else if (needMeatFreeDay && meatFreeCandidates.length > 0) {
-        const mfNonSalmon = meatFreeCandidates.filter(m => !isSalmonMeal(m));
-        const preferred = mfNonSalmon.filter(noCarbOverlap);
-        meal = pickFromPool(preferred.length > 0 ? preferred : mfNonSalmon.length > 0 ? mfNonSalmon : nonSalmonMeals, day, true, nonSalmonMeals);
+        const mf = meatFreeCandidates.filter(m => !isSalmonMeal(m) && !isLongMeal(m));
+        meal = pickFromPool(bestOf(mf.length > 0 ? mf : everydayMeals), everydayMeals);
       } else if (preferQuick && quickMeals.length > 0) {
-        const quickNonSalmon = quickMeals.filter(m => !isSalmonMeal(m));
-        const preferred = quickNonSalmon.filter(noCarbOverlap);
-        meal = pickFromPool(preferred.length > 0 ? preferred : quickNonSalmon.length > 0 ? quickNonSalmon : nonSalmonMeals, day, true, nonSalmonMeals);
+        const quick = quickMeals.filter(m => !isSalmonMeal(m) && !isLongMeal(m));
+        meal = pickFromPool(bestOf(quick.length > 0 ? quick : everydayMeals), everydayMeals);
       } else {
-        const nonTakeawayNonSalmon = nonSalmonMeals.filter(m => !isTakeawayMeal(m));
-        const preferred = nonTakeawayNonSalmon.filter(noCarbOverlap);
-        meal = pickFromPool(preferred.length > 0 ? preferred : nonTakeawayNonSalmon.length > 0 ? nonTakeawayNonSalmon : nonSalmonMeals, day, true, nonSalmonMeals);
+        meal = pickFromPool(bestOf(everydayMeals), everydayMeals);
       }
       if (!meal) meal = shuffledMeals[0];
-      if (meal && isLongMeal(meal)) longMealDays.add(day);
 
       const needMeatFree = needMeatFreeDay && !isSalmonSlot;
-      ({ variantName, sideName } = pickRandomVariantAndSide(meal, prevCarbTypes, needMeatFree));
+      const { variantName, sideName } = pickRandomVariantAndSide(meal, prevCarbTypes, needMeatFree);
 
       setPlannedMeal(day, mealType, meal.meal_name, variantName, sideName);
       usedMealNames.add(meal.meal_name);
+      const cat = getMealCategory(meal);
+      categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+      prevCategory = cat;
       prevCarbTypes = getCarbTypes(meal, variantName, sideName);
       prevMealCarbTypes = getCarbTypes(meal, null, SIDE_NONE);
     }
@@ -299,7 +346,7 @@
     clearDay(day);
 
     const daySlots = getSlotsForDay(day);
-    const shuffledMeals = shuffleArray(state.meals);
+    const shuffledMeals = shuffleArray(autoFillCandidates());
     const dayHasLongMeal = (d) => getSlotsForDay(d).some(mt => {
       const name = getPlannedMeal(d, mt);
       return name && isLongMeal(state.meals.find(m => m.meal_name === name));
@@ -320,24 +367,26 @@
     };
     const usedToday = new Set();
     let prevCarbTypes = new Set();
-    // seed prevMealCarbTypes from the previous day's last planned meal
-    let prevMealCarbTypes = (() => {
-      if (!prevDay) return new Set();
+    // seed carb/cuisine context from the previous day's last planned meal
+    const prevDayMeal = (() => {
+      if (!prevDay) return null;
       const slots = getSlotsForDay(prevDay);
       const name = getPlannedMeal(prevDay, slots[slots.length - 1]);
-      if (!name) return new Set();
-      const m = state.meals.find(meal => meal.meal_name === name);
-      return m ? getCarbTypes(m, null, SIDE_NONE) : new Set();
+      if (!name) return null;
+      return state.meals.find(meal => meal.meal_name === name) || null;
     })();
+    let prevMealCarbTypes = prevDayMeal ? getCarbTypes(prevDayMeal, null, SIDE_NONE) : new Set();
+    let prevCategory = prevDayMeal ? getMealCategory(prevDayMeal) : null;
 
     for (const mealType of daySlots) {
       const preferQuick = (day === 'Tuesday' || day === 'Thursday') && daySlots.length === 1;
       const noCarbOverlap = (m) => hasNoCarbOverlap(m, prevMealCarbTypes);
+      const cuisineOk = (m) => getMealCategory(m) !== prevCategory;
 
-      let pool = shuffledMeals.filter(m => allowedForDay(m, day) && !usedToday.has(m.meal_name) && !isTakeawayMeal(m) && noCarbOverlap(m));
-      if (pool.length === 0) pool = shuffledMeals.filter(m => allowedForDay(m, day) && !usedToday.has(m.meal_name) && !isTakeawayMeal(m));
-      if (pool.length === 0) pool = shuffledMeals.filter(m => allowedForDay(m, day) && !isTakeawayMeal(m));
-      if (pool.length === 0) pool = shuffledMeals.filter(m => !isTakeawayMeal(m));
+      let pool = shuffledMeals.filter(m => allowedForDay(m, day) && !usedToday.has(m.meal_name) && noCarbOverlap(m) && cuisineOk(m));
+      if (pool.length === 0) pool = shuffledMeals.filter(m => allowedForDay(m, day) && !usedToday.has(m.meal_name) && noCarbOverlap(m));
+      if (pool.length === 0) pool = shuffledMeals.filter(m => allowedForDay(m, day) && !usedToday.has(m.meal_name));
+      if (pool.length === 0) pool = shuffledMeals.filter(m => allowedForDay(m, day));
       if (pool.length === 0) pool = shuffledMeals.slice();
 
       if (preferQuick) {
@@ -352,6 +401,7 @@
 
       setPlannedMeal(day, mealType, meal.meal_name, variantName, sideName);
       usedToday.add(meal.meal_name);
+      prevCategory = getMealCategory(meal);
       prevCarbTypes = getCarbTypes(meal, variantName, sideName);
       prevMealCarbTypes = getCarbTypes(meal, null, SIDE_NONE);
     }
